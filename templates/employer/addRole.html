@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+<div class="container-employer-85" >
+    <div class="row search-row">
+        <div class="col-md-12">
+
+            <div class="row">
+                <div class="col">
+                    <h5>New Role</h5>
+                </div>
+                <div class="col">
+                    <p style="text-align: right;">
+                        
+                    </p>
+                </div>
+            </div>
+            <br>
+            <form>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="roleName" placeholder="Dispatch">
+                    <label for="roleName">Role Name</label>
+                  </div>
+                  <p class="label">In a few sentences, describe the role and its responsibilites</p>
+                  <div class="form-floating">
+                    <textarea type="text" class="form-control" id="roleDesc" placeholder="Description"> </textarea>
+                  </div>
+
+                  <p class="label">What Modules Do You Wish to Include? (Select All That Apply)</p>
+                  <div class="card-group">
+                    {% for module in modules %}
+                    <div class="card-train" style="max-width: 18rem;">
+                        <div class="card-body">
+                        <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
+                        <h5 class="card-train-title">{{module['title']}}</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p style="text-align: right;">
+                    <a href="/company/roles" class="add-btn">Next</a>
+                </p>
+                
+            </form>
+
+            
+{% endblock %} 

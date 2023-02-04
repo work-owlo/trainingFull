@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+<div class="container-train">
+    <div class="row train-row">
+        <div class="col-md-12">
+            <h6 class="label">FedEx Driver</h6>
+            <h1>Welcome, Steve</h1>
+            <h6 class="train-text">Choose a module to onboard</h6>
+            <div class="card-group">
+                {% for module in modules %}
+                <a class="txt-dec" href="/">
+                    <div class="card-train" style="max-width: 18rem;">
+                        <div class="card-body">
+                        <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
+                        <h5 class="card-train-title">{{module['title']}}</h5>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

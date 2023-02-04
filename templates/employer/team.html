@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+<div class="container-employer" >
+    <div class="row search-row">
+        <div class="col-md-12">
+
+            <h5>Team</h5>
+
+            <!-- Search Bar -->
+            <div class="row g-2 inputs">
+                <div class="col-md">
+                    <div class="mb-3">
+                        <input type="text" class="form-control search-inputs" id="search-module" placeholder="Search">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select search-inputs" aria-label="Filter">
+                        <option selected>Filter</option>
+                        <option value="basic">Completed</option>
+                        <option value="invited">In Progress</option>
+                        <option value="completed">Pending</option>
+                        <option value="completed">Employee</option>
+                        <option value="completed">Contractor</option>
+                    </select>
+                </div>
+              </div>
+
+            <!-- Team Table -->
+            <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col" style="width:5rem">ID</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="invisible">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <form>
+                        <td> <input type="text" class="form-control team-input" id="member-id" placeholder="ID"></td>
+                        <td> <input type="text" class="form-control team-input" id="first-name" placeholder="First" required></td>
+                        <td> <input type="text" class="form-control team-input" id="last-name" placeholder="Last" required></td>
+                        <td> <input type="email" class="form-control team-input" id="email" placeholder="Email" required></td>
+                        <td><span class="type"> 
+                            
+                            <select class="form-select search-inputs" aria-label="Filter" required>
+                                <option value="dispatch">Dispatch</option>
+                                <option value="driver">Driver</option>
+                             </select>
+                        
+                        </span></td>
+
+                        <td><span class="type"> 
+                            
+                            <select class="form-select search-inputs" aria-label="Filter" required>
+                                <option value="employee">Employee</option>
+                                <option value="contractor">Contractor</option>
+                             </select>
+                        
+                        </span></td>
+                        <td colspan="2"><button type="submit" class="btn btn-success">Add Member</a></td>
+                        </form>
+                    </tr>
+                  {% for member in members %}
+                    <tr>
+                        <td scope="row">{{member['id']}}</td>
+                        <td>{{member['first_name']}}</td>
+                        <td>{{member['last_name']}}</td>
+                        <td >{{member['email']}}</td>
+                        <td >{{member['role']}}</td>
+                        <td><span class="type-{{member['type']|lower}}"> {{member['type']}} </span></td>
+                        <td><span class="status-{{member['status']|lower}}"> {{member['status']}} </span></td>
+                        <td><a href="/member/{{member['id']}}" class="txt-dec"><ion-icon class="action-btn" name="settings-outline"></ion-icon></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+
+            <br>
+
+        </div>
+    </div>
+
+</div>
+    
+
+{% endblock %} 
