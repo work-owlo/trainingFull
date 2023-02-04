@@ -74,6 +74,14 @@
         color: white;
     }
 
+    .card-metric-title {
+        font-size:3rem;
+    }
+
+    .card-metric-subtitle {
+        font-size:1rem;
+    }
+
     .container-train {
         display: flex;
         flex-direction: row;
@@ -272,6 +280,21 @@
         align-items: center;
         width: 95%;
         margin: 0 auto;
+    }
+
+    .container-complete {
+        all: unset;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin: 0 auto;
+        background-color: bisque;
+        padding-left:5rem;
+        padding-top:2rem;
+        padding-bottom:3rem;
+        border-radius: 1rem;
     }
 
     .container-employer-85{

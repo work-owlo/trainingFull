@@ -107,6 +107,37 @@ def start_training(request: Request) -> dict:
     )
 
 
+@api_router.get("/member/finish/{val}", status_code=200)
+def complete_training(request: Request) -> dict:
+    """
+    Root GET
+    """
+    metrics = [
+    {
+        "id": 1,
+        "title": "Accuracy",
+        "value": "98%"
+    },
+    {
+        "id": 2,
+        "title": "Hours",
+        "value": 2
+    },
+    {
+        "id": 3,
+        "title": "Percentile",
+        "value": 15
+    }
+    ]
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "complete.html",
+        {
+            "request": request,
+            "metrics": metrics
+        }
+    )
+
+
 
 @api_router.get("/company/team", status_code=200)
 def view_company_team(request: Request) -> dict:
@@ -221,5 +252,112 @@ def add_company_role(request: Request) -> dict:
             "modules": modules
         }
     )
+
+
+@api_router.get("/company/add_modules/{role_id}", status_code=200)
+def add_modules(role_id:str, request: Request) -> dict:
+    """
+    Root GET
+    """
+    modules = [
+    {
+        "id": 1,
+        "title": "Customer Simulation",
+        "icon": "people-outline"
+    },
+    {
+        "id": 2,
+        "title": "Co-worker Simulation",
+        "icon": "chatbubbles-outline"
+    },
+    {
+        "id": 3,
+        "title": "Software Simulation",
+        "icon": "desktop-outline"
+    }
+    ]
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "addModules.html",
+        {
+            "request": request,
+            "modules": modules
+        }
+    )
+
+
+@api_router.get("/company/onboarding_preview/{role_id}", status_code=200)
+def onboarding_preview(role_id:str, request: Request) -> dict:
+    """
+    Root GET
+    """
+    modules = [
+    {
+        "id": 1,
+        "title": "Customer Simulation",
+        "icon": "people-outline"
+    },
+    {
+        "id": 2,
+        "title": "Co-worker Simulation",
+        "icon": "chatbubbles-outline"
+    },
+    {
+        "id": 3,
+        "title": "Software Simulation",
+        "icon": "desktop-outline"
+    }
+    ]
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "onboardingPreview.html",
+        {
+            "request": request,
+            "modules": modules,
+            "sections": modules
+        }
+    )
+
+
+@api_router.get("/company/account", status_code=200)
+def view_account(request: Request) -> dict:
+    """
+    Root GET
+    """
+    info = {
+        "company_name": "Owlo",
+        "email": "sample@owlo.co"
+    }
+    invoices = [
+    {
+        "month": "January",
+        "custom_software_runs": 2,
+        "members_trained": 2,
+        "invoice": "$100",
+        "status": "Paid"
+    },
+    {
+        "month": "February",
+        "custom_software_runs": 2,
+        "members_trained": 2,
+        "invoice": "$100",
+        "status": "Paid"
+    },
+    {
+        "month": "March",
+        "custom_software_runs": 2,
+        "members_trained": 2,
+        "invoice": "$100",
+        "status": "Paid"
+    }]
+        
+    
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "account.html",
+        {
+            "request": request,
+            "invoices": invoices,
+            "info": info
+        }
+    )
+
 
 app.include_router(api_router)

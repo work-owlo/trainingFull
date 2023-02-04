@@ -1,6 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
+    
+<div class="container-employer-85" >
+    <div class="row search-row">
+        <div class="col-md-12">
 
+            <div class="row">
+                <div class="col">
+                    <h5>Customer Simulations</h5>
+                </div>
+                <div class="col">
+                    <p style="text-align: right;">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            Or Add Modules
+                          </button>
+                    </p>
+                </div>
+            </div>
+            <form>
+                  <p class="label">Select From Existing Scenarios</p>
+                  <div class="card-group">
+                    {% for module in modules %}
+                    <div class="card-train" style="max-width: 18rem;">
+                        <div class="card-body">
+                        <h5 class="card-train-title">{{module['title']}}</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p style="text-align: right;">
+                    <a href="/company/roles" class="add-btn">Continue</a>
+                </p>
+                
+            </form>
+        </div>
+    </div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Module</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="roleName" placeholder="Dispatch">
+                    <label for="roleName">Module Name</label>
+                  </div>
+                  <p class="label">In a few sentences, describe the scenario</p>
+                  <div class="form-floating">
+                    <textarea type="text" class="form-control" id="roleDesc" placeholder="Description"> </textarea>
+                  </div>
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-{% endblock %}
+            
+{% endblock %} 

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="container" style="">
+    <div class="row train-row">
+        <div class="col-md-12">
+            <h6 class="label">FedEx Driver</h6>
+            <h1>Congrats, Steve!</h1>
+            <h6 class="train-text">You are now trained for this role </h6>
+            <h6 class="label">Onboarding Statistics</h6>
+            <div class="card-group">
+            {% for metric in metrics %}
+                <div class="card-train" style="max-width: 18rem;">
+                    <div class="card-body">
+                    <h5 class="card-metric-title">{{metric['value']}}</h5>
+                    <h5 class="card-metric-subtitle">{{metric['title']}}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+             
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
