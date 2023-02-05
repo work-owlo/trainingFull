@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "todayfleet",
+    "private_key_id": "ae0a985511e34fd0ff8f697211105cc4b689d2d3",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDR3TpENKg0gu4H\nkTZcgdlHgykK0y+TLEYTV5DHK5cVC4ThFeVGFZHg0dYtBiDIGfiFp12mhO1ixzFd\nt633SRdKS8y3gSDWd0Q7d5HEjMKrynRAbDZTFdXa2zFBCusL26RamZ3kfrMpIadR\nBD96slJXsKzJX8kfN6TwxDvQrizlPkrswE1jHrHpjVLMPj5cUN9AQQuMk0YQsx2I\nHgdd2v8ynH7KVpXjwQn7LPyvWUv2+ynQ+VJp28FbfHAR3+/mo3DC+/6KQb633xx+\n9xOaFv62TMOXx/u7tIuXFfBE09K64vFtQR90DnmFyROBR07VbED7EWVOFCT8M7nn\n9s4yDRiBAgMBAAECggEAAk1HDyogBtoWyp4foVp1QSZhpAeWon/I/FD+EAkyMjNl\npOMMwueH/utzn3EimT9GWA+dZIRZvDcgxf02mxtB9k59iNe8Pfih7CBkHhVIf1eM\nTeFB+UhTMlWBeqFS3Fbvkbop9AXQaOzrEmWVsqlTuOLXClW9dX+ylJzPu9AP7asW\nU0xvHzhXKgW7WdTYX/LA4+ArvUZWmdHg9HNHJ04p1vH+rCu/78nncVD7njb4w2LH\ntShmiJyFS6TZUc05G2REY1Fpze40m+jb3Ns+iu3eW5Yi/m4tEX411dEb8jmejWGX\nm3EkqNSwpidKPJTmb6UPuiYCXCy4p2Uj95JaCpuNyQKBgQDvL60vZsXrWBYfnCwg\nn8g4LKrpCxQEpluRpO13wXWZW+n/u+N8chaCJkMY1p8bt27OrjvS6WmcHVwKUqUk\nf6dwcHpvHY889gE7iQcxP9p2mrC/pZNrLCinRZnHtzLvqBhQ4ze3aWPW2YWl1RCz\nZygVYLJxtE1z+bUQrrdaDp12rQKBgQDgneFJcDjTBbh6CR+EMrlhtA/U8pnU6qz6\n0wV9xk6NvwOX3gsSAsmcHLNs0/Jn6j0zr7rv23pPcfOoDYEamdZjl/af+yWVPoZK\ntvtvYOp1qhCAY/0RXHX91Nu+5nXQnRj6/BaMFGUjLH4riYBCzAx7LumphNqi9d2t\nxxzPJRBnpQKBgCXYw2yWtIaSv51s1saqwcGxv7F0YUyDDkYzdKfYYsVLd/FRR6Ov\nYcRiTYemnjKCifQGOc0bxew/8QppHVxzHol6IsVmRf39ZyCGhC7Uzbqqq4EHsBXr\nPNuK9dRWNqcZUA+shGpvMK8UaENfPW9FyV/olxPK1d6eCnqDStvjKCNZAoGANzGU\ncl9JF1GIizRCslFkjEWavlD+y/r+loPUDZv1IY+WanL9dWeJ8vp6fHt4TWCZuWGt\nJdNgsrTlkp3+43J54+8rgxRLn+jFRwa/sha2hkNL2sC3JtT5iW4MsVQgDysLQGFB\niRpZ39LHDhuzkLZjOsHEWQt0TibsWg9bXOtWpKECgYEAuvqc7q/L4+aG2GA2E5ac\nyFef8/OHXpGdhnspLoxTdRaBh17s3FlrcIpmktY7WjjgEDuTUnW5oyj2CAETAoLP\ng2j1ssdgFZM44Q99TDQbAGjmQD0dOlHkP1uhilVye7rR6hIgQi/2G9raD3QLMVww\noehJsFclBpAGPPreNGkxqE4=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-jzlvi@todayfleet.iam.gserviceaccount.com",
+    "client_id": "108178585733831204045",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-jzlvi%40todayfleet.iam.gserviceaccount.com"
+  }

@@ -6,7 +6,7 @@
     <div class="row search-row">
         <div class="col-md-12">
 
-            <h5>Let's get onboarded</h5>
+            <h5>Let's get you onboarded</h5>
 
             <!-- Search Bar -->
             <div class="row g-2 inputs">
@@ -25,10 +25,10 @@
                 </div>
               </div>
 
-            <!-- Onboarding Modules Explore -->
-            <h6 class="label">Explore</h6>
+            <!-- Onboarding Modules Invited -->
+            <h6 class="label">Invites</h6>
             <div class="row scrolling-wrapper">
-                {% for training in explore %} 
+                {% for training in invited %} 
                     <a href="/member/onboard/{{training['id']}}" class="card-btn">
                     <div class="card">
                         <div class="card-body">
@@ -53,10 +53,10 @@
                 {% endfor %}
             </div>
 
-            <!-- Onboarding Modules Invited -->
-            <h6 class="label">Invited</h6>
+            <!-- Onboarding Modules Explore -->
+            <h6 class="label">Explore</h6>
             <div class="card-group">
-                {% for training in invited %} 
+                {% for training in explore %} 
                 <a href="/member/onboard/{{training['id']}}" class="card-btn">
                     <div class="card">
                         <div class="card-body">

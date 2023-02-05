@@ -1,14 +1,18 @@
-from fastapi import FastAPI, Header, HTTPException, Depends, status, Response, Request, APIRouter
+from fastapi import FastAPI, Header, HTTPException, Depends, status, Response, Request, APIRouter, Form
 from pydantic import BaseModel
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from starlette.datastructures import URL
 
 from typing import Optional, Any
 from pathlib import Path
 import random
+
+from employee_auth import *
+from classes import *
 
 app = FastAPI()
 api_router = APIRouter()
@@ -29,19 +33,122 @@ EMPLOYER_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employ
 #     allow_headers=["*"],
 # )
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def verify_token_employee(token: str = Depends(oauth2_scheme)):
+    employee_uid = employee_verify_login(token['token'])
+    print(token)
+    print(employee_uid)
+    if not employee_uid['status'] == 'success':
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+    return_dict = employee_uid['body']
 
 
-@api_router.get("/member", status_code=200)
-def root(request: Request) -> dict:
+def verify_token_employee2(token: str = Depends(oauth2_scheme)):
+    print(token)
+    # return True
+    if 'token' not in req.headers:
+        raise HTTPException(
+            status_code=401,
+            status="Unauthorized"
+        )
+    token = req.headers["token"]
+    # Here your code for verifying the token or whatever you use
+    employee_uid = employee_verify_login(token)
+    if not employee_uid['status'] == 'success':
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+    return_dict = employee_uid['body']
+    return_dict['refresh_token'] = req.headers['refresh_token']
+    print(return_dict)
+    return return_dict
+
+
+
+""" EMPLOYEE ROUTES """
+@api_router.get("/", status_code=200)
+def employee_landing(request: Request, alert=None) -> dict:
+    '''Landing Page with auth options'''
+    print(verify_token_employee(oauth2_scheme))
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "landing.html",
+        {
+            "request": request,
+            "alert":alert
+        }
+    )
+
+
+@api_router.post("/member/login", status_code=200)
+def employee_login_api(request: Request, email: str = Form(), password:str = Form()) -> dict:
+    """
+    Employee login endpoint
+    Parameters:
+    ----------
+    email (str): email of the employee
+    password (str): password of the employee
+    
+    Returns:
+    -------
+    status code 201 success
+    dict: token: login auth token
+
+    """
+    state = employee_login(email, password)
+    if state['status'] == 'success':
+        set_token(state['token'], state['refresh_token'])
+        return RedirectResponse(url="/member", status_code=302)
+    else:
+        # return landing page with error
+        redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post("/token")
+def set_token(token, refresh):
+    print(token)
+    return {"access_token": token, "refresh_token": refresh, "token_type": "bearer"}
+
+
+@api_router.post("/member/signup", status_code=200)
+def employee_signup(request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
     """
     Root GET
     """
+    state = employee_create_account(fName, lName, email, password)
+    if state['status'] == 'success':
+        redirect_url = URL(request.url_for('member_root'))
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    else:
+        redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@api_router.get("/member", status_code=200)
+def member_root(request: Request ) -> dict:
+    """
+    Root GET
+    """
+    # print(current_user)
+    # current_user: bool = Depends(verify_token_employee)
+
     training = [
     {
         "id": 1,
-        "title": "FastAPI",
+        "title": "Driving Fedex",
         "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
         "status": 100,
+    },
+    {
+        "id": 1,
+        "title": "Warehouse Associate",
+        "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
+        "status": 50,
     },
     {
         "id": 1,
@@ -53,13 +160,7 @@ def root(request: Request) -> dict:
         "id": 1,
         "title": "FastAPI",
         "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        "status": 25,
-    },
-    {
-        "id": 1,
-        "title": "FastAPI",
-        "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        "status": 85,
+        "status": 75,
     }
     ]
     explore = training[0::]
@@ -138,6 +239,7 @@ def complete_training(request: Request) -> dict:
     )
 
 
+"""EMPLOYER ROUTES"""
 
 @api_router.get("/company/team", status_code=200)
 def view_company_team(request: Request) -> dict:

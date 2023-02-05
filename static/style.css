@@ -82,6 +82,12 @@
         font-size:1rem;
     }
 
+    .nav-dropdown {
+       float:right;
+       padding:.9rem
+
+    }
+
     .container-train {
         display: flex;
         flex-direction: row;

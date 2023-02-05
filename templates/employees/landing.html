@@ -27,19 +27,32 @@
             </defs>
             </svg>
         </a>
-
-        <!-- User profile dropdown on the right side -->
-
-        <div class="nav-dropdown"  >
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          John Doe
-        </a>
-        <ul class="dropdown-menu dropdown-menu">
-          <li><a class="dropdown-item" href="#">Account Settings</a></li>
-          <li><a class="dropdown-item" href="#">Sign Out</a></li>
-        </ul>
-      </div>
     </div>
+
+    <h1>For Testing</h1>
+
+    Employee
+    <br>
+    
+    <!-- sign in form -->
+    <form action="/member/login" method="post">
+      <input type="text" name="email" placeholder="username required">
+        <input type="password" name="password" placeholder="password" required>
+        <input type="submit" value="Sign In">
+    </form>
+    {% if alert %}
+    {{alert}}
+    {% endif %}
+    <br>
+
+    <!-- sign up form -->
+    <form action="/member/signup" method="post">
+        <input type="email" name="email" placeholder="email" required>
+        <input type="text" name="fName" placeholder="First Name" required>
+        <input type="text" name="lName" placeholder="Last Name" required>
+        <input type="password" name="password" placeholder="password" required>
+        <input type="submit" value="Sign Up">
+    </form>
 
 
     {% block content %}
