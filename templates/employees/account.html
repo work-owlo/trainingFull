@@ -53,8 +53,8 @@
                         <form method="post" action="/member/update_email">
                             <h6>Update Email</h6>
                             <div class="mb-3">
-                              <label for="exampleInputEmail1" class="form-label">Email address</label>
-                              <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{email}}">
+                              <label for="inputEmail" class="form-label">Email address</label>
+                              <input type="email" name="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" value="{{email}}">
                             </div>
                              <button type="submit" class="btn btn-success">Update</button>
                         </form>
@@ -62,12 +62,12 @@
                         <form method="post" action="/member/update_password">
                             <h6>Update Password</h6>
                             <div class="mb-3">
-                              <label for="exampleInputPassword1" class="form-label">Current Password</label>
-                              <input type="password" name="cur_password" class="form-control" id="exampleInputPassword1">
+                              <label for="curPassword" class="form-label">Current Password</label>
+                              <input type="password" name="cur_password" class="form-control" id="curPassword">
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputPassword1" class="form-label">New Password</label>
-                                <input type="password" name="new_password" class="form-control" id="exampleInputPassword1" minlength="6">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <input type="password" name="new_password" class="form-control" id="newPassword" minlength="6">
                               </div>
                            
                             <button type="submit" class="btn btn-success">Update</button>
@@ -75,7 +75,6 @@
                     </div>
                 </div>
 
-                <!-- PAYMENT METHODS -->
             </div>
 
         </div>

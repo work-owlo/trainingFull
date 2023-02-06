@@ -62,7 +62,7 @@ def employee_create_account(first_name, last_name, email, password):
             )
             conn.commit()
         # sign in user
-        return employee_login(email, password)
+        return return_success({"email": email, "password": password})
     except:
         return return_error("Email already exists")
 

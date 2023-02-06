@@ -49,31 +49,42 @@
                 <div class="col" style="padding: 1rem;">
                     <div class="row">
                         <div class="col">
-                            <h6>Account Information</h6>
+                            
                         </div>
-                        <div class="col">
-                            <p style="text-align: right;">
-                                <a href="/company/signout" class="add-btn">Signout</a>
-                            </p>
-                        </div>
+                       
                     </div>
                     <div>
-                        <form>
+                        <form method="post" action="/company/update_email">
+                            <h6>Update Email</h6>
                             <div class="mb-3">
-                              <label for="exampleInputEmail1" class="form-label">Email address</label>
-                              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{info['email']}}">
+                              <label for="inputEmail" class="form-label">Email address</label>
+                              <input type="email" name="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" value="{{email}}">
+                            </div>
+                             <button type="submit" class="btn btn-success">Update</button>
+                        </form>
+                        <br>
+                        <form method="post" action="/company/update_password">
+                            <h6>Update Password</h6>
+                            <div class="mb-3">
+                              <label for="curPassword" class="form-label">Current Password</label>
+                              <input type="password" name="cur_password" class="form-control" id="curPassword">
                             </div>
                             <div class="mb-3">
-                              <label for="exampleInputPassword1" class="form-label">Password</label>
-                              <input type="password" class="form-control" id="exampleInputPassword1">
-                            </div>
-                            <div class="mb-3">
-                                <label for="compName" class="form-label">Company Name</label>
-                                <input type="text" class="form-control" id="compName" value="{{info['company_name']}}">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <input type="password" name="new_password" class="form-control" id="newPassword" minlength="6">
                               </div>
                            
-                            <button type="submit" class="btn btn-success">Save</button>
-                          </form>
+                            <button type="submit" class="btn btn-success">Update</button>
+                        </form>
+                        <br>
+                        <form method="post" action="/company/update_company_name">
+                            <h6>Update Company Name</h6>
+                            <div class="mb-3">
+                              <label for="company_name" class="form-label">Company Name </label>
+                              <input type="text" name="company_name" class="form-control" id="company_name" aria-describedby="companyName" value="{{company_name}}">
+                            </div>
+                             <button type="submit" class="btn btn-success">Update</button>
+                        </form>
                     </div>
                 </div>
 

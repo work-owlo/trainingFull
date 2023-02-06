@@ -16,6 +16,9 @@ from employee_auth import *
 from employees import *
 from classes import *
 from auth_classes import *
+from manager_auth import *
+from company import *
+from managers import *
 
 app = FastAPI()
 api_router = APIRouter()
@@ -36,10 +39,10 @@ EMPLOYER_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employ
 # )
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
-
+oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
 
 """MUTUAL AUTH"""
-
+@app.post("/logout", response_class=HTMLResponse)
 @app.get("/logout", response_class=HTMLResponse)
 def logout_get(token: str = Depends(oauth2_scheme)):
     response = RedirectResponse(url="/")
@@ -86,9 +89,9 @@ def get_current_employee(response: Response, token: str = Depends(oauth2_scheme)
 
 
 @app.post("/token")
-async def login(response: Response, input_data: OAuth2PasswordRequestForm = Depends()):
+async def login(response: Response, username: str = Form(), password: str = Form()):
     ''' Login a user '''
-    login_state = employee_login(input_data.username, input_data.password)
+    login_state = employee_login(username, password)
     if login_state['status'] == 'error':
         return RedirectResponse(url="/?alert=Invalid Credentials", status_code=302)
     access_token = login_state['token']
@@ -103,24 +106,29 @@ async def login(response: Response, input_data: OAuth2PasswordRequestForm = Depe
 
 
 @api_router.post("/member/signup", status_code=200)
-async def employee_signup(request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
+async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
     """
     Root GET
     """
     state = employee_create_account(fName, lName, email, password)
     if state['status'] == 'success':
-        redirect_url = URL(request.url_for('member_root'))
-        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+        rr = await login(response, email, password)
+        return rr
+        # redirect_url = URL(request.url_for('member_root'))
+        # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
-# @app.get("/member/search")
+
 @app.get("/member")
 async def member_root(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Get training modules
     """
+    if not user == None:
+        return RedirectResponse(url="/logout", status_code=302)
+
     # get query params from url
     keyword = request.query_params.get('keyword')
     filter_status =  request.query_params.get('filter')
@@ -268,13 +276,195 @@ async def update_password(request: Request, response: Response, user: User = Dep
         return RedirectResponse(url='/member/account?alert='+str(state['body']))
     return state
 
+
 """EMPLOYER ROUTES"""
 
+
+def get_current_manager(response: Response, token: str = Depends(oauth2_company)) -> User:
+    """
+    Get the current user from the cookies in a request.
+    Use this function when you want to lock down a route so that only 
+    authenticated users can see access the route.
+    """
+    if token == None:
+        return False
+    user = manager_verify_login(token)
+    if user['status'] == 'error':
+        return False
+    # refreshed_token = manager_refresh_token(user['body']['token'])
+    # print(refreshed_token)
+    # response.set_cookie(
+    #     key="access_token", 
+    #     value=f"Bearer {refreshed_token['token']}", 
+    #     httponly=True
+    # )  
+    return user['body']['user']
+
+
+@api_router.post("/company", status_code=200)
+@api_router.get("/company", status_code=200)
+def company_landing(response:Response, request: Request, alert=None) -> dict:
+    '''Landing Page with auth options'''
+    # print(verify_token_employee(oauth2_scheme))
+    cookie = request.cookies.get('access_token')
+    if cookie:
+        return RedirectResponse(url="/company/team") 
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "landing.html",
+        {
+            "request": request,
+            "alert":alert
+        }
+    )
+
+'''AUTH'''
+
+
+@app.post("/company/token")
+async def company_login(response: Response, username: str = Form(), password: str = Form()):
+    ''' Login a user '''
+    login_state = manager_login(username, password)
+    if login_state['status'] == 'error':
+        return RedirectResponse(url="/company/?alert=Invalid Credentials", status_code=302)
+    access_token = login_state['token']
+    rr = RedirectResponse(url="/company/team", status_code=302)
+    rr.set_cookie(
+        key=settings.COOKIE_NAME, 
+        value=f"Bearer {access_token}", 
+        httponly=True
+    )  
+    return rr
+
+
+@api_router.post("/company/signup", status_code=200)
+async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
+    """
+    Create a new company account
+    """
+    state = manager_create_admin_account(fName, lName, email, password)
+    if state['status'] == 'success':
+        rr = await company_login(response, email, password)
+        return rr
+        # redirect_url = URL(request.url_for('member_root'))
+        # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    else:
+        redirect_url = URL(request.url_for('company_landing')).include_query_params(alert=str(state['body']))
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post("/company/logout", response_class=HTMLResponse)
+@app.get("/company/logout", response_class=HTMLResponse)
+def logout_get(token: str = Depends(oauth2_scheme)):
+    ''' Logout a user '''
+    response = RedirectResponse(url="/company")
+    delete_session_token_db(token)
+    response.delete_cookie("access_token")
+    return response
+
+
+@api_router.get("/company/add_company", status_code=200)
+def company_add_company(response:Response, request: Request, alert=None, manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Form to input company information'''
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id != None:
+        return RedirectResponse(url="/company/team")
+
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "addCompany.html",
+        {
+            "request": request,
+            "alert":alert
+        }
+    )
+
+@api_router.post("/company/add_company", status_code=200)
+async def company_add_company_post(response:Response, request: Request, manager: Manager = Depends(get_current_manager), name: str = Form(), description: str = Form()) -> dict:
+    '''Form to input company information'''
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id != None:
+        return RedirectResponse(url="/company/team")
+    state = add_company(manager.uid, name, description)
+    if state['status'] == 'success':
+        return RedirectResponse(url="/company/team", status_code=302)
+    else:
+        return RedirectResponse(url="/company/add_company?alert="+str(state['body']))
+
+
+@api_router.post("/company/update_email", status_code=200)
+async def company_update_email(request: Request, response: Response, manager: Manager = Depends(get_current_manager), email: str = Form()) -> dict:
+    """
+    Update email for the current member
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    state = manager_change_self_email(manager.uid, manager.email, email)
+    if state['status'] == 'success':
+        return RedirectResponse(url='/company/account')
+    else:
+        return RedirectResponse(url='/company/account?alert='+str(state['body']))
+    return state
+
+
+@api_router.post("/company/update_company_name", status_code=200)
+async def company_update_email(request: Request, response: Response, manager: Manager = Depends(get_current_manager), company_name: str = Form()) -> dict:
+    """
+    Update email for the current member
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    state = update_company_name(manager.uid, company_name, manager.company_id)
+    if state['status'] == 'success':
+        return RedirectResponse(url='/company/account')
+    else:
+        return RedirectResponse(url='/company/account?alert='+str(state['body']))
+    return state
+
+
+@api_router.post("/company/update_password", status_code=200)
+async def company_update_password(request: Request, response: Response, manager: Manager = Depends(get_current_manager), cur_password: str = Form(), new_password:str = Form()) -> dict:
+    """
+    Update password for the current company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    if len(new_password) < 6:
+        return RedirectResponse(url='/company/account?alert=Password must be at least 6 characters long')
+    if not re.search(r'[A-Z]', new_password):
+        return RedirectResponse(url='/company/account?alert=Password must contain at least one uppercase letter')
+    if not re.search(r'[a-z]', new_password):
+        return RedirectResponse(url='/company/account?alert=Password must contain at least one lowercase letter')
+    if not re.search(r'[0-9]', new_password):
+        return RedirectResponse(url='/company/account?alert=Password must contain at least one number')
+    
+    state = manager_change_password(manager.uid, manager.email, cur_password, new_password)
+    if state['status'] == 'success':
+        return RedirectResponse(url='/company/account')
+    else:
+        return RedirectResponse(url='/company/account?alert='+str(state['body']))
+    return state
+
+
 @api_router.get("/company/team", status_code=200)
-def view_company_team(request: Request) -> dict:
+def view_company_team(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Root GET
+    Get all the members of this company
     """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
     members = [
     {
         "id": 1,
@@ -317,16 +507,23 @@ def view_company_team(request: Request) -> dict:
         "team.html",
         {
             "request": request,
-            "members": members
+            "members": members,
+            "name": manager.first_name,
+
         }
     )
 
 
 @api_router.get("/company/roles", status_code=200)
-def view_company_roles(request: Request) -> dict:
+def view_company_roles(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Root GET
+    Get all the roles of this company
     """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
     roles = [
     {   
         "id": 1,
@@ -357,10 +554,15 @@ def view_company_roles(request: Request) -> dict:
 
 
 @api_router.get("/company/add_role", status_code=200)
-def add_company_role(request: Request) -> dict:
+def add_company_role(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Root GET
+    Add new role to this company
     """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
     modules = [
     {
         "id": 1,
@@ -388,10 +590,15 @@ def add_company_role(request: Request) -> dict:
 
 
 @api_router.get("/company/add_modules/{role_id}", status_code=200)
-def add_modules(role_id:str, request: Request) -> dict:
+def add_modules(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Root GET
+    Add new module
     """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
     modules = [
     {
         "id": 1,
@@ -419,10 +626,14 @@ def add_modules(role_id:str, request: Request) -> dict:
 
 
 @api_router.get("/company/onboarding_preview/{role_id}", status_code=200)
-def onboarding_preview(role_id:str, request: Request) -> dict:
+def onboarding_preview(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Root GET
+    Preview the onboarding
     """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
     modules = [
     {
         "id": 1,
@@ -449,12 +660,19 @@ def onboarding_preview(role_id:str, request: Request) -> dict:
         }
     )
 
-
+@api_router.post("/company/account", status_code=200)
 @api_router.get("/company/account", status_code=200)
-def view_account(request: Request) -> dict:
+def view_account(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Root GET
+    View and edit the company account
     """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    company_name = get_company(manager.company_id)['body']['company_name']
+
     info = {
         "company_name": "Owlo",
         "email": "sample@owlo.co"
@@ -488,7 +706,10 @@ def view_account(request: Request) -> dict:
         {
             "request": request,
             "invoices": invoices,
-            "info": info
+            "email": manager.email,
+            "company_name": company_name,
+            "name": manager.first_name,
+            "alert": request.query_params.get("alert", None)
         }
     )
 

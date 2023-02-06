@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+<div class="container-employer-85" >
+    <div class="row search-row">
+        <div class="col-md-12">
+
+            <div class="row">
+                <div class="col">
+                    <h5>Company Information</h5>
+                </div>
+                <div class="col">
+                    <p style="text-align: right;">
+                        
+                    </p>
+                </div>
+            </div>
+            <br>
+            <form action="/company/add_company" method="post">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="company_name" name="name" placeholder="Dispatch" required>
+                    <label for="roleName">Company Name</label>
+                  </div>
+                  <p class="label">What does your company do?</p>
+                  <div class="form">
+                    <textarea type="text" name="description" class="form-control" id="roleDesc" placeholder="Description" minlength="20"> </textarea>
+                  </div>
+                  <br>
+                  <input type="submit" class="btn btn-success" value="Next">
+
+                 
+                </div>
+                
+            </form>
+
+            
+{% endblock %} 
