@@ -47,6 +47,10 @@ def generate_uid():
     '''Generate a random 15 character string.'''
     return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', k=25))
 
+def generate_eid():
+    '''Generate a random 15 character string.'''
+    return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', k=5))
+
 
 def return_success(message="success"):
     return {"status": "success", "body": message, "code": 200}

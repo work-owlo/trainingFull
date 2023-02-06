@@ -19,6 +19,7 @@ from auth_classes import *
 from manager_auth import *
 from company import *
 from managers import *
+from roles import *
 
 app = FastAPI()
 api_router = APIRouter()
@@ -464,55 +465,38 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company")
-
-    members = [
-    {
-        "id": 1,
-        "first_name": "John",
-        "last_name": "Doe",
-        "type": "Employee",
-        "status": "Completed",
-        "email": "sample@owlo.co",
-        "role": "Dispatch"
-    },
-    {
-        "id": 2,
-        "first_name": "Jane",
-        "last_name": "Doe",
-        "type": "Employee",
-        "status": "Pending",
-        "email": "sample@owlo.co",
-        "role": "Driver"
-    },
-    {
-        "id": 3,
-        "first_name": "Arda",
-        "last_name": "Akman",
-        "type": "Contractor",
-        "status": "Completed",
-        "email": "sample@owlo.co",
-        "role": "Manager"
-    },
-    {
-        "id": 4,
-        "first_name": "Anshul",
-        "last_name": "Paul",
-        "type": "Contractor",
-        "status": "Incomplete",
-        "email": "sample@owlo.co",
-        "role": "Manager"
-    }
-    ]
+    keyword = request.query_params.get('keyword')
+    filter_search = request.query_params.get('filter')
+    if keyword != None:
+        keyword = keyword.strip()
+    if filter_search != None:
+        filter_search = filter_search.strip()
+    members = get_team(manager.company_id, keyword, filter_search)
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "team.html",
         {
             "request": request,
             "members": members,
             "name": manager.first_name,
+            "keyword": keyword if keyword != None else '',
+            "filter": filter_search if filter_search != None else ''
 
         }
     )
 
+@api_router.post("/company/assign_employee", status_code=200)
+def assign_employee(response: Response, request: Request,  id_input: str = Form(), first_name: str = Form(), last_name: str = Form(), email: str = Form(), role_id: str = Form(), employment_type: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    assign = assign_employee_role(manager.company_id, id_input, first_name, last_name, email, role_id, employment_type)
+    if assign['status'] == 'success':
+        return RedirectResponse(url='/company/team', status_code=302)
+    else:
+        return RedirectResponse(url='/company/team?alert='+str(assign['body']), status_code=302)
+    
 
 @api_router.get("/company/roles", status_code=200)
 def view_company_roles(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
@@ -520,9 +504,9 @@ def view_company_roles(response: Response, request: Request,  manager: Manager =
     Get all the roles of this company
     """
     if not manager:
-        return RedirectResponse(url="/company/logout")
+        return RedirectResponse(url="/company/logout", status_code=302)
     elif manager.company_id == None:
-        return RedirectResponse(url="/company/add_company")
+        return RedirectResponse(url="/company/add_company", status_code=302)
 
     roles = [
     {   
