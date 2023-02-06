@@ -9,10 +9,13 @@ from starlette.datastructures import URL
 
 from typing import Optional, Any
 from pathlib import Path
+import re
 import random
 
 from employee_auth import *
+from employees import *
 from classes import *
+from auth_classes import *
 
 app = FastAPI()
 api_router = APIRouter()
@@ -20,7 +23,6 @@ BASE_PATH = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory="static"), name="static")
 EMPLOYEE_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employees"))
 EMPLOYER_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employer"))
-
 
 # # Add the allowed origins here
 # origins = ["http://localhost:3000"]
@@ -33,48 +35,26 @@ EMPLOYER_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employ
 #     allow_headers=["*"],
 # )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-def verify_token_employee(token: str = Depends(oauth2_scheme)):
-    employee_uid = employee_verify_login(token['token'])
-    print(token)
-    print(employee_uid)
-    if not employee_uid['status'] == 'success':
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
-    return_dict = employee_uid['body']
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
 
 
-def verify_token_employee2(token: str = Depends(oauth2_scheme)):
-    print(token)
-    # return True
-    if 'token' not in req.headers:
-        raise HTTPException(
-            status_code=401,
-            status="Unauthorized"
-        )
-    token = req.headers["token"]
-    # Here your code for verifying the token or whatever you use
-    employee_uid = employee_verify_login(token)
-    if not employee_uid['status'] == 'success':
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
-    return_dict = employee_uid['body']
-    return_dict['refresh_token'] = req.headers['refresh_token']
-    print(return_dict)
-    return return_dict
+"""MUTUAL AUTH"""
 
-
+@app.get("/logout", response_class=HTMLResponse)
+def logout_get(token: str = Depends(oauth2_scheme)):
+    response = RedirectResponse(url="/")
+    delete_session_token_db(token)
+    response.delete_cookie("access_token")
+    return response
 
 """ EMPLOYEE ROUTES """
 @api_router.get("/", status_code=200)
-def employee_landing(request: Request, alert=None) -> dict:
+def employee_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
-    print(verify_token_employee(oauth2_scheme))
+    # print(verify_token_employee(oauth2_scheme))
+    cookie = request.cookies.get('access_token')
+    if cookie:
+        return RedirectResponse(url="/member") 
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "landing.html",
         {
@@ -84,39 +64,46 @@ def employee_landing(request: Request, alert=None) -> dict:
     )
 
 
-@api_router.post("/member/login", status_code=200)
-def employee_login_api(request: Request, email: str = Form(), password:str = Form()) -> dict:
+def get_current_employee(response: Response, token: str = Depends(oauth2_scheme)) -> User:
     """
-    Employee login endpoint
-    Parameters:
-    ----------
-    email (str): email of the employee
-    password (str): password of the employee
-    
-    Returns:
-    -------
-    status code 201 success
-    dict: token: login auth token
-
+    Get the current user from the cookies in a request.
+    Use this function when you want to lock down a route so that only 
+    authenticated users can see access the route.
     """
-    state = employee_login(email, password)
-    if state['status'] == 'success':
-        set_token(state['token'], state['refresh_token'])
-        return RedirectResponse(url="/member", status_code=302)
-    else:
-        # return landing page with error
-        redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
-        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    if token == None:
+        return False
+    user = employee_verify_login(token)
+    if user['status'] == 'error':
+        return False
+    # refreshed_token = employee_refresh_token(user['body']['token'])
+    # print(refreshed_token)
+    # response.set_cookie(
+    #     key="access_token", 
+    #     value=f"Bearer {refreshed_token['token']}", 
+    #     httponly=True
+    # )  
+    return user['body']['user']
 
 
 @app.post("/token")
-def set_token(token, refresh):
-    print(token)
-    return {"access_token": token, "refresh_token": refresh, "token_type": "bearer"}
+async def login(response: Response, input_data: OAuth2PasswordRequestForm = Depends()):
+    ''' Login a user '''
+    login_state = employee_login(input_data.username, input_data.password)
+    if login_state['status'] == 'error':
+        return RedirectResponse(url="/?alert=Invalid Credentials", status_code=302)
+    access_token = login_state['token']
+    rr = RedirectResponse(url="/member", status_code=302)
+    rr.set_cookie(
+        key=settings.COOKIE_NAME, 
+        value=f"Bearer {access_token}", 
+        httponly=True
+
+    )  
+    return rr
 
 
 @api_router.post("/member/signup", status_code=200)
-def employee_signup(request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
+async def employee_signup(request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
     """
     Root GET
     """
@@ -128,41 +115,16 @@ def employee_signup(request: Request, email: str = Form(), password:str = Form()
         redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
-
-@api_router.get("/member", status_code=200)
-def member_root(request: Request ) -> dict:
+# @app.get("/member/search")
+@app.get("/member")
+async def member_root(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
-    Root GET
+    Get training modules
     """
-    # print(current_user)
-    # current_user: bool = Depends(verify_token_employee)
-
-    training = [
-    {
-        "id": 1,
-        "title": "Driving Fedex",
-        "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        "status": 100,
-    },
-    {
-        "id": 1,
-        "title": "Warehouse Associate",
-        "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        "status": 50,
-    },
-    {
-        "id": 1,
-        "title": "FastAPI",
-        "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        "status": 0,
-    },
-    {
-        "id": 1,
-        "title": "FastAPI",
-        "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        "status": 75,
-    }
-    ]
+    # get query params from url
+    keyword = request.query_params.get('keyword')
+    filter_status =  request.query_params.get('filter')
+    training = get_training_invited(user.uid,keyword,filter_status)
     explore = training[0::]
     random.shuffle(training)
     invited = training[0::]
@@ -172,13 +134,14 @@ def member_root(request: Request ) -> dict:
             "request": request,
             "title": "FastAPI",
             "explore": explore,
-            "invited": invited
+            "invited": invited,
+            "name": user.first_name
         }
     )
 
 
 @api_router.get("/member/onboard/{val}", status_code=200)
-def start_training(request: Request) -> dict:
+def start_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
     """
@@ -203,13 +166,14 @@ def start_training(request: Request) -> dict:
         "train.html",
         {
             "request": request,
-            "modules": modules + modules
+            "modules": modules + modules,
+            "name": user.first_name
         }
     )
 
 
 @api_router.get("/member/finish/{val}", status_code=200)
-def complete_training(request: Request) -> dict:
+def complete_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
     """
@@ -238,6 +202,71 @@ def complete_training(request: Request) -> dict:
         }
     )
 
+@api_router.post("/member/account", status_code=200)
+@api_router.get("/member/account", status_code=200)
+def member_view_account(request: Request, response: Response, user: User = Depends(get_current_employee)):
+    """
+    Root GET
+    """
+    if not user:
+        return RedirectResponse(url="/logout", status_code=302)
+   
+    training = [
+    {
+        "id": 1,
+        "role": "Dispatch",
+        "company": "Owlo",
+        "status": "Completed",
+    }
+    ]
+        
+        
+    
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "account.html",
+        {
+            "request": request,
+            "training": training,
+            "email": user.email,
+            "name": user.first_name,
+            "alert": request.query_params.get('alert')
+        }
+    )
+
+
+@api_router.post("/member/update_email", status_code=200)
+async def update_email(request: Request, response: Response, user: User = Depends(get_current_employee), email: str = Form()) -> dict:
+    """
+    Update email for the current member
+    """
+    state = employee_change_self_email(user.uid, email, user.email)
+    if state['status'] == 'success':
+        return RedirectResponse(url='/member/account')
+    else:
+        return RedirectResponse(url='/member/account?alert='+str(state['body']))
+    return state
+
+
+@api_router.post("/member/update_password", status_code=200)
+async def update_password(request: Request, response: Response, user: User = Depends(get_current_employee), cur_password: str = Form(), new_password:str = Form()) -> dict:
+    """
+    Update password for the current member
+    """
+    if len(new_password) < 6:
+        return RedirectResponse(url='/member/account?alert=Password must be at least 6 characters long')
+    if not re.search(r'[A-Z]', new_password):
+        return RedirectResponse(url='/member/account?alert=Password must contain at least one uppercase letter')
+    if not re.search(r'[a-z]', new_password):
+        return RedirectResponse(url='/member/account?alert=Password must contain at least one lowercase letter')
+    if not re.search(r'[0-9]', new_password):
+        return RedirectResponse(url='/member/account?alert=Password must contain at least one number')
+    
+    state = employee_change_password(user.uid, user.email, cur_password, new_password)
+    if state['status'] == 'success':
+        return RedirectResponse(url='/member/account')
+    else:
+        return RedirectResponse(url='/member/account?alert='+str(state['body']))
+    return state
 
 """EMPLOYER ROUTES"""
 
@@ -292,6 +321,7 @@ def view_company_team(request: Request) -> dict:
         }
     )
 
+
 @api_router.get("/company/roles", status_code=200)
 def view_company_roles(request: Request) -> dict:
     """
@@ -324,6 +354,7 @@ def view_company_roles(request: Request) -> dict:
             "roles": roles
         }
     )
+
 
 @api_router.get("/company/add_role", status_code=200)
 def add_company_role(request: Request) -> dict:
@@ -460,6 +491,7 @@ def view_account(request: Request) -> dict:
             "info": info
         }
     )
+
 
 
 app.include_router(api_router)

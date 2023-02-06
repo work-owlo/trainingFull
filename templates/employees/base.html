@@ -32,15 +32,20 @@
 
         <div class="nav-dropdown"  >
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          John Doe
+          {{name}}
         </a>
         <ul class="dropdown-menu dropdown-menu">
-          <li><a class="dropdown-item" href="#">Account Settings</a></li>
-          <li><a class="dropdown-item" href="#">Sign Out</a></li>
+          <li><a class="dropdown-item" href="/member/account">Account Settings</a></li>
+          <li><a class="dropdown-item" href="/logout">Sign Out</a></li>
         </ul>
       </div>
     </div>
 
+    {% if alert %}
+    <div class="alert alert-warning" role="alert" style="width: 90%;margin:0 auto; margin-bottom: 2rem;">
+      {{alert}}
+    </div>
+    {% endif %}
 
     {% block content %}
     {% endblock %}

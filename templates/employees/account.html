@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+<div class="container-employer" >
+    <div class="row search-row">
+        <div class="col-md-12">
+
+            <h5>Account</h5>
+
+            <br>
+            <div class="row">
+                <div class="col" style="padding: 1rem;">
+                    <div class="row">
+                        <div class="col">
+                            <h6>History</h6>
+                        </div>
+                       
+                    </div>
+                    <!-- INVOICE HISTORY -->
+                    <!-- table -->
+                    <table class="table table-hover" style="width: 100%;">
+                        <thead>
+                          <tr>
+                            <th scope="col">Company</th>
+                            <th scope="col"> Role</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Score</th>
+                            <th scope="col">Status</th>
+                         </tr>
+                        </thead>
+                        <tbody>
+                          {% for data in training %}
+                            <tr>
+                                <td scope="row">{{data['company']}}</td>
+                                <td>{{data['role']}}</td>
+                                <td>{{data['time']}}</td>
+                                <td>{{data['score']}}</td>
+                                <td>{{data['status']}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                </div>
+                <div class="col" style="padding: 1rem;">
+                    <div class="row">
+                        <div class="col">
+                            
+                        </div>
+                       
+                    </div>
+                    <div>
+                        <form method="post" action="/member/update_email">
+                            <h6>Update Email</h6>
+                            <div class="mb-3">
+                              <label for="exampleInputEmail1" class="form-label">Email address</label>
+                              <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="{{email}}">
+                            </div>
+                             <button type="submit" class="btn btn-success">Update</button>
+                        </form>
+                        <br>
+                        <form method="post" action="/member/update_password">
+                            <h6>Update Password</h6>
+                            <div class="mb-3">
+                              <label for="exampleInputPassword1" class="form-label">Current Password</label>
+                              <input type="password" name="cur_password" class="form-control" id="exampleInputPassword1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputPassword1" class="form-label">New Password</label>
+                                <input type="password" name="new_password" class="form-control" id="exampleInputPassword1" minlength="6">
+                              </div>
+                           
+                            <button type="submit" class="btn btn-success">Update</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PAYMENT METHODS -->
+            </div>
+
+        </div>
+    </div>
+
+</div>
+    
+
+{% endblock %} 

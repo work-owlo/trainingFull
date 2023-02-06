@@ -9,22 +9,23 @@
             <h5>Let's get you onboarded</h5>
 
             <!-- Search Bar -->
+            <form method="get" action="/member">
             <div class="row g-2 inputs">
                 <div class="col-md">
                     <div class="mb-3">
-                        <input type="text" class="form-control search-inputs" id="search-module" placeholder="Search">
+                        <input type="text" name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search">
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select search-inputs" aria-label="Filter">
-                        <option selected>Filter</option>
-                        <option value="basic">Completed</option>
-                        <option value="invited">Incomplete</option>
-                        <option value="completed">Pending</option>
+                    <select class="form-select search-inputs" name="filter" id="filter" aria-label="Filter" onchange="this.form.submit()">
+                        <option disabled selected>Filter</option>
+                        <option value="complete">Completed</option>
+                        <option value="incomplete">Incomplete</option>
+                        <option value="pending">Pending</option>
                     </select>
                 </div>
               </div>
-
+            </form>
             <!-- Onboarding Modules Invited -->
             <h6 class="label">Invites</h6>
             <div class="row scrolling-wrapper">
