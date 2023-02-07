@@ -51,6 +51,19 @@ def logout_get(token: str = Depends(oauth2_scheme)):
     response.delete_cookie("access_token")
     return response
 
+
+@app.post("/forgotPassword", response_class=HTMLResponse)
+def forgot_password(response:Response, request: Request, email: str = Form()):
+    state = employee_forgot_password(email)
+    return RedirectResponse(url="/?alert=Password Reset Email Sent", status_code=302)
+
+
+@app.post("/company/forgotPassword", response_class=HTMLResponse)
+def company_forgot_password(response:Response, request: Request, email: str = Form()):
+    state = manager_forgot_password(email)
+    return RedirectResponse(url="/company?alert=Password Reset Email Sent", status_code=302)
+
+
 """ EMPLOYEE ROUTES """
 @api_router.get("/", status_code=200)
 def employee_landing(response:Response, request: Request, alert=None) -> dict:
@@ -375,7 +388,8 @@ def company_add_company(response:Response, request: Request, alert=None, manager
         "addCompany.html",
         {
             "request": request,
-            "alert":alert
+            "alert":alert,
+            "name":manager.first_name,
         }
     )
 

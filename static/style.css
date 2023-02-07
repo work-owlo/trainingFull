@@ -319,6 +319,23 @@
         border:none;
     }
 
+    .btn-success-outline {
+        border: 1px solid #70ABAF;
+        color: #70ABAF;
+        background-color:white;
+    }
+
+    .btn-success-outline:hover {
+        border: 1px solid #70ABAF;
+        color: #ffffff;
+        background-color:#70ABAF;
+    }
+
+    .forgot-password {
+        margin-top:2rem;
+        text-decoration: none;
+    }
+
     .th-role {
         width: 20%;
     }

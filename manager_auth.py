@@ -127,8 +127,11 @@ def add_admin_permissions(uid):
 
 def manager_forgot_password(email):
     ''' Use Firebase to send a password reset email '''
-    pyrebase_auth.send_password_reset_email(email)
-    return return_success()
+    try:
+        pyrebase_auth.send_password_reset_email(email)
+        return return_success()
+    except:
+        return return_success()
 
 
 def manager_change_self_email(uid, curr_email, email):

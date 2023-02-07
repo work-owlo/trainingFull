@@ -69,8 +69,11 @@ def employee_create_account(first_name, last_name, email, password):
 
 def employee_forgot_password(email):
     ''' Use Firebase to send a password reset email '''
-    pyrebase_auth.send_password_reset_email(email)
-    return return_success()
+    try:
+        pyrebase_auth.send_password_reset_email(email)
+        return return_success()
+    except:
+        return return_success()
 
 
 def employee_change_self_email(uid, email, cur_email):
