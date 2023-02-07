@@ -494,6 +494,8 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
     if filter_search != None:
         filter_search = filter_search.strip()
     members = get_team(manager.company_id, keyword, filter_search)
+    roles = get_roles(manager.company_id)
+    print(roles)
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "team.html",
         {
@@ -501,7 +503,8 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
             "members": members,
             "name": manager.first_name,
             "keyword": keyword if keyword != None else '',
-            "filter": filter_search if filter_search != None else ''
+            "filter": filter_search if filter_search != None else '',
+            "roles": roles
 
         }
     )

@@ -36,3 +36,8 @@ class Assignment(BaseModel):
     email: str
     role_id: str
     employment_type: str
+
+
+class Role(BaseModel):
+    role_id: str
+    role_name: str
