@@ -128,8 +128,6 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     if state['status'] == 'success':
         rr = await login(response, email, password)
         return rr
-        # redirect_url = URL(request.url_for('member_root'))
-        # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
         return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
@@ -140,7 +138,7 @@ async def member_root(request: Request, response: Response, user: User = Depends
     """
     Get training modules
     """
-    if not user == None:
+    if user == None or not user:
         return RedirectResponse(url="/logout", status_code=302)
 
     # get query params from url
@@ -167,6 +165,9 @@ def start_training(request: Request, response: Response, user: User = Depends(ge
     """
     Root GET
     """
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
+
     modules = [
     {
         "id": 1,
@@ -198,7 +199,10 @@ def start_training(request: Request, response: Response, user: User = Depends(ge
 def complete_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
-    """
+    """    
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
+        
     metrics = [
     {
         "id": 1,
@@ -230,7 +234,7 @@ def member_view_account(request: Request, response: Response, user: User = Depen
     """
     Root GET
     """
-    if not user:
+    if user == None or not user:
         return RedirectResponse(url="/logout", status_code=302)
    
     training = [
@@ -261,6 +265,8 @@ async def update_email(request: Request, response: Response, user: User = Depend
     """
     Update email for the current member
     """
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
     state = employee_change_self_email(user.uid, email, user.email)
     if state['status'] == 'success':
         return RedirectResponse(url='/member/account')
@@ -274,6 +280,8 @@ async def update_password(request: Request, response: Response, user: User = Dep
     """
     Update password for the current member
     """
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
     if len(new_password) < 6:
         return RedirectResponse(url='/member/account?alert=Password must be at least 6 characters long')
     if not re.search(r'[A-Z]', new_password):
