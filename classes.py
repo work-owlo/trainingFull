@@ -23,7 +23,7 @@ class Member(BaseModel):
     last_name: str
     email: str
     role: str
-    employee_id: str
+    employee_id: str = None
     role_id: str
     employment_type: str
     status: str

@@ -495,7 +495,6 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
         filter_search = filter_search.strip()
     members = get_team(manager.company_id, keyword, filter_search)
     roles = get_roles(manager.company_id)
-    print(roles)
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "team.html",
         {
@@ -508,6 +507,7 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
 
         }
     )
+
 
 @api_router.post("/company/assign_employee", status_code=200)
 def assign_employee(response: Response, request: Request,  id_input: str = Form(), first_name: str = Form(), last_name: str = Form(), email: str = Form(), role_id: str = Form(), employment_type: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
@@ -537,13 +537,35 @@ def view_company_roles(response: Response, request: Request,  manager: Manager =
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company", status_code=302)
     roles = get_role_comprehensive(manager.company_id, keyword)
-    print(roles)
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "roles.html",
         {
             "request": request,
             "roles": roles,
             "keyword": keyword if keyword != None else '',
+            "name": manager.first_name
+        }
+    )
+
+
+@api_router.get("/company/employee/view/{employee_id}", status_code=200)
+def view_employee(response: Response, request: Request, employee_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Get all the roles of this company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout", status_code=302)
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company", status_code=302)
+    # employee = get_employee(manager.company_id, employee_id)
+    if not check_emp_in_team(manager.company_id, employee_id):
+        return RedirectResponse(url="/company/team", status_code=302)
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "employee.html",
+        {
+            "request": request,
+            "employee": 'Hi',
+            "name": manager.first_name
         }
     )
 
@@ -582,6 +604,22 @@ def add_company_role(response: Response, request: Request,  manager: Manager = D
             "modules": modules
         }
     )
+
+@api_router.post("/company/employee/unassign", status_code=200)
+def unassign_role(response: Response, request: Request, team_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Unassign role to this company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    unassign = unasign_employee_role(manager.company_id, team_id)
+    if unassign['status'] == 'success':
+        return RedirectResponse(url='/company/team', status_code=302)
+    else:
+        return RedirectResponse(url='/company/team?alert='+str(unassign['body']), status_code=302)
 
 
 @api_router.get("/company/add_modules/{role_id}", status_code=200)

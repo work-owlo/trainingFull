@@ -80,7 +80,7 @@
                   {% endif %}
                   {% for member in members %}
                     <tr>
-                        <td scope="row">{{member['id']}}</td>
+                        <td scope="row">{{member['id_input']}}</td>
                         <td>{{member['first_name']}}</td>
                         <td>{{member['last_name']}}</td>
                         <td >{{member['email']}}</td>
@@ -94,9 +94,20 @@
                             </button>
                             <ul class="dropdown-menu">
                               <!-- Dropdown menu links -->
-                                <li><a class="dropdown-item" href="/company/team/{{member['id']}}">View</a></li>
-                                <li><a class="dropdown-item" href="/company/team/{{member['id']}}/edit">Remind</a></li>
-                                <li><a class="dropdown-item" href="/company/team/{{member['id']}}/edit">Unassign</a></li>
+                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View</a></li>
+                                <li>
+                                    <form action="/company/employee/remind/" method="post">
+                                        <input type="hidden" name="team_id" value="{{member['id']}}">
+                                        <button class="dropdown-item">Remind</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="/company/employee/unassign/" method="post">
+                                        <input type="hidden" name="team_id" value="{{member['id']}}">
+                                        <button class="dropdown-item">Unassign</button>
+                                    </form>
+                                    <!-- <a class="dropdown-item" href="/company/employee/unassign/{{member['id']}}">Unassign</a> -->
+                                </li>
                             </ul>
                         </div>
 
