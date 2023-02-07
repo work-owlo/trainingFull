@@ -41,3 +41,13 @@ class Assignment(BaseModel):
 class Role(BaseModel):
     role_id: str
     role_name: str
+
+
+class Role_Info(BaseModel):
+    role_id: str
+    role_name: str
+    count: int
+    completed: int = None
+    completion_rate: float = None
+    average_score: float = None
+    average_time: float = None

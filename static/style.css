@@ -65,6 +65,15 @@
         color: white;
     }
 
+    .btn-clear {
+        color:black;
+        background-color: transparent;
+        border:none;
+        padding:0px;
+        margin:0px;
+        
+    }
+
     .no-hover:hover {
         color:white
     }
@@ -344,6 +353,15 @@
         background-color: #70ABAF !important;
         color:white;
         border: 1px solid #70ABAF;
+        text-align: center;
+        padding:.3rem
+    }
+
+
+    .role-analytics {
+        background-color: #8170af !important;
+        color:white;
+        border: 1px solid #8170af !important;
         text-align: center;
         padding:.3rem
     }

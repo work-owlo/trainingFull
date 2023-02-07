@@ -528,36 +528,22 @@ def view_company_roles(response: Response, request: Request,  manager: Manager =
     """
     Get all the roles of this company
     """
+    keyword = request.query_params.get('keyword')
+    if keyword != None:
+        keyword = keyword.strip()
+
     if not manager:
         return RedirectResponse(url="/company/logout", status_code=302)
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company", status_code=302)
-
-    roles = [
-    {   
-        "id": 1,
-        "name": "Dispatch",
-        "num_members": 2,
-        "sent_to": 2,
-        "comp_rate": 100,
-        "avg_score": 4.5,
-        "avg_time": 4.5
-    },
-    {
-        "id": 2,
-        "name": "Driver",
-        "num_members": 2,
-        "sent_to": 2,
-        "comp_rate": 100,
-        "avg_score": 4.5,
-        "avg_time": 4.5
-    }
-    ]
+    roles = get_role_comprehensive(manager.company_id, keyword)
+    print(roles)
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "roles.html",
         {
             "request": request,
-            "roles": roles
+            "roles": roles,
+            "keyword": keyword if keyword != None else '',
         }
     )
 

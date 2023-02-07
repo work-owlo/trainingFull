@@ -67,3 +67,28 @@ def get_roles(company_id):
                 role_list.append(Role(role_id=role[0], role_name=role[1]))
     return role_list
 
+
+def get_role_comprehensive(company_id, keyword=None):
+    '''Get all the roles and their stats for active roles'''
+    # lowercase keyword
+    if keyword != None:
+        keyword = '%' + keyword.lower() + '%'
+    else:
+        keyword = '%%'
+# (SELECT count(*) from team WHERE team.role_id = j.role_id)
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            """SELECT j.role_id, j.role_name, (SELECT count(*) from team WHERE team.role_id = j.role_id), (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='completed'), completion_rate, average_score, average_time 
+            FROM job_roles as j
+            WHERE
+            j.company_id = %s AND
+            j.status = %s AND
+            lower(j.role_name) LIKE %s""", (company_id, "active", keyword))
+        roles = cur.fetchall()
+        role_list = []
+        if roles != None:
+            for role in roles:
+                role_list.append(Role_Info(role_id=role[0], role_name=role[1], count=role[2], completed=role[3], completion_rate=role[4], average_score=role[5], average_time=role[6]))
+    return role_list
+

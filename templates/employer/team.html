@@ -73,6 +73,11 @@
                         </td>
                         </form>
                     </tr>
+                  {% if members|length == 0 %}
+                    <tr>
+                        <td colspan="8">No members found</td>
+                    </tr>
+                  {% endif %}
                   {% for member in members %}
                     <tr>
                         <td scope="row">{{member['id']}}</td>
@@ -82,7 +87,21 @@
                         <td >{{member['role']}}</td>
                         <td><span class="type-{{member['employment_type']|lower}}"> {{member['employment_type']}} </span></td>
                         <td><span class="status-{{member['status']|lower}}"> {{member['status']}} </span></td>
-                        <td><a href="/member/{{member['id']}}" class="txt-dec"><ion-icon class="action-btn" name="settings-outline"></ion-icon></a></td>
+                        <td>
+                        <div class="btn-group dropend">
+                            <button type="button" class="btn-clear" data-bs-toggle="dropdown" aria-expanded="false">
+                                <ion-icon class="action-btn" name="settings-outline"></ion-icon>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <!-- Dropdown menu links -->
+                                <li><a class="dropdown-item" href="/company/team/{{member['id']}}">View</a></li>
+                                <li><a class="dropdown-item" href="/company/team/{{member['id']}}/edit">Remind</a></li>
+                                <li><a class="dropdown-item" href="/company/team/{{member['id']}}/edit">Unassign</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- <a href="/member/{{member['id']}}" class="txt-dec"></a> -->
+                    </td>
                     </tr>
                 {% endfor %}
                 </tbody>
