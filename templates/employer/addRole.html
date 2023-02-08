@@ -17,29 +17,38 @@
                 </div>
             </div>
             <br>
-            <form>
+            <form action="/company/add_role" method="post">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="roleName" placeholder="Dispatch">
+                    <input type="text" class="form-control" name="role_name" id="roleName" placeholder="Dispatch">
                     <label for="roleName">Role Name</label>
                   </div>
                   <p class="label">In a few sentences, describe the role and its responsibilites</p>
                   <div class="form">
-                    <textarea type="text" class="form-control" id="roleDesc" placeholder="Description"> </textarea>
+                    <textarea type="text" name="role_description" class="form-control" id="roleDesc" placeholder="Description"> </textarea>
                   </div>
 
                   <p class="label">What Modules Do You Wish to Include? (Select All That Apply)</p>
                   <div class="card-group">
                     {% for module in modules %}
-                    <div class="card-train" style="max-width: 18rem;">
-                        <div class="card-body">
+                    {% if module['status'] == 'active' %}
+                    <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
+                    <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
                         <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
-                        <h5 class="card-train-title">{{module['title']}}</h5>
-                        </div>
-                    </div>
+                        <p class="">{{module['name']}}</p>
+                    </label>
+                    
+                    {% else %}
+                    <input type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off" disabled>
+                    <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
+                        <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
+                        <p class="">{{module['name']}} Coming Soon</p>
+                        
+                    </label>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 <p style="text-align: right;">
-                    <a href="/company/roles" class="add-btn">Next</a>
+                    <button class="btn btn-success">Next</button>
                 </p>
                 
             </form>

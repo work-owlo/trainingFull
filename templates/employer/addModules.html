@@ -1,38 +1,90 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<script>
+
+  // if keyword is not a substring of card-train title or description, hide the card
+
+  function searchModules() {
+    console.log('searching')
+    var searchInput = document.getElementById('search-module');
+    var cards = document.getElementsByClassName('checkCard');
+    for (var i = 0; i < cards.length; i++) {
+      // get text in label
+      var title = cards[i].getElementsByClassName('card-train')[0].innerText;
+      if (title.toLowerCase().indexOf(searchInput.value.toLowerCase()) < 0) {
+        cards[i].style.display = 'none';
+      } else {
+        cards[i].style.display = 'block';
+      }
+    }
+  }
+
+
+
+</script>
+
     
 <div class="container-employer-85" >
     <div class="row search-row">
         <div class="col-md-12">
-
             <div class="row">
                 <div class="col">
-                    <h5>Customer Simulations</h5>
+                    <h5>{{tool['tool_name']}}</h5>
                 </div>
                 <div class="col">
                     <p style="text-align: right;">
                         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                            Or Add Modules
+                            Add Modules
                           </button>
                     </p>
                 </div>
             </div>
-            <form>
-                  <p class="label">Select From Existing Scenarios</p>
-                  <div class="card-group">
-                    {% for module in modules %}
-                    <div class="card-train" style="max-width: 18rem;">
-                        <div class="card-body">
-                        <h5 class="card-train-title">{{module['title']}}</h5>
-                        </div>
+            <div class="row g-2 inputs">
+                <div class="col-md">
+                    <div class="mb-3">
+                        <input type="text" onkeyup="searchModules()"  name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search" value="{{keyword}}">
                     </div>
-                    {% endfor %}
                 </div>
-                <p style="text-align: right;">
-                    <a href="/company/roles" class="add-btn">Continue</a>
-                </p>
-                
+            </div>
+            <p class="label">Select From Existing Scenarios</p>
+            <label>Private Modules</label>
+            {% if modules|length == 0 %}
+              <br>
+              <div class="alert alert-warning" role="alert">
+                  No modules found. Please add one above
+              </div>
+            {% endif %}
+            <form action="/company/add_modules" method="post">
+              <div class="card-group">
+                {% for module in private_modules %}
+                <div class="card-train" style="max-width: 18rem;">
+                    <div class="card-body">
+                    <h5 class="card-train-title">{{module['title']}}</h5>
+                    </div>
+                </div>
+                {% endfor %}
+              </div>
+              <label>Explore Library</label>
+              {% if public_modules|length == 0 %}
+                <div class="alert alert-warning" role="alert">
+                    No modules found. Please add one above
+                </div>
+              {% endif %}
+              <div class="card-group">
+                {% for module in public_modules %}
+                <div class="checkCard">
+                  <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
+                  <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
+                  {{module['name']}} - {{module['description']}}
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+              <p style="text-align: right;">
+                <button href="/company/roles" class="btn btn-success">Continue</button>
+              </p>
             </form>
         </div>
     </div>

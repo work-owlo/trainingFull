@@ -9,6 +9,11 @@
             <h5>Team</h5>
 
             <!-- Search Bar -->
+            {% if roles|length == 0%}
+                <div class="alert alert-warning" role="alert">
+                <a href="/company/add_role" class="txt-dec">Add role training modules </a>to get started
+                </div>
+            {% endif %}
             <form method="get" action="/company/team">
                 <div class="row g-2 inputs">
                     <div class="col-md">
@@ -26,7 +31,6 @@
                     </div>
                 </div>
             </form>
-
             <!-- Team Table -->
             <table class="table table-striped">
                 <thead>
@@ -42,6 +46,7 @@
                   </tr>
                 </thead>
                 <tbody>
+                {% if roles|length > 0 %}
                     <tr>
                         <form action="/company/assign_employee" method="post">
                         <td> <input type="text" class="form-control team-input" name="id_input" id="member-id" placeholder="ID"></td>
@@ -72,7 +77,9 @@
                             <button type="submit" class="btn btn-success">Add Member</a>
                         </td>
                         </form>
+                    
                     </tr>
+                {% endif %}
                   {% if members|length == 0 %}
                     <tr>
                         <td colspan="8">No members found</td>

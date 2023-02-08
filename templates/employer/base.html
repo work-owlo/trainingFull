@@ -40,11 +40,6 @@
         </ul>
       </div>
     </div>
-    {% if alert %}
-    <div class="alert alert-warning" role="alert" style="width: 90%;margin:0 auto; margin-bottom: 2rem;">
-      {{alert}}
-    </div>
-    {% endif %}
     <div class="row">
         <div class="col-md-2">
             <ul class="vert-menu">
@@ -61,7 +56,11 @@
             </ul>
         </div>
         <div class="col-md-10">
-          
+        {% if alert %}
+        <div class="alert alert-warning" role="alert" style="width: 90%;margin:0 auto; margin-bottom: 2rem;">
+          {{alert}}
+        </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
         </div>

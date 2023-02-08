@@ -4,6 +4,31 @@ from utils import *
 from classes import *
 
 
+def add_role(company_id, role_id, role_name, role_description):
+    ''' Add role to company '''
+    # Check if role already exists
+
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT * FROM job_roles WHERE role_name = %s AND company_id = %s", (role_name, company_id))
+        role = cur.fetchone()
+        if role != None:
+            return return_error("Role already exists")
+        cur.execute(
+            "INSERT INTO job_roles (role_id, company_id, role_name, role_description, status) VALUES (%s, %s, %s, %s, %s)", (role_id, company_id, role_name, role_description, "pending"))
+        conn.commit()
+    return return_success()
+
+
+def add_role_tool_relationship(role_id, tool_id):
+    ''' Add relationship between role and tool '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO role_tools (role_id, tool_id, status) VALUES (%s, %s, %s)", (role_id, tool_id, 'pending'))
+        conn.commit()
+
 
 def assign_employee_role(company_id, id_input, first_name, last_name, email, role_id, employment_type):
     with get_db_connection() as conn:
@@ -79,17 +104,17 @@ def get_role_comprehensive(company_id, keyword=None):
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute(
-            """SELECT j.role_id, j.role_name, (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='unassigned'), (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='completed'), completion_rate, average_score, average_time 
+            """SELECT j.role_id, j.role_name, (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='unassigned'), (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='completed'), completion_rate, average_score, average_time, j.status 
             FROM job_roles as j
             WHERE
-            j.company_id = %s AND
-            j.status = %s AND
-            lower(j.role_name) LIKE %s""", (company_id, "active", keyword))
+            j.company_id = %s
+            AND lower(j.role_name) LIKE %s
+            AND j.status != 'deleted' """, (company_id, keyword))
         roles = cur.fetchall()
         role_list = []
         if roles != None:
             for role in roles:
-                role_list.append(Role_Info(role_id=role[0], role_name=role[1], count=role[2], completed=role[3], completion_rate=role[4], average_score=role[5], average_time=role[6]))
+                role_list.append(Role_Info(role_id=role[0], role_name=role[1], count=role[2], completed=role[3], completion_rate=role[4], average_score=role[5], average_time=role[6], status=role[7]))
     return role_list
 
 
@@ -103,6 +128,29 @@ def check_emp_in_team(company_id, team_id):
         if employee == None:
             return False
     return True
+
+
+def check_role_in_company(company_id, role_id):
+    '''Check if role is in company'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT status FROM job_roles WHERE company_id = %s AND role_id = %s AND status != 'deleted'" , (company_id, role_id))
+        role = cur.fetchone()
+        if role == None:
+            return False
+    return role[0]
+
+
+def get_role_tools_remaining(role_id):
+    '''Get all the tools for a role'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT r.tool_id, tool_name, tool_icon FROM tools as t, role_tools as r WHERE t.tool_id = r.tool_id AND role_id = %s AND r.status = 'pending' ORDER BY tool_name LIMIT 1", (role_id,))
+        tool = cur.fetchone()
+        return Tool_info(tool_id=tool[0], tool_name=tool[1], tool_icon=tool[2])
+
 
 
 def unasign_employee_role(company_id, team_id):

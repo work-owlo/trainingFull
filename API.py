@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.datastructures import URL
+from fastapi.encoders import jsonable_encoder
 
 from typing import Optional, Any
 from pathlib import Path
@@ -20,6 +21,7 @@ from manager_auth import *
 from company import *
 from managers import *
 from roles import *
+from training import *
 
 app = FastAPI()
 api_router = APIRouter()
@@ -54,13 +56,13 @@ def logout_get(token: str = Depends(oauth2_scheme)):
 
 @app.post("/forgotPassword", response_class=HTMLResponse)
 def forgot_password(response:Response, request: Request, email: str = Form()):
-    state = employee_forgot_password(email)
+    employee_forgot_password(email)
     return RedirectResponse(url="/?alert=Password Reset Email Sent", status_code=302)
 
 
 @app.post("/company/forgotPassword", response_class=HTMLResponse)
 def company_forgot_password(response:Response, request: Request, email: str = Form()):
-    state = manager_forgot_password(email)
+    manager_forgot_password(email)
     return RedirectResponse(url="/company?alert=Password Reset Email Sent", status_code=302)
 
 
@@ -580,30 +582,45 @@ def add_company_role(response: Response, request: Request,  manager: Manager = D
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company")
 
-    modules = [
-    {
-        "id": 1,
-        "title": "Customer Simulation",
-        "icon": "people-outline"
-    },
-    {
-        "id": 2,
-        "title": "Co-worker Simulation",
-        "icon": "chatbubbles-outline"
-    },
-    {
-        "id": 3,
-        "title": "Software Simulation",
-        "icon": "desktop-outline"
-    }
-    ]
+    modules = get_tools()
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "addRole.html",
         {
             "request": request,
-            "modules": modules
+            "modules": modules,
+            "name": manager.first_name,
+            "alert": request.query_params.get('alert') if request.query_params.get('alert') != None else ''
         }
     )
+
+
+@api_router.post("/company/add_role", status_code=200)
+async def add_company_role(response: Response, request: Request,  role_name: str = Form(), role_description: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Add new role to this company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+    form_data = await request.form()
+    form_data = jsonable_encoder(form_data)
+    role_id = generate_uid()
+    
+    available_tools = get_tools()
+    # verify one or more tools are selected
+    if sum([1 for tool in available_tools if tool.id in form_data]) == 0:
+        return RedirectResponse(url='/company/add_role?alert=Please select at least one tool', status_code=302)
+
+    add = add_role(manager.company_id, role_id, role_name, role_description)
+    if add['status'] == 'error':
+        return RedirectResponse(url='/company/add_role?alert='+str(add['body']), status_code=302)
+
+    for tool in available_tools:
+        if tool.id in form_data:
+            add_role_tool_relationship(role_id, tool.id)
+    return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+
 
 @api_router.post("/company/employee/unassign", status_code=200)
 def unassign_role(response: Response, request: Request, team_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
@@ -631,29 +648,27 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company")
+    # check role belongs to company
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles", status_code=302)
 
-    modules = [
-    {
-        "id": 1,
-        "title": "Customer Simulation",
-        "icon": "people-outline"
-    },
-    {
-        "id": 2,
-        "title": "Co-worker Simulation",
-        "icon": "chatbubbles-outline"
-    },
-    {
-        "id": 3,
-        "title": "Software Simulation",
-        "icon": "desktop-outline"
-    }
-    ]
+    # check that role is in process of being edited
+    tool = get_role_tools_remaining(role_id)
+    if not tool:
+        return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
+
+    public_modules = get_public_modules(tool.tool_id)
+    modules = []
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "addModules.html",
         {
             "request": request,
-            "modules": modules
+            "modules": modules,
+            "public_modules": public_modules,
+            "name": manager.first_name, 
+            "tool": tool,
+            "role_id": role_id
         }
     )
 
@@ -706,10 +721,6 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
 
     company_name = get_company(manager.company_id)['body']['company_name']
 
-    info = {
-        "company_name": "Owlo",
-        "email": "sample@owlo.co"
-    }
     invoices = [
     {
         "month": "January",

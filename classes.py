@@ -51,3 +51,26 @@ class Role_Info(BaseModel):
     completion_rate: float = None
     average_score: float = None
     average_time: float = None
+    status: str
+
+
+class Tool(BaseModel):
+    id: str
+    name: str
+    icon: str
+    status: str
+
+
+class Tool_info(BaseModel):
+    tool_id: str
+    tool_name: str
+    tool_icon: str
+
+
+class Module(BaseModel):
+    id: str
+    name: str
+    description: str
+    status: str = None
+
+

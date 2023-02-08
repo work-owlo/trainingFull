@@ -19,9 +19,6 @@
                     </p>
                 </div>
             </div>
-            
-            
-
             <!-- Search Bar -->
             <form method="get" action="/company/roles">
               <div class="row g-2 inputs">
@@ -31,7 +28,7 @@
                       </div>
                   </div>
               </div>
-          </form>
+            </form>
 
             <!-- Team Table -->
             <table class="table table-striped">
@@ -43,8 +40,8 @@
                     <th scope="col">Completion Rate</th>
                     <th scope="col">Avg. Score</th>
                     <th scope="col">Avg. Time</th>
+                    <th scope="col">Status</th>
                     <th scope="col" class="invisible">View</th>
-                    <th scope="col" class="invisible">Edit</th>
                     <th scope="col" class="invisible"><ion-icon name="trash-outline"></ion-icon></th>
                   </tr>
                 </thead>
@@ -57,13 +54,17 @@
                   {% for role in roles %}
                     <tr>
                         <td scope="row">{{role['role_name']}}</td>
-                        <td>{{role['count']}}</td>
-                        <td>{{role['completed']}}</td>
-                        <td >{{role['completion_rate']}}%</td>
-                        <td >{{role['average_score']}}%</td>
-                        <td >{{role['average_time']}} hours </td>
+                        <td> {{role['count']}} </td>
+                        <td> {{role['completed']}} </td>
+                        <td> {{role['completion_rate']~'%' if role['completion_rate'] else '-'}} </td>
+                        <td> {{role['average_score']~'%' if role['average_score'] else '-'}} </td>
+                        <td> {{role['average_time']~' hours' if role['average_time'] else '-'}}  </td>
+                        <td><span class="status-{{role['status']|lower}}"> {{role['status']|title}} </span></td>
+                        {% if role['status'] == 'active' %}
                         <td class="role-analytics"><a href="/company/viewRole/{{role['role_id']}}" class="txt-dec-white no-hover">View</a></td>
-                        <td class="role-edit"><a href="/company/editRole/{{role['role_id']}}" class="txt-dec-white no-hover">Edit</a></td>
+                        {% else %}
+                        <td class="role-edit"><a href="/company/add_modules/{{role['role_id']}}" class="txt-dec-white no-hover">Complete</a></td>
+                        {% endif %}
                         <td class="role-delete"><button data-bs-toggle="modal" data-bs-target="#exampleModal" class="no-btn no-hover "><ion-icon name="trash-outline"></ion-icon></button></td>
                     </tr>
                 {% endfor %}

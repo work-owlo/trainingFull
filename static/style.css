@@ -117,7 +117,7 @@
         vertical-align: middle;
         text-align: center;
         margin: 0 auto;
-        padding-bottom: 1rem;
+        /* padding-bottom: 1rem; */
     }
 
     .card-train {
@@ -129,14 +129,31 @@
         margin:1rem;
         display: flex;
         justify-content: center;
+        /* padding:2rem; */
+        padding:2rem;
+        padding-top:2.5rem;
+        text-align: center;
+    }
+
+
+    .card-train:hover {
+        color:#ffffff !important;
+        background-color: #70ABAF !important;
+    }
+
+    .card-train-disabled {
+        border:1px solid #a1a1a1;
+        border-radius:3px;
+        color:#a1a1a1;
+        width: 13rem;
+        fill:#a1a1a1;
+        margin:1rem;
+        display: flex;
+        justify-content: center;
         padding:2rem;
         text-align: center;
     }
 
-    .card-train:hover, .card-train::selection {
-        color:#ffffff;
-        background-color: #70ABAF;
-    }
 
     .search-select {
         width:50%
@@ -264,6 +281,16 @@
         /* green text with border */
         color: #FF0000;
         border: 1px solid #FF0000;
+        border-radius: 3px;
+        text-align: center;
+        padding:.3rem
+        
+    }
+
+    .status-active {
+        /* green text with border */
+        color: #70ABAF;
+        border: 1px solid #70ABAF;
         border-radius: 3px;
         text-align: center;
         padding:.3rem
