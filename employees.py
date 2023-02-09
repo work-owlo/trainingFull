@@ -45,7 +45,7 @@ def get_training_tools(team_id):
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute('''
-            SELECT tools.tool_id, tools.tool_name, tools.tool_icon, tools.status
+            SELECT role_tools.rt_id as id, tools.tool_name, tools.tool_icon, tools.status
             FROM tools, team, role_tools
             WHERE team.role_id = role_tools.role_id AND tools.tool_id = role_tools.tool_id AND team.team_id = %s AND tools.status = 'active'
         ''', (team_id,))
@@ -53,22 +53,37 @@ def get_training_tools(team_id):
         tool_lst = []
         if tools:
             for tool in tools:
-                tool_lst.append(Tool(id=tool['tool_id'], name=tool['tool_name'], icon=tool['tool_icon'], status=tool['status']))
+                tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status=tool['status']))
     return tool_lst
 
+def get_module_permissions(employee_id, rt_id):
+    ''' Check if employee is assigned to the role '''
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute('''
+            SELECT count(*) as count
+            FROM team as t, role_tools as r
+            WHERE r.role_id = t.role_id AND t.employee_id = %s AND r.rt_id = %s
+            ''', (employee_id, rt_id))
+        count = cur.fetchone()
+    return True if count and count['count'] > 0 else False
 
-# def get_training_status(team_id):
-#     # get training status (in percentage) for a role
-#     with get_db_connection() as conn:
-#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-#         cur.execute('''COUNT(*) as count FROM role_module, team WHERE role_module.role_id = team.role_id and team_id = %s''', (team_id,))
-#         total = cur.fetchone()
-#         cur.execute('''COUNT(*) as count FROM training WHERE team_id = %s AND status = 'completed' ''', (team_id,))
-#         completed = cur.fetchone()
-#         if total and completed:
-#             return round(completed['count']/total['count']*100)
-#     return 0
 
+def get_training_modules_tool(rt_id):
+    # get modules for a tool
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute('''
+            SELECT module.module_id, module_title, module_description
+            FROM module, role_tools, role_module
+            WHERE role_tools.rt_id = %s AND role_tools.role_id = role_module.role_id AND module.tool_id = role_tools.tool_id
+            ''', (rt_id,))
+        modules = cur.fetchall()
+        if not modules:
+            return []
+        return modules
+
+print(get_training_modules_tool('1vJ6ym6BsKXQdEzQdjE5LDqjx'))
 
 def get_training_status(team_id):
     # get training status (in percentage) for a role

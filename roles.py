@@ -118,7 +118,7 @@ def get_role_comprehensive(company_id, keyword=None):
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute(
-            """SELECT j.role_id, j.role_name, (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='unassigned'), (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='completed'), completion_rate, average_score, average_time, j.status 
+            """SELECT j.role_id, j.role_name, (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status!='unassigned'), (SELECT count(*) from team WHERE team.role_id = j.role_id AND team.status='completed'), completion_rate, average_score, average_time, j.status 
             FROM job_roles as j
             WHERE
             j.company_id = %s
@@ -269,7 +269,6 @@ def get_role_info(role_id):
 
 def get_role_modules(role_id):
     '''Get all the modules for a role'''
-
     # get all tools
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -298,6 +297,3 @@ def get_role_modules(role_id):
             module_list.append(modules)
 
     return module_list
-
-
-print(get_role_modules('w0N1o7bSOoi98r8EFxTpGkPen'))

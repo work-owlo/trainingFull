@@ -10,7 +10,7 @@
             <h6 class="train-text">Select a module to continue</h6>
             <div class="card-group">
                 {% for module in modules %}
-                <a class="txt-dec" href="/{{module['id']}}">
+                <a class="txt-dec" href="/member/onboard/module/{{module['id']}}">
                     <div class="card-train" style="max-width: 18rem;">
                         <div class="card-body">
                         <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>

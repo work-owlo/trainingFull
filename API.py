@@ -173,26 +173,10 @@ def start_training(request: Request, response: Response, team_id:str, user: User
 
     role_name = get_training_permission(user.uid, team_id)
     modules = get_training_tools(team_id)
+    print(modules)
     if not role_name:
         return RedirectResponse(url="/member?alert=" + str("You are not permitted to view this role"), status_code=302)
 
-    # modules = [
-    # {
-    #     "id": 1,
-    #     "title": "Customer Simulation",
-    #     "icon": "people-outline"
-    # },
-    # {
-    #     "id": 2,
-    #     "title": "Co-worker Simulation",
-    #     "icon": "chatbubbles-outline"
-    # },
-    # {
-    #     "id": 3,
-    #     "title": "Software Simulation",
-    #     "icon": "desktop-outline"
-    # }
-    # ]
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "train.html",
         {
@@ -200,6 +184,34 @@ def start_training(request: Request, response: Response, team_id:str, user: User
             "modules": modules,
             "name": user.first_name,
             "role_name": role_name
+        }
+    )
+
+
+@api_router.get("/member/onboard/module/{rt_id}", status_code=200)
+async def view_module(request: Request, response: Response, rt_id:str, user: User = Depends(get_current_employee)) -> dict:
+    """
+    Get module for the current user
+    """
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
+    
+    permissions = get_module_permissions(user.uid, rt_id)
+    if not permissions:
+        return RedirectResponse(url="/member?alert=" + str("You are not permitted to view this module"), status_code=302)
+
+    modules = get_training_modules_tool(rt_id)
+
+    # module = get_module(module_id)
+    # if module['status'] == 'error':
+    #     return RedirectResponse(url="/", status_code=302)
+    # module = module['body']
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "module.html",
+        {
+            "request": request,
+            "modules": modules,
+            "name": user.first_name
         }
     )
 
@@ -305,7 +317,7 @@ async def update_password(request: Request, response: Response, user: User = Dep
         return RedirectResponse(url='/member/account')
     else:
         return RedirectResponse(url='/member/account?alert='+str(state['body']))
-    return state
+
 
 
 """EMPLOYER ROUTES"""
@@ -349,7 +361,6 @@ def company_landing(response:Response, request: Request, alert=None) -> dict:
     )
 
 '''AUTH'''
-
 
 @app.post("/company/token")
 async def company_login(response: Response, username: str = Form(), password: str = Form()):
@@ -743,9 +754,6 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
     update_role_tool_status(role_id, tool_id, 'active')
 
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
-
-
-    
 
 
 @api_router.get("/company/role/edit/{role_id}", status_code=200)

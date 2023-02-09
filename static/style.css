@@ -154,6 +154,15 @@
         text-align: center;
     }
 
+    .module-box {
+        background-color:#e8e8e8;
+        border-radius:3px;
+        color:#484848;
+        text-align: center;
+        line-height: 4rem;
+        /* padding:.5rem; */
+        margin:.5rem;
+    }
 
     .search-select {
         width:50%

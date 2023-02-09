@@ -1,6 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row" style="padding:2rem">
+    <div class="col-md-2">
+        <!-- vertical progress menu -->
+        <p class="label">Dispatch Driver</p>
+        {% for module in modules %}
+            <div class="module-box">
+                <p>{{module['module_title']}}</p>
+            </div>
+        {%endfor%}
+
+    </div>
+    <div class="col-md-10">
+        Training
+    </div>
+    
+</div>
+<!-- <button class="btn btn-success">Testing Next</button> -->
 
 
 {% endblock %}
