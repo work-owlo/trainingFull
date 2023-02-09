@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<script>
+  function setVal(val) {
+    // set value of input where id = deleteInput to val
+    document.getElementById("deleteInput").value = val; 
+  }
+</script>
     
 <div class="container-employer-85" >
     <div class="row search-row">
@@ -65,7 +72,7 @@
                         {% else %}
                         <td class="role-edit"><a href="/company/add_modules/{{role['role_id']}}" class="txt-dec-white no-hover">Complete</a></td>
                         {% endif %}
-                        <td class="role-delete"><button data-bs-toggle="modal" data-bs-target="#exampleModal" class="no-btn no-hover "><ion-icon name="trash-outline"></ion-icon></button></td>
+                        <td class="role-delete"><button onclick="setVal('{{role['role_id']}}')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="no-btn no-hover "><ion-icon name="trash-outline"></ion-icon></button></td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -88,7 +95,10 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger">Delete</button>
+          <form action="/company/role/delete" method="post">
+            <input type="hidden" name="delete_role_id" id="deleteInput">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
         </div>
       </div>
     </div>

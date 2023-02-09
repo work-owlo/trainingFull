@@ -163,3 +163,16 @@ def unasign_employee_role(company_id, team_id):
             "UPDATE team SET status = %s WHERE company_id = %s AND team_id = %s", ("unassigned", company_id, team_id))
         conn.commit()
     return return_success()
+
+
+def delete_role(company_id, role_id):
+    '''Delete role by setting status to deleted'''
+    permission = check_role_in_company(company_id, role_id)
+    if permission == False:
+        return return_error("Permission Denied")
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE job_roles SET status = %s WHERE role_id = %s", ("deleted", role_id))
+        conn.commit()
+    return return_success()

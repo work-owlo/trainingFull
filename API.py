@@ -146,6 +146,8 @@ async def member_root(request: Request, response: Response, user: User = Depends
     # get query params from url
     keyword = request.query_params.get('keyword')
     filter_status =  request.query_params.get('filter')
+    alert = request.query_params.get('alert')
+    print(keyword, filter_status)
     training = get_training_invited(user.uid,keyword,filter_status)
     explore = training[0::]
     random.shuffle(training)
@@ -157,42 +159,51 @@ async def member_root(request: Request, response: Response, user: User = Depends
             "title": "FastAPI",
             "explore": explore,
             "invited": invited,
-            "name": user.first_name
+            "name": user.first_name,
+            "keyword": keyword if keyword else "",
+            "filter": filter_status,
+            "alert": alert
         }
     )
 
 
-@api_router.get("/member/onboard/{val}", status_code=200)
-def start_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
+@api_router.get("/member/onboard/{team_id}", status_code=200)
+def start_training(request: Request, response: Response, team_id:str, user: User = Depends(get_current_employee)):
     """
     Root GET
     """
     if user == None or not user:
         return RedirectResponse(url="/logout", status_code=302)
 
-    modules = [
-    {
-        "id": 1,
-        "title": "Customer Simulation",
-        "icon": "people-outline"
-    },
-    {
-        "id": 2,
-        "title": "Co-worker Simulation",
-        "icon": "chatbubbles-outline"
-    },
-    {
-        "id": 3,
-        "title": "Software Simulation",
-        "icon": "desktop-outline"
-    }
-    ]
+    role_name = get_training_permission(user.uid, team_id)
+    modules = get_training_tools(team_id)
+    if not role_name:
+        return RedirectResponse(url="/member?alert=" + str("You are not permitted to view this role"), status_code=302)
+
+    # modules = [
+    # {
+    #     "id": 1,
+    #     "title": "Customer Simulation",
+    #     "icon": "people-outline"
+    # },
+    # {
+    #     "id": 2,
+    #     "title": "Co-worker Simulation",
+    #     "icon": "chatbubbles-outline"
+    # },
+    # {
+    #     "id": 3,
+    #     "title": "Software Simulation",
+    #     "icon": "desktop-outline"
+    # }
+    # ]
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "train.html",
         {
             "request": request,
-            "modules": modules + modules,
-            "name": user.first_name
+            "modules": modules,
+            "name": user.first_name,
+            "role_name": role_name
         }
     )
 
@@ -620,6 +631,23 @@ async def add_company_role(response: Response, request: Request,  role_name: str
         if tool.id in form_data:
             add_role_tool_relationship(role_id, tool.id)
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+
+
+@api_router.post("/company/role/delete", status_code=200)
+def delete_role_api(response: Response, request: Request, delete_role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Delete role to this company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    delete = delete_role(manager.company_id, delete_role_id)
+    if delete['status'] == 'success':
+        return RedirectResponse(url='/company/roles', status_code=302)
+    else:
+        return RedirectResponse(url='/company/roles?alert='+str(delete['body']), status_code=302)
 
 
 @api_router.post("/company/employee/unassign", status_code=200)

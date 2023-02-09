@@ -91,9 +91,9 @@
                         <td>{{member['first_name']}}</td>
                         <td>{{member['last_name']}}</td>
                         <td >{{member['email']}}</td>
-                        <td >{{member['role']}}</td>
-                        <td><span class="type-{{member['employment_type']|lower}}"> {{member['employment_type']}} </span></td>
-                        <td><span class="status-{{member['status']|lower}}"> {{member['status']}} </span></td>
+                        <td >{{member['role']|title}}</td>
+                        <td><span class="type-{{member['employment_type']|lower}}"> {{member['employment_type']|title}} </span></td>
+                        <td><span class="status-{{member['status']|lower}}"> {{member['status']|title}} </span></td>
                         <td>
                         <div class="btn-group dropend">
                             <button type="button" class="btn-clear" data-bs-toggle="dropdown" aria-expanded="false">

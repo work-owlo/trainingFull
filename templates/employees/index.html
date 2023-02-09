@@ -13,28 +13,36 @@
             <div class="row g-2 inputs">
                 <div class="col-md">
                     <div class="mb-3">
-                        <input type="text" name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search">
+                        <input type="text" name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search" value="{{keyword}}">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <select class="form-select search-inputs" name="filter" id="filter" aria-label="Filter" onchange="this.form.submit()">
-                        <option disabled selected>Filter</option>
-                        <option value="complete">Completed</option>
-                        <option value="incomplete">Incomplete</option>
-                        <option value="pending">Pending</option>
+                        <option value="all" {{'selected' if filter == 'all'}}>All</option>
+                        <option value="complete" {{'selected' if filter == 'complete'}}>Completed</option>
+                        <option value="incomplete" {{'selected' if filter == 'incomplete'}}>Incomplete</option>
+                        <option value="pending"{{'selected' if filter == 'pending'}} >Pending</option>
                     </select>
                 </div>
               </div>
             </form>
             <!-- Onboarding Modules Invited -->
             <h6 class="label">Invites</h6>
+            {% if invited|length == 0 %}
+                <div class="row">
+                    <div class="col">
+                        <p>No invites found</p>
+                    </div>
+                </div>
+            {% endif %}
             <div class="row scrolling-wrapper">
                 {% for training in invited %} 
-                    <a href="/member/onboard/{{training['id']}}" class="card-btn">
+                    <a href="/member/onboard/{{training['team_id']}}" class="card-btn">
                     <div class="card">
                         <div class="card-body">
-                        <h5 class="card-title">{{training['title']}}</h5>
-                        <p class="card-text">{{training['description']}}</p>
+                        <label class="">{{training['company_name']}}</label>
+                        <h3 class="card-title">{{training['role_name']}}</h3>
+                        <p class="card-text">{{training['role_description']}}</p>
                         {% if training['status'] > 0 and training['status'] < 100 %}
                             <div class="progress">
                                 <div class="progress-bar" role="progressbar" aria-label="Progress-bar" style="width:{{training['status']}}%;" aria-valuenow="{{training['status']}}" aria-valuemin="0" aria-valuemax="100">{{training['status']}}%</div>
@@ -55,14 +63,15 @@
             </div>
 
             <!-- Onboarding Modules Explore -->
-            <h6 class="label">Explore</h6>
+            <!-- <h6 class="label">Explore</h6>
             <div class="card-group">
                 {% for training in explore %} 
                 <a href="/member/onboard/{{training['id']}}" class="card-btn">
                     <div class="card">
                         <div class="card-body">
-                        <h5 class="card-title">{{training['title']}}</h5>
-                        <p class="card-text">{{training['description']}}</p>
+                        <label class="">{{training['company_name']}}</label>
+                        <h3 class="card-title">{{training['role_name']}}</h3>
+                        <p class="card-text">{{training['role_description']}}</p>
                         {% if training['status'] > 0 and training['status'] < 100 %}
                             <div class="progress">
                                 <div class="progress-bar" role="progressbar" aria-label="Progress-bar" style="width:{{training['status']}}%;" aria-valuenow="{{training['status']}}" aria-valuemin="0" aria-valuemax="100">{{training['status']}}%</div>
@@ -80,7 +89,7 @@
                     </div>
                     </a>
                 {% endfor %}
-            </div>
+            </div> -->
 
             <br>
 
