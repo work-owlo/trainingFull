@@ -62,10 +62,21 @@ def employee_create_account(first_name, last_name, email, password):
                 "INSERT INTO employee_user (user_id, first_name, last_name, email, status) VALUES (%s, %s, %s, %s, %s)", (uid, first_name, last_name, email, 'active')
             )
             conn.commit()
-        # sign in user
+        # set uid to team where email is in team table
+        update_team_with_uid(email, uid)
         return return_success({"email": email, "password": password})
     except:
         return return_error("Email already exists")
+
+
+def update_team_with_uid(email, uid):
+    ''' Update team table with uid '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE team SET employee_id = %s WHERE email = %s", (uid, email)
+        )
+        conn.commit()
 
 
 def employee_forgot_password(email):

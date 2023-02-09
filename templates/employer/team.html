@@ -49,7 +49,7 @@
                 {% if roles|length > 0 %}
                     <tr>
                         <form action="/company/assign_employee" method="post">
-                        <td> <input type="text" class="form-control team-input" name="id_input" id="member-id" placeholder="ID"></td>
+                        <td> <input type="text" class="form-control team-input" name="id_input" id="member-id" placeholder="ID" required></td>
                         <td> <input type="text" class="form-control team-input" name="first_name" id="first-name" placeholder="First" required></td>
                         <td> <input type="text" class="form-control team-input" name="last_name" id="last-name" placeholder="Last" required></td>
                         <td> <input type="email" class="form-control team-input" name="email" id="email" placeholder="Email" required></td>
