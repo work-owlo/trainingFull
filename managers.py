@@ -16,7 +16,6 @@ def get_managers(uid, company_id):
 
 def manager_get_company_id(uid):
     ''' Get the company id of a manager '''
-    print(uid)
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute(

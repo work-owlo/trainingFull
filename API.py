@@ -144,7 +144,6 @@ async def member_root(request: Request, response: Response, user: User = Depends
     keyword = request.query_params.get('keyword')
     filter_status =  request.query_params.get('filter')
     alert = request.query_params.get('alert')
-    print(keyword, filter_status)
     invited = get_training_invited(user.uid,keyword,filter_status)
     response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "index.html",
