@@ -25,3 +25,16 @@ def get_public_modules(tool_id):
             for module in modules:
                 modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
     return modules_list
+
+
+def get_private_modules(tool_id, company_id):
+    '''Get all public modules for a tool.'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT module_id, module_title, module_description FROM module WHERE tool_id = %s AND company_id = %s ORDER BY module_title asc", (tool_id, company_id))
+        modules = cur.fetchall()
+        modules_list = []
+        if modules != None:
+            for module in modules:
+                modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
+    return modules_list

@@ -61,29 +61,29 @@ def get_module_permissions(employee_id, rt_id):
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute('''
-            SELECT count(*) as count
+            SELECT r.role_id as role_id
             FROM team as t, role_tools as r
             WHERE r.role_id = t.role_id AND t.employee_id = %s AND r.rt_id = %s
             ''', (employee_id, rt_id))
         count = cur.fetchone()
-    return True if count and count['count'] > 0 else False
+    return count['role_id'] if count else False
 
 
-def get_training_modules_tool(rt_id):
+def get_training_modules_tool(employee_id, rt_id):
     # get modules for a tool
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute('''
-            SELECT module.module_id, module_title, module_description
-            FROM module, role_tools, role_module
-            WHERE role_tools.rt_id = %s AND role_tools.role_id = role_module.role_id AND module.tool_id = role_tools.tool_id
-            ''', (rt_id,))
+            SELECT module.module_id, module_title, module_description, training.status as status 
+            FROM module, role_tools, role_module, training, team
+            WHERE role_tools.rt_id = %s AND role_tools.role_id = role_module.role_id AND module.tool_id = role_tools.tool_id AND role_module.module_id = module.module_id AND team.team_id = training.team_id AND team.employee_id = %s AND training.module_id = module.module_id
+            ORDER BY training.status, module.module_id
+            ''', (rt_id, employee_id))
         modules = cur.fetchall()
         if not modules:
             return []
         return modules
 
-print(get_training_modules_tool('1vJ6ym6BsKXQdEzQdjE5LDqjx'))
 
 def get_training_status(team_id):
     # get training status (in percentage) for a role

@@ -25,22 +25,29 @@ def add_role_tool_relationship(role_id, tool_id):
     ''' Add relationship between role and tool '''
     with get_db_connection() as conn:
         cur = conn.cursor()
+        rt_id = generate_uid()
         cur.execute(
-            "INSERT INTO role_tools (role_id, tool_id, status) VALUES (%s, %s, %s)", (role_id, tool_id, 'pending'))
+            "INSERT INTO role_tools (rt_id, role_id, tool_id, status) VALUES (%s, %s, %s, %s)", (rt_id, role_id, tool_id, 'pending'))
         conn.commit()
 
 
 def assign_employee_role(company_id, id_input, first_name, last_name, email, role_id, employment_type):
     with get_db_connection() as conn:
         ''' Assign role to employee '''
-        cur = conn.cursor()
-        new_id = generate_uid()
-        employee_id = get_employee_id(email)
-        cur.execute(
-            "INSERT INTO team (team_id, company_id, id_input, first_name, last_name, employee_id, role_id, employment_type, email, status) VALUES (%s, %s, %s, %s, %s,%s, %s, %s, %s, %s)", (new_id, company_id, id_input, first_name, last_name, employee_id, role_id, employment_type, email, "pending"))
-        conn.commit()
-        add_training_tasks(new_id, role_id)
-    return return_success()
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT * FROM team WHERE role_id = %s AND email = %s AND status != 'deleted'", (role_id, email))
+            employee = cur.fetchone()
+            if employee != None:
+                return return_error("Employee already exists for this role")
+            new_id = generate_uid()
+            employee_id = get_employee_id(email)
+            cur.execute(
+                "INSERT INTO team (team_id, company_id, id_input, first_name, last_name, employee_id, role_id, employment_type, email, status) VALUES (%s, %s, %s, %s, %s,%s, %s, %s, %s, %s)", (new_id, company_id, id_input, first_name, last_name, employee_id, role_id, employment_type, email, "pending"))
+            conn.commit()
+            add_training_tasks(new_id, role_id)
+        return return_success()
 
 
 def add_training_tasks(team_id, role_id):

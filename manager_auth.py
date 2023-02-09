@@ -37,23 +37,23 @@ def manager_login(email, password):
 
 def manager_create_admin_account(first_name, last_name, email, password, uid=None, add_to_firebase=True):
     ''' Use Firebase to create a manager account '''
-    # try:
-    uid = generate_uid() if uid is None else uid
-    # create user in firebase
-    user = auth.create_user(uid=uid, email=email, password=password) if add_to_firebase else None
-    # create user in db
-    with get_db_connection() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO manager_user (user_id, first_name, last_name, email, status) VALUES (%s, %s, %s, %s, %s)", (uid, first_name, last_name, email, 'active')
-        )
-        conn.commit()
-    # add permissions
-    add_admin_permissions(uid)
-    # sign in user
-    return manager_login(email, password)
-    # except:
-    #     return return_error("Email already exists")
+    try:
+        uid = generate_uid() if uid is None else uid
+        # create user in firebase
+        user = auth.create_user(uid=uid, email=email, password=password) if add_to_firebase else None
+        # create user in db
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO manager_user (user_id, first_name, last_name, email, status) VALUES (%s, %s, %s, %s, %s)", (uid, first_name, last_name, email, 'active')
+            )
+            conn.commit()
+        # add permissions
+        add_admin_permissions(uid)
+        # sign in user
+        return manager_login(email, password)
+    except:
+        return return_error("Email already exists")
 
 
 def manager_email_exists(email):
@@ -177,7 +177,7 @@ def firebase_edit_manager_password(uid, password):
 
 def manager_verify_login(token, email=None):
     ''' Verify a user's login token '''
-    try:
+    try:            
         info = pyrebase_auth.get_account_info(token)
         if info:
             if (email and info['users'][0]['email'] == email) or not email:
@@ -188,7 +188,7 @@ def manager_verify_login(token, email=None):
                     user = cur.fetchone()
                     user = Manager(company_id=user['company_id'], first_name=user['first_name'], last_name=user['last_name'], uid=user['user_id'], email=user['email'])
                     if user:
-                        return return_success({'user': user})
+                        return return_success({'user': user, 'token': token})
                     else:
                         return return_error("User not found")
         return return_error()
@@ -216,8 +216,10 @@ def manager_refresh_token(token):
         return return_error("Invalid Token")
     try:
         refresh_token = get_refresh_token_db(token)
-        user = pyrebase_auth.refresh(refresh_token)
-        update_access_token_db(token, user['idToken'])
-        return {"status": "success", "token": user['idToken']}
+        if refresh_token != False:
+            user = pyrebase_auth.refresh(refresh_token)
+            update_access_token_db(token, user['idToken'])
+            return return_success({'token': user['idToken']})
+        return False
     except:
         return return_error()

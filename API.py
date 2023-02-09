@@ -94,13 +94,14 @@ def get_current_employee(response: Response, token: str = Depends(oauth2_scheme)
     user = employee_verify_login(token)
     if user['status'] == 'error':
         return False
-    # refreshed_token = employee_refresh_token(user['body']['token'])
-    # print(refreshed_token)
-    # response.set_cookie(
-    #     key="access_token", 
-    #     value=f"Bearer {refreshed_token['token']}", 
-    #     httponly=True
-    # )  
+ 
+    refreshed_token = employee_refresh_token(user['body']['token'])
+    if refreshed_token and refreshed_token['status'] == 'success':
+        response.set_cookie(
+            key="access_token", 
+            value=f"Bearer {refreshed_token['body']['token']}", 
+            httponly=True
+        )  
     return user['body']['user']
 
 
@@ -200,18 +201,15 @@ async def view_module(request: Request, response: Response, rt_id:str, user: Use
     if not permissions:
         return RedirectResponse(url="/member?alert=" + str("You are not permitted to view this module"), status_code=302)
 
-    modules = get_training_modules_tool(rt_id)
-
-    # module = get_module(module_id)
-    # if module['status'] == 'error':
-    #     return RedirectResponse(url="/", status_code=302)
-    # module = module['body']
+    modules = get_training_modules_tool(user.uid, rt_id)
+    role = get_role_info(permissions)
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "module.html",
         {
             "request": request,
             "modules": modules,
-            "name": user.first_name
+            "name": user.first_name,
+            "role": role
         }
     )
 
@@ -334,13 +332,13 @@ def get_current_manager(response: Response, token: str = Depends(oauth2_company)
     user = manager_verify_login(token)
     if user['status'] == 'error':
         return False
-    # refreshed_token = manager_refresh_token(user['body']['token'])
-    # print(refreshed_token)
-    # response.set_cookie(
-    #     key="access_token", 
-    #     value=f"Bearer {refreshed_token['token']}", 
-    #     httponly=True
-    # )  
+    refreshed_token = manager_refresh_token(user['body']['token'])
+    if refreshed_token and refreshed_token['status'] == 'success':
+        response.set_cookie(
+            key="access_token", 
+            value=f"Bearer {refreshed_token['body']['token']}", 
+            httponly=True
+        )  
     return user['body']['user']
 
 
@@ -523,7 +521,8 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
             "name": manager.first_name,
             "keyword": keyword if keyword != None else '',
             "filter": filter_search if filter_search != None else '',
-            "roles": roles
+            "roles": roles,
+            "alert": request.query_params.get('alert') if request.query_params.get('alert') != None else ''
 
         }
     )
@@ -699,13 +698,15 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
             return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
 
     public_modules = get_public_modules(tool.tool_id)
-    modules = []
+    private_modules = get_private_modules(tool.tool_id, manager.company_id)
+    # modules = []
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "addModules.html",
         {
             "request": request,
-            "modules": modules,
+            # "modules": modules,
             "public_modules": public_modules,
+            "private_modules": private_modules,
             "name": manager.first_name, 
             "tool": tool,
             "role_id": role_id

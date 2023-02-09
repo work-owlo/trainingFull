@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row" style="padding:2rem">
+<div class="row row-training">
     <div class="col-md-2">
         <!-- vertical progress menu -->
-        <p class="label">Dispatch Driver</p>
+        <p class="label">{{role['role_name']}}</p>
         {% for module in modules %}
-            <div class="module-box">
-                <p>{{module['module_title']}}</p>
-            </div>
+            {% if module['status'] == 'complete' %}
+            <a class="btn module-box module-box-complete">
+                {{module['module_title']}}
+            </a>
+            {% else %}
+            <a class="btn module-box module-box-pending">
+                {{module['module_title']}}
+            </a>
+            {% endif %}
         {%endfor%}
 
     </div>
-    <div class="col-md-10">
-        Training
+    <div class="col-md-8">
+        <p class="label">Training</p>
     </div>
     
 </div>

@@ -4,6 +4,7 @@ import pyrebase
 from firebase_admin import auth
 from firebase_init import *
 from classes import *
+import datetime as dt, time
 
 firebase = pyrebase.initialize_app(firebase_config)
 pyrebase_auth = firebase.auth()
@@ -133,7 +134,7 @@ def employee_verify_login(token, email=None):
                     if user is None:
                         return return_error()
                     user = User(email= user[0], first_name=user[1], last_name=user[2], uid=info['users'][0]['localId'])
-                    return return_success({"user": user})
+                    return return_success({"user": user, "token": token})
 
         return return_error()
     except:
@@ -160,9 +161,11 @@ def employee_refresh_token(token):
         return return_error("Invalid Token")
     try:
         refresh_token = get_refresh_token_db(token)
-        user = pyrebase_auth.refresh(refresh_token)
-        update_access_token_db(token, user['idToken'])
-        return {"status": "success", "token": user['idToken']}
+        if refresh_token != False:
+            user = pyrebase_auth.refresh(refresh_token)
+            update_access_token_db(token, user['idToken'])
+            return return_success({'token': user['idToken']})
+        return False
     except:
         return return_error()
 
@@ -171,11 +174,34 @@ def create_session_token_db(access_token, refresh_token):
     ''' Create a session token in the db '''
     with get_db_connection() as conn:
         cur = conn.cursor()
+        now = dt.datetime.now()
         cur.execute(
-            "INSERT INTO auth_token (access_token, refresh_token) VALUES (%s, %s)", (access_token, refresh_token)
+            "INSERT INTO auth_token (access_token, refresh_token, updated) VALUES (%s, %s, %s)", (access_token, refresh_token, now)
         )
         conn.commit()
     return return_success()
+
+
+def update_access_token_db(cur_token, new_token):
+    ''' Update the access token in the db '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        # get updated time from db
+        cur.execute(
+            "SELECT updated FROM auth_token WHERE access_token = %s", (cur_token,)
+        )
+        updated = cur.fetchone()
+        if updated is None:
+            return False
+        updated = updated[0]
+        # if update is before 30 minutes ago
+        if updated < dt.datetime.now() - dt.timedelta(minutes=30):
+            now = dt.datetime.now()
+            print(now)
+            cur.execute(
+                "UPDATE auth_token SET access_token = %s, updated = %s WHERE access_token = %s", (new_token, now, cur_token)
+            )
+            conn.commit()
 
 
 def delete_session_token_db(access_token):
@@ -196,16 +222,9 @@ def get_refresh_token_db(access_token):
             "SELECT refresh_token FROM auth_token WHERE access_token = %s", (access_token,)
         )
         refresh_token = cur.fetchone()
+        print('refresh_token' if refresh_token is None else refresh_token[0])
         if refresh_token is None:
             return return_error()
-        return refresh_token[0]
+    return refresh_token[0]
 
 
-def update_access_token_db(cur_token, new_token):
-    ''' Update the access token in the db '''
-    with get_db_connection() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "UPDATE auth_token SET access_token = %s WHERE access_token = %s", (new_token, cur_token)
-        )
-        conn.commit()

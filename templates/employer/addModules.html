@@ -20,12 +20,8 @@
       }
     }
   }
-
-
-
 </script>
 
-    
 <div class="container-employer-85" >
     <div class="row search-row">
         <div class="col-md-12">
@@ -50,7 +46,7 @@
             </div>
             <p class="label">Select From Existing Scenarios</p>
             <label>Private Modules</label>
-            {% if modules|length == 0 %}
+            {% if private_modules|length == 0 %}
               <br>
               <div class="alert alert-warning" role="alert">
                   No modules found. Please add one above
@@ -61,10 +57,11 @@
               <input type="hidden" name="tool_id" value="{{tool['tool_id']}}">
               <div class="card-group">
                 {% for module in private_modules %}
-                <div class="card-train" style="max-width: 18rem;">
-                    <div class="card-body">
-                    <h5 class="card-train-title">{{module['title']}}</h5>
-                    </div>
+                <div class="checkCard">
+                  <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
+                  <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
+                  {{module['name']}} - {{module['description']}}
+                  </label>
                 </div>
                 {% endfor %}
               </div>

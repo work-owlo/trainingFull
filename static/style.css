@@ -154,14 +154,32 @@
         text-align: center;
     }
 
+    .row-training {
+        padding-left:2rem;
+        padding-right:2rem;
+        padding-top:1rem;
+    }
+
     .module-box {
-        background-color:#e8e8e8;
         border-radius:3px;
-        color:#484848;
         text-align: center;
-        line-height: 4rem;
-        /* padding:.5rem; */
-        margin:.5rem;
+        text-decoration: none;
+        padding:1rem;
+        margin:.2rem;
+    }
+
+    .module-box-pending {
+        background-color:#e8e8e8;
+        color:#484848;
+    }
+
+    .module-box-complete {
+        background-color:#70ABAF;
+        color:#ffffff;
+    }
+
+    .module-box:hover {
+        color:#484848;
     }
 
     .search-select {
