@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+<div class="container-employer-85" >
+    <div class="row search-row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col">
+                    <h4>Edit {{role['role_name']}}</h4>
+                    <p>{{role['role_description']}}</p>
+                </div>
+                <!-- <div class="col">
+                    <p style="text-align: right;">
+                        <a href="/company/add_role" class="add-btn">Edit Role Info</a>
+                    </p>
+                </div> -->
+            </div>
+            <div class="form-floating mb-3">
+
+                {% for module in modules %}
+                <div class="row">
+                    <div class="col">
+                        <p class="label">{{module['tool_name']}}</p>
+                    </div>
+                    <div class="col">
+                        <p style="text-align: right;">
+                            <a href="/company/edit_role" class="add-btn">Edit {{module['tool_name']}}</a>
+                        </p>
+                    </div>
+
+                </div>
+                <div class="card-group">
+                    {% for mod in module['modules'] %}
+                    <div class="card-train" style="max-width: 18rem;">
+                        <div class="card-body">
+                        <h5 class="card-train-title">{{mod['module_title']}}</h5>
+                        <p class="">{{mod['module_description']}}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+            
+            </div>
+        </div> 
+
+            
+{% endblock %} 

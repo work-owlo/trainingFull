@@ -41,6 +41,8 @@ class Assignment(BaseModel):
 class Role(BaseModel):
     role_id: str
     role_name: str
+    role_description: str = None
+    status: str = None
 
 
 class Role_Info(BaseModel):

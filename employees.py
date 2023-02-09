@@ -5,23 +5,25 @@ from classes import *
 
 def get_training_invited(uid, keyword=None, filter_status=None):
     ''' Get all training programs an employee is invited to '''
-        #     "id": 1,
-        # "title": "Driving Fedex",
-        # "description": "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        # "status": 100,
     if keyword is None:
         keyword = '' 
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute('''
-            SELECT t.team_id, c.company_name, r.role_name, r.role_description, 50 as status
+            SELECT t.team_id, c.company_name, r.role_name, r.role_description
             FROM job_roles as r, company as c, team as t
             WHERE r.company_id = c.company_id AND t.role_id = r.role_id AND t.employee_id = %s AND r.status = 'active'
             AND (lower(r.role_name) LIKE %s or lower(r.role_description) LIKE %s or lower(c.company_name) LIKE %s)
         ''', (uid, '%'+keyword.lower()+'%', '%'+keyword.lower()+'%', '%'+keyword.lower()+'%' ))
         training = cur.fetchall()
-    # if keyword:
-    #     return [t for t in training if keyword in t['description']]
+        for t in training:
+            t['status'] = get_training_status(t['team_id'])
+        if filter_status == 'incomplete':
+            training = [t for t in training if t['status'] < 100 and t['status'] > 0]
+        elif filter_status == 'complete':
+            training = [t for t in training if t['status'] == 100]
+        elif filter_status == 'pending':
+            training = [t for t in training if t['status'] == 0]
     return training
 
 
@@ -55,14 +57,38 @@ def get_training_tools(team_id):
     return tool_lst
 
 
+# def get_training_status(team_id):
+#     # get training status (in percentage) for a role
+#     with get_db_connection() as conn:
+#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+#         cur.execute('''COUNT(*) as count FROM role_module, team WHERE role_module.role_id = team.role_id and team_id = %s''', (team_id,))
+#         total = cur.fetchone()
+#         cur.execute('''COUNT(*) as count FROM training WHERE team_id = %s AND status = 'completed' ''', (team_id,))
+#         completed = cur.fetchone()
+#         if total and completed:
+#             return round(completed['count']/total['count']*100)
+#     return 0
+
+
 def get_training_status(team_id):
     # get training status (in percentage) for a role
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute('''COUNT(*) as count FROM role_module, team WHERE role_module.role_id = team.role_id and team_id = %s''', (team_id,))
-        total = cur.fetchone()
-        cur.execute('''COUNT(*) as count FROM training WHERE team_id = %s AND status = 'completed' ''', (team_id,))
+        cur.execute('''
+            SELECT COUNT(*) as count
+            FROM team, training
+            WHERE team.team_id = training.team_id
+              AND team.team_id = %s
+              AND training.status = 'completed'
+        ''', (team_id,))
         completed = cur.fetchone()
+        cur.execute('''
+            SELECT COUNT(*) as count
+            FROM team, role_module
+            WHERE team.role_id = role_module.role_id
+             AND team.team_id = %s
+        ''', (team_id,))
+        total = cur.fetchone()
         if total and completed:
             return round(completed['count']/total['count']*100)
     return 0

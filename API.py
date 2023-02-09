@@ -148,16 +148,12 @@ async def member_root(request: Request, response: Response, user: User = Depends
     filter_status =  request.query_params.get('filter')
     alert = request.query_params.get('alert')
     print(keyword, filter_status)
-    training = get_training_invited(user.uid,keyword,filter_status)
-    explore = training[0::]
-    random.shuffle(training)
-    invited = training[0::]
+    invited = get_training_invited(user.uid,keyword,filter_status)
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "index.html",
         {
             "request": request,
             "title": "FastAPI",
-            "explore": explore,
             "invited": invited,
             "name": user.first_name,
             "keyword": keyword if keyword else "",
@@ -683,8 +679,13 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
 
     # check that role is in process of being edited
     tool = get_role_tools_remaining(role_id)
+    print(tool)
     if not tool:
-        return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
+        complete = complete_role(manager.company_id, role_id)
+        if complete['status'] == 'error':
+            return RedirectResponse(url="/company/roles?alert="+str(complete['body']), status_code=302)
+        else:
+            return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
 
     public_modules = get_public_modules(tool.tool_id)
     modules = []
@@ -701,8 +702,54 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
     )
 
 
-@api_router.get("/company/onboarding_preview/{role_id}", status_code=200)
-def onboarding_preview(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.post("/company/add_modules", status_code=200)
+async def add_modules_api(response: Response, request: Request, tool_id:str = Form(), role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Add modules to role'''
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    # verify permisison to add modules to the role
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles?alert=Error", status_code=302)
+
+    # check tool_id in roll tools and 
+    permission = verify_pending_rool_tool_relationship(role_id, tool_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles?alert=Error", status_code=302)
+
+    # for each module, verify permissions to add the module (access)
+    form_data = await request.form()
+    form_data = jsonable_encoder(form_data)
+
+    valid_modules = []
+    for module in form_data:
+        if module == 'role_id':
+            continue
+        permission = verify_module_access(manager.company_id, module, tool_id)
+        if permission:
+            valid_modules.append(module)
+            
+    if len(valid_modules) == 0:    
+        return RedirectResponse(url='/company/add_modules/'+str(role_id) + "?alert=" + str('Please add atleast one module'), status_code=302)
+    
+    # add modules to role
+    for module in valid_modules:
+        add_module_to_role(role_id, module)
+
+    # change rool_tool status to active
+    update_role_tool_status(role_id, tool_id, 'active')
+
+    return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+
+
+    
+
+
+@api_router.get("/company/role/edit/{role_id}", status_code=200)
+def edit_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Preview the onboarding
     """
@@ -710,31 +757,54 @@ def onboarding_preview(role_id:str, response: Response, request: Request,  manag
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company")
-    modules = [
-    {
-        "id": 1,
-        "title": "Customer Simulation",
-        "icon": "people-outline"
-    },
-    {
-        "id": 2,
-        "title": "Co-worker Simulation",
-        "icon": "chatbubbles-outline"
-    },
-    {
-        "id": 3,
-        "title": "Software Simulation",
-        "icon": "desktop-outline"
-    }
-    ]
+
+    # check role belongs to company
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles", status_code=302)
+
+    role = get_role_info(role_id)
+    if role.status != 'active':
+        return RedirectResponse(url="/company/roles", status_code=302)
+    modules = get_role_modules(role_id)
     return EMPLOYER_TEMPLATES.TemplateResponse(
-        "onboardingPreview.html",
+        "editRole.html",
         {
             "request": request,
             "modules": modules,
-            "sections": modules
+            "sections": modules,
+            "name": manager.first_name,
+            "role": role
         }
     )
+
+@api_router.get("/company/role/view/{role_id}", status_code=200)
+def view_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Preview the onboarding
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    # check role belongs to company
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles", status_code=302)
+
+    role = get_role_info(role_id)
+    if role.status != 'active':
+        return RedirectResponse(url="/company/roles", status_code=302)
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "viewRole.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "role": role
+        }
+    )
+
 
 @api_router.post("/company/account", status_code=200)
 @api_router.get("/company/account", status_code=200)
