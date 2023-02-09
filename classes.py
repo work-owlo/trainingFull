@@ -5,6 +5,7 @@ class User(BaseModel):
     first_name: str
     last_name: str
     uid: str
+    token: str = None
 
 
 class Manager(BaseModel):
@@ -14,6 +15,7 @@ class Manager(BaseModel):
     last_name: str
     uid: str
     email: str
+    token: str = None
 
 
 class Member(BaseModel):

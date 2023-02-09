@@ -70,7 +70,6 @@ def company_forgot_password(response:Response, request: Request, email: str = Fo
 @api_router.get("/", status_code=200)
 def employee_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
-    # print(verify_token_employee(oauth2_scheme))
     cookie = request.cookies.get('access_token')
     if cookie:
         return RedirectResponse(url="/member") 
@@ -94,14 +93,11 @@ def get_current_employee(response: Response, token: str = Depends(oauth2_scheme)
     user = employee_verify_login(token)
     if user['status'] == 'error':
         return False
- 
     refreshed_token = employee_refresh_token(user['body']['token'])
     if refreshed_token and refreshed_token['status'] == 'success':
-        response.set_cookie(
-            key="access_token", 
-            value=f"Bearer {refreshed_token['body']['token']}", 
-            httponly=True
-        )  
+        user['body']['user'].token = refreshed_token['body']['token']
+    else:
+        user['body']['user'].token = None
     return user['body']['user']
 
 
@@ -150,7 +146,7 @@ async def member_root(request: Request, response: Response, user: User = Depends
     alert = request.query_params.get('alert')
     print(keyword, filter_status)
     invited = get_training_invited(user.uid,keyword,filter_status)
-    return EMPLOYEE_TEMPLATES.TemplateResponse(
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "index.html",
         {
             "request": request,
@@ -162,6 +158,13 @@ async def member_root(request: Request, response: Response, user: User = Depends
             "alert": alert
         }
     )
+    if user.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {user.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.get("/member/onboard/{team_id}", status_code=200)
@@ -174,11 +177,10 @@ def start_training(request: Request, response: Response, team_id:str, user: User
 
     role_name = get_training_permission(user.uid, team_id)
     modules = get_training_tools(team_id)
-    print(modules)
     if not role_name:
         return RedirectResponse(url="/member?alert=" + str("You are not permitted to view this role"), status_code=302)
 
-    return EMPLOYEE_TEMPLATES.TemplateResponse(
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "train.html",
         {
             "request": request,
@@ -187,6 +189,13 @@ def start_training(request: Request, response: Response, team_id:str, user: User
             "role_name": role_name
         }
     )
+    if user.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {user.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.get("/member/onboard/module/{rt_id}", status_code=200)
@@ -203,7 +212,7 @@ async def view_module(request: Request, response: Response, rt_id:str, user: Use
 
     modules = get_training_modules_tool(user.uid, rt_id)
     role = get_role_info(permissions)
-    return EMPLOYEE_TEMPLATES.TemplateResponse(
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "module.html",
         {
             "request": request,
@@ -212,6 +221,13 @@ async def view_module(request: Request, response: Response, rt_id:str, user: Use
             "role": role
         }
     )
+    if user.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {user.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.get("/member/finish/{val}", status_code=200)
@@ -239,13 +255,21 @@ def complete_training(request: Request, response: Response, user: User = Depends
         "value": 15
     }
     ]
-    return EMPLOYEE_TEMPLATES.TemplateResponse(
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "complete.html",
         {
             "request": request,
             "metrics": metrics
         }
     )
+    if user.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {user.token}",
+            httponly=True
+        )
+    return response
+
 
 @api_router.post("/member/account", status_code=200)
 @api_router.get("/member/account", status_code=200)
@@ -265,9 +289,7 @@ def member_view_account(request: Request, response: Response, user: User = Depen
     }
     ]
         
-        
-    
-    return EMPLOYEE_TEMPLATES.TemplateResponse(
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "account.html",
         {
             "request": request,
@@ -277,6 +299,13 @@ def member_view_account(request: Request, response: Response, user: User = Depen
             "alert": request.query_params.get('alert')
         }
     )
+    if user.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {user.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.post("/member/update_email", status_code=200)
@@ -291,7 +320,6 @@ async def update_email(request: Request, response: Response, user: User = Depend
         return RedirectResponse(url='/member/account')
     else:
         return RedirectResponse(url='/member/account?alert='+str(state['body']))
-    return state
 
 
 @api_router.post("/member/update_password", status_code=200)
@@ -334,19 +362,52 @@ def get_current_manager(response: Response, token: str = Depends(oauth2_company)
         return False
     refreshed_token = manager_refresh_token(user['body']['token'])
     if refreshed_token and refreshed_token['status'] == 'success':
-        response.set_cookie(
-            key="access_token", 
-            value=f"Bearer {refreshed_token['body']['token']}", 
-            httponly=True
-        )  
+        user['body']['user'].token = refreshed_token['body']['token']
+    else:
+        user['body']['user'].token = None
     return user['body']['user']
+
+
+@api_router.get("/company/roles", status_code=200)
+def view_company_roles(response: Response, request: Request, manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Get all the roles of this company
+    """
+    keyword = request.query_params.get('keyword')
+    if keyword != None:
+        keyword = keyword.strip()
+
+    if not manager:
+        return RedirectResponse(url="/company/logout", status_code=302)
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company", status_code=302)
+    roles = get_role_comprehensive(manager.company_id, keyword)
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "roles.html",
+        {
+            "request": request,
+            "roles": roles,
+            "keyword": keyword if keyword != None else '',
+            "name": manager.first_name
+        }
+
+    )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
+
 
 
 @api_router.post("/company", status_code=200)
 @api_router.get("/company", status_code=200)
 def company_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
-    # print(verify_token_employee(oauth2_scheme))
     cookie = request.cookies.get('access_token')
     if cookie:
         return RedirectResponse(url="/company/team") 
@@ -410,7 +471,7 @@ def company_add_company(response:Response, request: Request, alert=None, manager
     elif manager.company_id != None:
         return RedirectResponse(url="/company/team")
 
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addCompany.html",
         {
             "request": request,
@@ -418,6 +479,15 @@ def company_add_company(response:Response, request: Request, alert=None, manager
             "name":manager.first_name,
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
+
 
 @api_router.post("/company/add_company", status_code=200)
 async def company_add_company_post(response:Response, request: Request, manager: Manager = Depends(get_current_manager), name: str = Form(), description: str = Form()) -> dict:
@@ -448,7 +518,6 @@ async def company_update_email(request: Request, response: Response, manager: Ma
         return RedirectResponse(url='/company/account')
     else:
         return RedirectResponse(url='/company/account?alert='+str(state['body']))
-    return state
 
 
 @api_router.post("/company/update_company_name", status_code=200)
@@ -466,7 +535,6 @@ async def company_update_email(request: Request, response: Response, manager: Ma
         return RedirectResponse(url='/company/account')
     else:
         return RedirectResponse(url='/company/account?alert='+str(state['body']))
-    return state
 
 
 @api_router.post("/company/update_password", status_code=200)
@@ -493,7 +561,6 @@ async def company_update_password(request: Request, response: Response, manager:
         return RedirectResponse(url='/company/account')
     else:
         return RedirectResponse(url='/company/account?alert='+str(state['body']))
-    return state
 
 
 @api_router.get("/company/team", status_code=200)
@@ -513,7 +580,7 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
         filter_search = filter_search.strip()
     members = get_team(manager.company_id, keyword, filter_search)
     roles = get_roles(manager.company_id)
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "team.html",
         {
             "request": request,
@@ -526,6 +593,14 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
 
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.post("/company/assign_employee", status_code=200)
@@ -542,31 +617,6 @@ def assign_employee(response: Response, request: Request,  id_input: str = Form(
         return RedirectResponse(url='/company/team?alert='+str(assign['body']), status_code=302)
     
 
-@api_router.get("/company/roles", status_code=200)
-def view_company_roles(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
-    """
-    Get all the roles of this company
-    """
-    keyword = request.query_params.get('keyword')
-    if keyword != None:
-        keyword = keyword.strip()
-
-    if not manager:
-        return RedirectResponse(url="/company/logout", status_code=302)
-    elif manager.company_id == None:
-        return RedirectResponse(url="/company/add_company", status_code=302)
-    roles = get_role_comprehensive(manager.company_id, keyword)
-    return EMPLOYER_TEMPLATES.TemplateResponse(
-        "roles.html",
-        {
-            "request": request,
-            "roles": roles,
-            "keyword": keyword if keyword != None else '',
-            "name": manager.first_name
-        }
-    )
-
-
 @api_router.get("/company/employee/view/{employee_id}", status_code=200)
 def view_employee(response: Response, request: Request, employee_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
@@ -579,7 +629,7 @@ def view_employee(response: Response, request: Request, employee_id: str, manage
     # employee = get_employee(manager.company_id, employee_id)
     if not check_emp_in_team(manager.company_id, employee_id):
         return RedirectResponse(url="/company/team", status_code=302)
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "employee.html",
         {
             "request": request,
@@ -587,6 +637,14 @@ def view_employee(response: Response, request: Request, employee_id: str, manage
             "name": manager.first_name
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.get("/company/add_role", status_code=200)
@@ -600,7 +658,7 @@ def add_company_role(response: Response, request: Request,  manager: Manager = D
         return RedirectResponse(url="/company/add_company")
 
     modules = get_tools()
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addRole.html",
         {
             "request": request,
@@ -609,6 +667,14 @@ def add_company_role(response: Response, request: Request,  manager: Manager = D
             "alert": request.query_params.get('alert') if request.query_params.get('alert') != None else ''
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.post("/company/add_role", status_code=200)
@@ -689,7 +755,6 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
 
     # check that role is in process of being edited
     tool = get_role_tools_remaining(role_id)
-    print(tool)
     if not tool:
         complete = complete_role(manager.company_id, role_id)
         if complete['status'] == 'error':
@@ -700,11 +765,10 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
     public_modules = get_public_modules(tool.tool_id)
     private_modules = get_private_modules(tool.tool_id, manager.company_id)
     # modules = []
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addModules.html",
         {
             "request": request,
-            # "modules": modules,
             "public_modules": public_modules,
             "private_modules": private_modules,
             "name": manager.first_name, 
@@ -712,6 +776,14 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
             "role_id": role_id
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.post("/company/add_modules", status_code=200)
@@ -776,7 +848,7 @@ def edit_role(role_id:str, response: Response, request: Request,  manager: Manag
     if role.status != 'active':
         return RedirectResponse(url="/company/roles", status_code=302)
     modules = get_role_modules(role_id)
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "editRole.html",
         {
             "request": request,
@@ -786,6 +858,15 @@ def edit_role(role_id:str, response: Response, request: Request,  manager: Manag
             "role": role
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
+
 
 @api_router.get("/company/role/view/{role_id}", status_code=200)
 def view_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
@@ -805,7 +886,7 @@ def view_role(role_id:str, response: Response, request: Request,  manager: Manag
     role = get_role_info(role_id)
     if role.status != 'active':
         return RedirectResponse(url="/company/roles", status_code=302)
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "viewRole.html",
         {
             "request": request,
@@ -813,6 +894,14 @@ def view_role(role_id:str, response: Response, request: Request,  manager: Manag
             "role": role
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 @api_router.post("/company/account", status_code=200)
@@ -852,7 +941,7 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
     }]
         
     
-    return EMPLOYER_TEMPLATES.TemplateResponse(
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
         "account.html",
         {
             "request": request,
@@ -863,6 +952,14 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
             "alert": request.query_params.get("alert", None)
         }
     )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 

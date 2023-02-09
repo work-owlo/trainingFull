@@ -179,6 +179,11 @@ def manager_verify_login(token, email=None):
     ''' Verify a user's login token '''
     try:            
         info = pyrebase_auth.get_account_info(token)
+        # with get_db_connection() as conn:
+        #     cur = conn.cursor()
+        #     cur.execute("SELECT * FROM auth_token WHERE access_token = %s", (token,))
+        #     if not cur.fetchone():
+        #         return return_error("Invalid Token")
         if info:
             if (email and info['users'][0]['email'] == email) or not email:
                 with get_db_connection() as conn:
@@ -216,7 +221,8 @@ def manager_refresh_token(token):
         return return_error("Invalid Token")
     try:
         refresh_token = get_refresh_token_db(token)
-        if refresh_token != False:
+        time = get_refresh_time(token)
+        if time != False:
             user = pyrebase_auth.refresh(refresh_token)
             update_access_token_db(token, user['idToken'])
             return return_success({'token': user['idToken']})
