@@ -2,7 +2,7 @@ from fastapi import FastAPI, Header, HTTPException, Depends, status, Response, R
 from pydantic import BaseModel
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.datastructures import URL
@@ -29,6 +29,12 @@ BASE_PATH = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory="static"), name="static")
 EMPLOYEE_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employees"))
 EMPLOYER_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employer"))
+
+favicon_path = 'favicon.ico'
+
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse(favicon_path)
 
 # # Add the allowed origins here
 # origins = ["http://localhost:3000"]
