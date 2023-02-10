@@ -82,6 +82,7 @@ def get_training_modules_tool(employee_id, rt_id):
         modules = cur.fetchall()
         if not modules:
             return []
+        print(modules)
         return modules
 
 

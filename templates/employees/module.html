@@ -5,6 +5,7 @@
     <div class="col-md-2">
         <!-- vertical progress menu -->
         <p class="label">{{role['role_name']}}</p>
+        
         {% for module in modules %}
             {% if module['status'] == 'complete' %}
             <a class="btn module-box module-box-complete">
