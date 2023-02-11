@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.auth_token
 
 CREATE TABLE IF NOT EXISTS public.company
 (
-    id integer NOT NULL DEFAULT nextval('company_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     company_id text COLLATE pg_catalog."default" NOT NULL,
     company_name text COLLATE pg_catalog."default" NOT NULL,
     company_description text COLLATE pg_catalog."default" NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.company
 
 CREATE TABLE IF NOT EXISTS public.employee_user
 (
-    id integer NOT NULL DEFAULT nextval('employee_user_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     user_id text COLLATE pg_catalog."default" NOT NULL,
     first_name text COLLATE pg_catalog."default" NOT NULL,
     last_name text COLLATE pg_catalog."default" NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.employee_user
 
 CREATE TABLE IF NOT EXISTS public.invoice
 (
-    id integer NOT NULL DEFAULT nextval('invoice_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     invoice_id text COLLATE pg_catalog."default" NOT NULL,
     invoice_month integer NOT NULL,
     invoice_year integer NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS public.invoice
 
 CREATE TABLE IF NOT EXISTS public.job_roles
 (
-    id integer NOT NULL DEFAULT nextval('job_roles_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     company_id text COLLATE pg_catalog."default" NOT NULL,
     role_id text COLLATE pg_catalog."default" NOT NULL,
     role_name text COLLATE pg_catalog."default" NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS public.job_roles
 
 CREATE TABLE IF NOT EXISTS public.manager_permissions
 (
-    id integer NOT NULL DEFAULT nextval('manager_permissions_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     user_id text COLLATE pg_catalog."default" NOT NULL,
     add_managers boolean DEFAULT false,
     edit_managers boolean DEFAULT false,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS public.manager_permissions
 
 CREATE TABLE IF NOT EXISTS public.manager_user
 (
-    id integer NOT NULL DEFAULT nextval('manager_user_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     user_id text COLLATE pg_catalog."default" NOT NULL,
     company_id text COLLATE pg_catalog."default",
     first_name text COLLATE pg_catalog."default" NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS public.manager_user
 
 CREATE TABLE IF NOT EXISTS public.module
 (
-    id integer NOT NULL DEFAULT nextval('module_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     module_id text COLLATE pg_catalog."default" NOT NULL,
     company_id text COLLATE pg_catalog."default" NOT NULL,
     module_title text COLLATE pg_catalog."default" NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS public.role_module
     module_id text COLLATE pg_catalog."default" NOT NULL,
     role_id text COLLATE pg_catalog."default" NOT NULL,
     status text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT role_module_pkey PRIMARY KEY ("int")
+    CONSTRAINT role_module_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public.role_tools
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS public.role_tools
 
 CREATE TABLE IF NOT EXISTS public.section
 (
-    id integer NOT NULL DEFAULT nextval('section_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     section_id text COLLATE pg_catalog."default" NOT NULL,
     module_id text COLLATE pg_catalog."default" NOT NULL,
     section_title text COLLATE pg_catalog."default" NOT NULL,
@@ -158,14 +158,14 @@ CREATE TABLE IF NOT EXISTS public.team
     first_name text COLLATE pg_catalog."default",
     last_name text COLLATE pg_catalog."default",
     email text COLLATE pg_catalog."default" NOT NULL,
-    id integer NOT NULL DEFAULT nextval('team_id_seq'::regclass),
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     team_id text COLLATE pg_catalog."default",
     CONSTRAINT team_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public.tools
 (
-    id integer NOT NULL,
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     tool_id text COLLATE pg_catalog."default" NOT NULL,
     tool_name text COLLATE pg_catalog."default" NOT NULL,
     tool_icon text COLLATE pg_catalog."default" NOT NULL,
