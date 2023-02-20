@@ -48,11 +48,27 @@ def employee_email_exists(email):
             return False
         return True
 
+def check_password(password):
+    ''' Check if password is valid '''
+    if len(password) < 6:
+        return return_error("Password must be at least 6 characters")
+    elif len(password) > 20:
+        return return_error("Password must be less than 20 characters")
+    elif not any(char.isdigit() for char in password):
+        return return_error("Password must contain at least one number")
+    elif not any(char.isupper() for char in password):
+        return return_error("Password must contain at least one uppercase letter")
+    elif not any(char.islower() for char in password):
+        return return_error("Password must contain at least one lowercase letter")
+    return True
 
 def employee_create_account(first_name, last_name, email, password):
     ''' Use Firebase to create a manager account '''
     try:
         uid = generate_uid()
+        verify_password = check_password(password)
+        if verify_password['status'] == 'error':
+            return verify_password
         # create user in firebase
         user = auth.create_user(uid=uid, email=email, password=password)
         # create user in db
@@ -162,6 +178,9 @@ def employee_change_password(uid, email, curr_password, password):
         # see if credentials are valid
         if not employee_login(email, curr_password)['status'] == 'success':
             return {'error': 'Invalid Credentials'}
+        verify_password = check_password(password)
+        if verify_password['status'] == 'error':
+            return verify_password
         auth.update_user(uid, password=password)
         # sign out user
         return return_success()
