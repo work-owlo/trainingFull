@@ -767,7 +767,7 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
         else:
             return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
 
-    public_modules = get_public_modules(tool.tool_id)
+    public_modules = get_public_modules(tool.tool_id,manager.company_id)
     private_modules = get_private_modules(tool.tool_id, manager.company_id)
     # modules = []
     response = EMPLOYER_TEMPLATES.TemplateResponse(
@@ -813,19 +813,18 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
     form_data = await request.form()
     form_data = jsonable_encoder(form_data)
 
-    valid_modules = []
+    valid_modules_list = []
     for module in form_data:
         if module == 'role_id':
             continue
         permission = verify_module_access(manager.company_id, module, tool_id)
         if permission:
-            valid_modules.append(module)
-            
-    if len(valid_modules) == 0:    
+            valid_modules_list.append(module)
+    if len(valid_modules_list) == 0:    
         return RedirectResponse(url='/company/add_modules/'+str(role_id) + "?alert=" + str('Please add atleast one module'), status_code=302)
     
     # add modules to role
-    for module in valid_modules:
+    for module in valid_modules_list:
         add_module_to_role(role_id, module)
 
     # change rool_tool status to active

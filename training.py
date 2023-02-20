@@ -14,11 +14,11 @@ def get_tools():
     return tools_list
 
 
-def get_public_modules(tool_id):
+def get_public_modules(tool_id, company_id):
     '''Get all public modules for a tool.'''
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("SELECT module_id, module_title, module_description FROM module WHERE tool_id = %s AND access = 'public' ORDER BY module_title asc", (tool_id,))
+        cur.execute("SELECT module_id, module_title, module_description FROM module WHERE tool_id = %s AND access = 'public' AND not module.company_id = %s  ORDER BY module_title asc", (tool_id,company_id))
         modules = cur.fetchall()
         modules_list = []
         if modules != None:
@@ -28,7 +28,7 @@ def get_public_modules(tool_id):
 
 
 def get_private_modules(tool_id, company_id):
-    '''Get all public modules for a tool.'''
+    '''Get all private modules for a tool.'''
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("SELECT module_id, module_title, module_description FROM module WHERE tool_id = %s AND company_id = %s ORDER BY module_title asc", (tool_id, company_id))
