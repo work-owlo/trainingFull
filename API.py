@@ -833,6 +833,34 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
 
 
+@api_router.get("/company/add_software_module", status_code=200)
+def add_software_module(response: Response, request: Request) -> dict:
+    """
+    Add new module
+    """
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addSoftware.html",
+        {
+            "request": request,
+        }
+    )
+    return response
+
+
+@api_router.get("/company/add_software_process", status_code=200)
+def add_software_module(response: Response, request: Request) -> dict:
+    """
+    Add new module
+    """
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "softwareLoading.html",
+        {
+            "request": request,
+        }
+    )
+    return response
+
+
 @api_router.get("/company/role/edit/{role_id}", status_code=200)
 def edit_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
