@@ -24,7 +24,6 @@ from roles import *
 from training import *
 
 app = FastAPI()
-api_router = APIRouter()
 BASE_PATH = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory="static"), name="static")
 EMPLOYEE_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employees"))
@@ -73,7 +72,7 @@ def company_forgot_password(response:Response, request: Request, email: str = Fo
 
 
 """ EMPLOYEE ROUTES """
-@api_router.get("/", status_code=200)
+@app.get("/", response_class=HTMLResponse)
 def employee_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
     cookie = request.cookies.get('access_token')
@@ -124,7 +123,7 @@ async def login(response: Response, username: str = Form(), password: str = Form
     return rr
 
 
-@api_router.post("/member/signup", status_code=200)
+@app.post("/member/signup", status_code=200)
 async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
     """
     Root GET
@@ -172,7 +171,7 @@ async def member_root(request: Request, response: Response, user: User = Depends
     return response
 
 
-@api_router.get("/member/onboard/{team_id}", status_code=200)
+@app.get("/member/onboard/{team_id}", status_code=200)
 def start_training(request: Request, response: Response, team_id:str, user: User = Depends(get_current_employee)):
     """
     Root GET
@@ -203,7 +202,7 @@ def start_training(request: Request, response: Response, team_id:str, user: User
     return response
 
 
-@api_router.get("/member/onboard/module/{rt_id}", status_code=200)
+@app.get("/member/onboard/module/{rt_id}", status_code=200)
 async def view_module(request: Request, response: Response, rt_id:str, user: User = Depends(get_current_employee)) -> dict:
     """
     Get module for the current user
@@ -235,7 +234,7 @@ async def view_module(request: Request, response: Response, rt_id:str, user: Use
     return response
 
 
-@api_router.get("/member/finish/{val}", status_code=200)
+@app.get("/member/finish/{val}", status_code=200)
 def complete_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
@@ -276,8 +275,8 @@ def complete_training(request: Request, response: Response, user: User = Depends
     return response
 
 
-@api_router.post("/member/account", status_code=200)
-@api_router.get("/member/account", status_code=200)
+@app.post("/member/account", status_code=200)
+@app.get("/member/account", status_code=200)
 def member_view_account(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
@@ -313,7 +312,7 @@ def member_view_account(request: Request, response: Response, user: User = Depen
     return response
 
 
-@api_router.post("/member/update_email", status_code=200)
+@app.post("/member/update_email", status_code=200)
 async def update_email(request: Request, response: Response, user: User = Depends(get_current_employee), email: str = Form()) -> dict:
     """
     Update email for the current member
@@ -327,7 +326,7 @@ async def update_email(request: Request, response: Response, user: User = Depend
         return RedirectResponse(url='/member/account?alert='+str(state['body']))
 
 
-@api_router.post("/member/update_password", status_code=200)
+@app.post("/member/update_password", status_code=200)
 async def update_password(request: Request, response: Response, user: User = Depends(get_current_employee), cur_password: str = Form(), new_password:str = Form()) -> dict:
     """
     Update password for the current member
@@ -373,7 +372,7 @@ def get_current_manager(response: Response, token: str = Depends(oauth2_company)
     return user['body']['user']
 
 
-@api_router.get("/company/roles", status_code=200)
+@app.get("/company/roles", status_code=200)
 def view_company_roles(response: Response, request: Request, manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the roles of this company
@@ -409,8 +408,8 @@ def view_company_roles(response: Response, request: Request, manager: Manager = 
 
 
 
-@api_router.post("/company", status_code=200)
-@api_router.get("/company", status_code=200)
+@app.post("/company", status_code=200)
+@app.get("/company", status_code=200)
 def company_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
     cookie = request.cookies.get('access_token')
@@ -442,7 +441,7 @@ async def company_login(response: Response, username: str = Form(), password: st
     return rr
 
 
-@api_router.post("/company/signup", status_code=200)
+@app.post("/company/signup", status_code=200)
 async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
     """
     Create a new company account
@@ -468,7 +467,7 @@ def logout_get(token: str = Depends(oauth2_scheme)):
     return response
 
 
-@api_router.get("/company/add_company", status_code=200)
+@app.get("/company/add_company", status_code=200)
 def company_add_company(response:Response, request: Request, alert=None, manager: Manager = Depends(get_current_manager)) -> dict:
     '''Form to input company information'''
     if not manager:
@@ -494,7 +493,7 @@ def company_add_company(response:Response, request: Request, alert=None, manager
     return response
 
 
-@api_router.post("/company/add_company", status_code=200)
+@app.post("/company/add_company", status_code=200)
 async def company_add_company_post(response:Response, request: Request, manager: Manager = Depends(get_current_manager), name: str = Form(), description: str = Form()) -> dict:
     '''Form to input company information'''
     if not manager:
@@ -508,7 +507,7 @@ async def company_add_company_post(response:Response, request: Request, manager:
         return RedirectResponse(url="/company/add_company?alert="+str(state['body']))
 
 
-@api_router.post("/company/update_email", status_code=200)
+@app.post("/company/update_email", status_code=200)
 async def company_update_email(request: Request, response: Response, manager: Manager = Depends(get_current_manager), email: str = Form()) -> dict:
     """
     Update email for the current member
@@ -525,7 +524,7 @@ async def company_update_email(request: Request, response: Response, manager: Ma
         return RedirectResponse(url='/company/account?alert='+str(state['body']))
 
 
-@api_router.post("/company/update_company_name", status_code=200)
+@app.post("/company/update_company_name", status_code=200)
 async def company_update_email(request: Request, response: Response, manager: Manager = Depends(get_current_manager), company_name: str = Form()) -> dict:
     """
     Update email for the current member
@@ -542,7 +541,7 @@ async def company_update_email(request: Request, response: Response, manager: Ma
         return RedirectResponse(url='/company/account?alert='+str(state['body']))
 
 
-@api_router.post("/company/update_password", status_code=200)
+@app.post("/company/update_password", status_code=200)
 async def company_update_password(request: Request, response: Response, manager: Manager = Depends(get_current_manager), cur_password: str = Form(), new_password:str = Form()) -> dict:
     """
     Update password for the current company
@@ -568,7 +567,7 @@ async def company_update_password(request: Request, response: Response, manager:
         return RedirectResponse(url='/company/account?alert='+str(state['body']))
 
 
-@api_router.get("/company/team", status_code=200)
+@app.get("/company/team", status_code=200)
 def view_company_team(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the members of this company
@@ -608,7 +607,7 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
     return response
 
 
-@api_router.post("/company/assign_employee", status_code=200)
+@app.post("/company/assign_employee", status_code=200)
 def assign_employee(response: Response, request: Request,  id_input: str = Form(), first_name: str = Form(), last_name: str = Form(), email: str = Form(), role_id: str = Form(), employment_type: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     if not manager:
         return RedirectResponse(url="/company/logout")
@@ -622,7 +621,7 @@ def assign_employee(response: Response, request: Request,  id_input: str = Form(
         return RedirectResponse(url='/company/team?alert='+str(assign['body']), status_code=302)
     
 
-@api_router.get("/company/employee/view/{employee_id}", status_code=200)
+@app.get("/company/employee/view/{employee_id}", status_code=200)
 def view_employee(response: Response, request: Request, employee_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the roles of this company
@@ -652,7 +651,7 @@ def view_employee(response: Response, request: Request, employee_id: str, manage
     return response
 
 
-@api_router.get("/company/add_role", status_code=200)
+@app.get("/company/add_role", status_code=200)
 def add_company_role(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Add new role to this company
@@ -682,7 +681,7 @@ def add_company_role(response: Response, request: Request,  manager: Manager = D
     return response
 
 
-@api_router.post("/company/add_role", status_code=200)
+@app.post("/company/add_role", status_code=200)
 async def add_company_role(response: Response, request: Request,  role_name: str = Form(), role_description: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Add new role to this company
@@ -710,7 +709,7 @@ async def add_company_role(response: Response, request: Request,  role_name: str
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
 
 
-@api_router.post("/company/role/delete", status_code=200)
+@app.post("/company/role/delete", status_code=200)
 def delete_role_api(response: Response, request: Request, delete_role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Delete role to this company
@@ -727,7 +726,7 @@ def delete_role_api(response: Response, request: Request, delete_role_id: str = 
         return RedirectResponse(url='/company/roles?alert='+str(delete['body']), status_code=302)
 
 
-@api_router.post("/company/employee/unassign", status_code=200)
+@app.post("/company/employee/unassign", status_code=200)
 def unassign_role(response: Response, request: Request, team_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Unassign role to this company
@@ -744,7 +743,7 @@ def unassign_role(response: Response, request: Request, team_id: str = Form(), m
         return RedirectResponse(url='/company/team?alert='+str(unassign['body']), status_code=302)
 
 
-@api_router.get("/company/add_modules/{role_id}", status_code=200)
+@app.get("/company/add_modules/{role_id}", status_code=200)
 def add_modules(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Add new module
@@ -791,7 +790,7 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
     return response
 
 
-@api_router.post("/company/add_modules", status_code=200)
+@app.post("/company/add_modules", status_code=200)
 async def add_modules_api(response: Response, request: Request, tool_id:str = Form(), role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     '''Add modules to role'''
     if not manager:
@@ -834,7 +833,7 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
 
 
-@api_router.get("/company/role/edit/{role_id}", status_code=200)
+@app.get("/company/role/edit/{role_id}", status_code=200)
 def edit_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Preview the onboarding
@@ -873,7 +872,7 @@ def edit_role(role_id:str, response: Response, request: Request,  manager: Manag
     return response
 
 
-@api_router.get("/company/role/view/{role_id}", status_code=200)
+@app.get("/company/role/view/{role_id}", status_code=200)
 def view_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Preview the onboarding
@@ -909,8 +908,8 @@ def view_role(role_id:str, response: Response, request: Request,  manager: Manag
     return response
 
 
-@api_router.post("/company/account", status_code=200)
-@api_router.get("/company/account", status_code=200)
+@app.post("/company/account", status_code=200)
+@app.get("/company/account", status_code=200)
 def view_account(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     View and edit the company account
@@ -968,4 +967,30 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
 
 
 
-app.include_router(api_router)
+@app.get("/chat", status_code=200)
+def chat_feature(response: Response, request: Request) -> dict:
+    # filter_status =  request.query_params.get('filter')
+    #Hardcoded stuff for now
+    role_names = [["first", "second"], ["first", "second"], ["first", "second"], ["first", "second"], ["first", "second"]]
+    training_progress = [[1, 0], [1, 0], [1, 1], [0, 0], [1, 0]]
+    training_names = ["Hippa 1", "Hippa 2", "Hippa 3", "Hippa 4", "Hippa 5"]
+    percentages = [str(int(sum(training_progress[i])/(len(training_progress[i])) * 100)) + "%" for i in range(len(training_progress))]
+    left = [len(training_progress[i]) - sum(training_progress[i]) for i in range(len(training_progress))]
+    role = ["Fedex driver", "Arda Akman"]
+    chat = {"query": ["Hello, nice to meet you! How can I help you?", "Thats a great questions - check our FAQ for that", "I'm sorry, I don't understand that question. Can you rephrase it?"], "response" : ["Hi, I would like to know where the ___ are?", "No, its not there :("]}
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
+        "chat.html", 
+        {
+            "request": request,
+            "role_names" : role_names,
+            "training_progress": training_progress,
+            "training_percentage": percentages,
+            "training_names": training_names,
+            "left" : left,
+            "role" : role,
+            "chat" : chat,
+            "name": "Arda",
+            "chatbot-name":"Bard"
+        }
+    )
+    return response

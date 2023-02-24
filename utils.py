@@ -2,7 +2,7 @@ import sqlite3
 import psycopg2.extras
 import random 
 import logging
-# import rds_config
+import rds_config
 import sys
 import psycopg2
 import os
@@ -28,26 +28,26 @@ def get_db_connection():
     conn = psycopg2.connect(db_info)
     return conn
     
-# def get_db_connection():
-#     '''Get a connection to the RDS database.'''
-#     rds_host  = rds_config.db_host
-#     rds_username = rds_config.db_username
-#     rds_user_pwd = rds_config.db_password
-#     rds_db_name = rds_config.db_name
+def get_db_connection():
+    '''Get a connection to the RDS database.'''
+    rds_host  = rds_config.db_host
+    rds_username = rds_config.db_username
+    rds_user_pwd = rds_config.db_password
+    rds_db_name = rds_config.db_name
 
-#     logger = logging.getLogger()
-#     logger.setLevel(logging.INFO)
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
 
-#     try:
-#         conn_string = "host=%s user=%s password=%s dbname=%s" % \
-#                         (rds_host, rds_username, rds_user_pwd, rds_db_name)
-#         conn = psycopg2.connect(conn_string)
-#         logger.info("SUCCESS: Connection to RDS Postgres instance succeeded")
-#         return conn
-#     except:
-#         logger.error("ERROR: Could not connect to Postgres instance.")
-#         sys.exit()
-#         return_error()
+    try:
+        conn_string = "host=%s user=%s password=%s dbname=%s" % \
+                        (rds_host, rds_username, rds_user_pwd, rds_db_name)
+        conn = psycopg2.connect(conn_string)
+        logger.info("SUCCESS: Connection to RDS Postgres instance succeeded")
+        return conn
+    except:
+        logger.error("ERROR: Could not connect to Postgres instance.")
+        sys.exit()
+        return_error()
 
 # print(get_db_connection())
 

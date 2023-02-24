@@ -1,7 +1,6 @@
 
 /* for desktops */
 @media screen and (min-width: 768px) {
-
     body {
         background-color: rgb(255, 255, 255);
         font-family: 'Inter', sans-serif;
@@ -455,4 +454,55 @@
         background-color: #70ABAF;
         color: #ffffff;
     }
+
+    .task-card {
+        background-color: gainsboro;
+        border-radius: 0.5rem;
+        width: 60%;
+    }
+
+    .tast-text {
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+        padding: 0 0 0 0;
+    }
+    .taskheader {
+        display:flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 0.4rem 0 0.4rem 0;
+    }
+    .fullheader {
+        display: flex;
+        flex-direction: column;
+        align-content: stretch;
+        position:relative;
+    }
+
+    .percentagesign {
+        position:relative;
+        display:inline-block;
+        margin-left: 10px;
+
+    }
+    .percentagesign span {
+        padding:60% 10%;
+        margin-top:-0.6em;
+        display:flex;
+    }
+    .percentagesign span:after {
+        content:'';
+        position:absolute;
+        top:0; left:0;
+        width:120%;
+        padding-bottom:120%;
+        background-color: gray;
+        border-radius:50%;
+        z-index:-1;
+     }
+
+    
 }

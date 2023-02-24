@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+
+    <div class="container-fluid m-lg-5">
+  
+      <div class="row">
+  
+        <div class="col-sm-3">
+  
+          <h5 class="font-weight-bold mb-3 text-center text-lg-start">{{role[0]}}</h5>
+  
+          <div>
+            <div>
+                
+              <ul class="list-unstyled mb-0">
+                {% for i in range(training_names|length) %}
+                <li>
+                    <div class="fullheader">
+                      <div>
+                        {% if left[i] == 0 %}
+                          <p class="fw-bold mb-0">{{training_names[i]}} &#x2713</p>
+                        {% else %}
+                          <div class = "taskheader">
+                              <p class="fw-bold mb-0">
+                              {{training_names[i]}}
+                            </p>
+                            <span style = "margin-left: 50%;" class="badge bg-danger float-end"> {{left[i]}}</span>
+                          </div>
+                        {% endif %}
+                        <div>
+                          {% for j in range(training_progress[i]|length) %}
+                            <div class="card task-card" style = "margin-bottom: 1.5%; left:10%;">
+                              {% if training_progress[i][j] == 0 %}
+                              <div class = "card" style="opacity: 0.8;">
+                                  <div class = "card-body" style = "padding: 5% 10% 5% 10%">
+                                    <p class = "card-text">
+                                      {{role_names[i][j]}}
+                                    </p>
+                                  </div>
+                              </div>
+                              {% else %}
+                              <div class = "card" style="opacity: 0.2;";>
+                                <div class = "card-body" style = "padding: 5% 10% 5% 10%">
+                                  <p class = "card-text">
+                                    {{role_names[i][j]}} 
+                                  </p>
+                                </div>
+                              </div>
+                            {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                </li>
+                {% endfor %}
+              </ul>
+  
+            </div>
+          </div>
+  
+        </div>
+  
+        <div class="col-md">
+          <div class = "container-fluid mb-5">
+            <div class="d-flex flex-row justify-content-start">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp" alt="avatar"
+                class="rounded-circle d-flex align-self-left me-3 shadow-1-strong" width="60">
+              <div class="pt-1">
+                <p class="fw-bold mb-0">{{role[1]}}</p>
+                <p class="small text-muted">{{role[0]}}</p>
+              </div>
+            </div>
+            <hr/>
+          </div>
+          
+
+  
+          <ul class="list-unstyled">
+            {% for i in range(chat["query"]|length) %}
+              <li class="d-flex justify-content-between mb-4 align-items-center" style="margin-right:30%" >
+                <div class="card">
+                  <div class="card-header d-flex justify-content-between p-3">
+                    <p class="fw-bold mb-0">Owlo-Bot</p>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-0">
+                      {{chat["query"][i]}}
+                    </p>
+                  </div>
+                </div>
+              </li>
+              {% if i < chat["response"]|length %}
+              <li class="d-flex justify-content-between mb-4" style="margin-left:20%">
+                <div class="card w-100">
+                  <div class="card-header d-flex justify-content-between p-3">
+                    <p class="fw-bold mb-0">{{role[1]}}</p>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-0">
+                      {{chat["response"][i]}}
+                    </p>
+                  </div>
+                </div>
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp" alt="avatar"
+                  class="rounded-circle d-flex align-self-start ms-3 shadow-1-strong" width="60">
+              </li>
+              {% endif %}
+            {% endfor %}
+            <li class="bg-white mb-3">
+              <div class="form-outline">
+                <textarea class="form-control" id="textAreaExample2" rows="4"></textarea>
+                <label class="form-label" for="textAreaExample2">Message</label>
+              </div>
+            </li>
+            <button type="button" class="btn btn-info btn-rounded float-end">Send</button>
+          </ul>
+  
+        </div>
+        <div class="col-sm-4">
+          <div class = "container">
+            <div class = "card">
+              <div class = "card-header">
+                <h1 class = "fw-bold w-100">Instructions</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+  
+    </div>
+  </section>
+
+{% endblock %}

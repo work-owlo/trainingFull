@@ -179,7 +179,10 @@ CREATE TABLE IF NOT EXISTS public.training
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     training_id text COLLATE pg_catalog."default" NOT NULL,
     team_id text COLLATE pg_catalog."default" NOT NULL,
+    query_data text COLLATE pg_catalog."default" NOT NULL,
+    response text COLLATE pg_catalog."default" NOT NULL,
     module_id text COLLATE pg_catalog."default" NOT NULL,
+    type text COLLATE pg_catalog."default" NOT NULL,
     status text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT training_pkey PRIMARY KEY (id)
 );
