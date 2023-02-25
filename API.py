@@ -48,7 +48,47 @@ async def favicon():
 # )
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
+
 oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
+
+
+"""MUTUAL AUTH"""
+@app.get("/privacy_policy", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "privacyPolicy.html",
+        {
+            "request": request,
+        }
+    )
+
+@app.get("/terms", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "terms.html",
+        {
+            "request": request,
+        }
+    )
+
+
+@app.get("/company/privacy_policy", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "privacyPolicy.html",
+        {
+            "request": request,
+        }
+    )
+
+@app.get("/company/terms", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "terms.html",
+        {
+            "request": request,
+        }
+    )
 
 """MUTUAL AUTH"""
 @app.post("/logout", response_class=HTMLResponse)
@@ -125,10 +165,13 @@ async def login(response: Response, username: str = Form(), password: str = Form
 
 
 @api_router.post("/member/signup", status_code=200)
-async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
+async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form(), legalCheckbox:bool = Form(False)) -> dict:
     """
     Root GET
     """
+    if not legalCheckbox:
+        redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert='Please agree to the terms and conditions')
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     state = employee_create_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await login(response, email, password)
@@ -443,10 +486,13 @@ async def company_login(response: Response, username: str = Form(), password: st
 
 
 @api_router.post("/company/signup", status_code=200)
-async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form()) -> dict:
+async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form(), legalCheckbox:bool = Form(False)) -> dict:
     """
     Create a new company account
     """
+    if not legalCheckbox:
+        redirect_url = URL(request.url_for('company_landing')).include_query_params(alert='You must agree to the terms and conditions')
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     state = manager_create_admin_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await company_login(response, email, password)
