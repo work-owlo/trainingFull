@@ -85,6 +85,18 @@ def get_training_modules_tool(employee_id, rt_id):
         print(modules)
         return modules
 
+def get_trainig_data(team_id, employee_id, role_id):
+    # get training data for a role
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute('''
+            SELECT module.module_id, module_title, training.status as status
+            ''', (team_id, employee_id))
+        modules = cur.fetchall()
+        if not modules:
+            return []
+        return modules
+    
 
 def get_training_status(team_id):
     # get training status (in percentage) for a role
