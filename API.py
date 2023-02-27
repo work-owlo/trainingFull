@@ -53,7 +53,7 @@ oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
 
 
 """MUTUAL AUTH"""
-@app.get("/privacy_policy", response_class=HTMLResponse)
+@app.get("/privacy", response_class=HTMLResponse)
 def privacy_policy(request: Request):
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "privacyPolicy.html",
@@ -72,7 +72,7 @@ def privacy_policy(request: Request):
     )
 
 
-@app.get("/company/privacy_policy", response_class=HTMLResponse)
+@app.get("/company/privacy", response_class=HTMLResponse)
 def privacy_policy(request: Request):
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "privacyPolicy.html",
