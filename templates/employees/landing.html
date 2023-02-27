@@ -55,11 +55,19 @@
           <form action="/token" method="post">
               <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email address</label>
-                <input name="username" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <input name="username" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
               </div>
               <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input name="password" type="password" class="form-control" id="exampleInputPassword1">
+                <input name="password" type="password" class="form-control" id="exampleInputPassword1" required>
+              </div>
+              <div class="mb-3">
+              <select class="form-select" aria-label="Default select example" name="exampleSelect" id="exampleSelect">
+                <option selected>Open this select menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+              </select>
               </div>
               <button type="submit" class="btn btn-success">Login Form</button>
           </form>
@@ -98,6 +106,10 @@
             <div class="mb-3">
               <label for="passwordVal" class="form-label">Password</label>
               <input name="password" type="password" class="form-control" id="passwordVal" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" name="legalCheckbox" class="form-check-input" id="legalCheckbox" required>
+              <label class="form-check-label" for="legalCheckbox">I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> </label>
             </div>
             <button type="submit" class="btn btn-success">Sign Up Form</button>
         </form>

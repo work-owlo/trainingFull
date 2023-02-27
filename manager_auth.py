@@ -75,6 +75,9 @@ def manager_create_account(uid, manager_uid, first_name, last_name, email, passw
         # create user in firebase
         if manager_email_exists(email):
             return return_error("Email already exists")
+        verify_password = check_password(password)
+        if verify_password['status'] == 'error':
+            return verify_password
         user = auth.create_user(uid=manager_uid, email=email, password=password)
         # create user in db
         with get_db_connection() as conn:
@@ -207,6 +210,9 @@ def manager_change_password(uid, email, curr_password, password):
         # see if credentials are valid
         if not manager_login(email, curr_password)['status'] == 'success':
             return {'error': 'Invalid Credentials'}
+        verify_password = check_password(password)
+        if verify_password['status'] == 'error':
+            return verify_password
         auth.update_user(uid, password=password)
         # sign out user
         return return_success()

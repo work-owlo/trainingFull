@@ -47,7 +47,47 @@ async def favicon():
 # )
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
+
 oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
+
+
+"""MUTUAL AUTH"""
+@app.get("/privacy", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "privacyPolicy.html",
+        {
+            "request": request,
+        }
+    )
+
+@app.get("/terms", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYEE_TEMPLATES.TemplateResponse(
+        "terms.html",
+        {
+            "request": request,
+        }
+    )
+
+
+@app.get("/company/privacy", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "privacyPolicy.html",
+        {
+            "request": request,
+        }
+    )
+
+@app.get("/company/terms", response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "terms.html",
+        {
+            "request": request,
+        }
+    )
 
 """MUTUAL AUTH"""
 @app.post("/logout", response_class=HTMLResponse)
@@ -128,6 +168,9 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     """
     Root GET
     """
+    if not legalCheckbox:
+        redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert='Please agree to the terms and conditions')
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     state = employee_create_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await login(response, email, password)
@@ -446,6 +489,9 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     """
     Create a new company account
     """
+    if not legalCheckbox:
+        redirect_url = URL(request.url_for('company_landing')).include_query_params(alert='You must agree to the terms and conditions')
+        return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     state = manager_create_admin_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await company_login(response, email, password)
@@ -766,7 +812,7 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
         else:
             return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
 
-    public_modules = get_public_modules(tool.tool_id)
+    public_modules = get_public_modules(tool.tool_id,manager.company_id)
     private_modules = get_private_modules(tool.tool_id, manager.company_id)
     # modules = []
     response = EMPLOYER_TEMPLATES.TemplateResponse(
@@ -812,25 +858,80 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
     form_data = await request.form()
     form_data = jsonable_encoder(form_data)
 
-    valid_modules = []
+    valid_modules_list = []
     for module in form_data:
         if module == 'role_id':
             continue
         permission = verify_module_access(manager.company_id, module, tool_id)
         if permission:
-            valid_modules.append(module)
-            
-    if len(valid_modules) == 0:    
+            valid_modules_list.append(module)
+    if len(valid_modules_list) == 0:    
         return RedirectResponse(url='/company/add_modules/'+str(role_id) + "?alert=" + str('Please add atleast one module'), status_code=302)
     
     # add modules to role
-    for module in valid_modules:
+    for module in valid_modules_list:
         add_module_to_role(role_id, module)
 
     # change rool_tool status to active
     update_role_tool_status(role_id, tool_id, 'active')
 
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+
+
+@app.get("/company/add_software_module", status_code=200)
+def add_software_module(response: Response, request: Request) -> dict:
+    """
+    Add new module
+    """
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addSoftware.html",
+        {
+            "request": request,
+        }
+    )
+    return response
+
+
+@app.get("/company/add_software_process", status_code=200)
+def add_software_module(response: Response, request: Request) -> dict:
+    """
+    Add new module
+    """
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "softwareLoading.html",
+        {
+            "request": request,
+        }
+    )
+    return response
+
+
+@app.get("/company/add_software_module", status_code=200)
+def add_software_module(response: Response, request: Request) -> dict:
+    """
+    Add new module
+    """
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addSoftware.html",
+        {
+            "request": request,
+        }
+    )
+    return response
+
+
+@api_router.get("/company/add_software_process", status_code=200)
+def add_software_module(response: Response, request: Request) -> dict:
+    """
+    Add new module
+    """
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "softwareLoading.html",
+        {
+            "request": request,
+        }
+    )
+    return response
 
 
 @app.get("/company/role/edit/{role_id}", status_code=200)
