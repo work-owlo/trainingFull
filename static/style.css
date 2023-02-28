@@ -43,6 +43,10 @@
         width:100%;
     }
 
+    .link-secondary {
+        text-decoration: none;
+    }
+
     .logo {
         all: unset;
         margin-left:1rem;
