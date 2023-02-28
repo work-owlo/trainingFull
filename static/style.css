@@ -5,6 +5,9 @@
     body {
         background-color: rgb(255, 255, 255);
         font-family: 'Inter', sans-serif;
+        height: 100%;
+        width: 100%;
+        position: relative;
 
     }
 
@@ -333,6 +336,12 @@
         padding:.3rem
     }
 
+    .container-main {
+        /* import generic bootstrap container classs */
+        width:65%;
+        margin:0 auto;
+    }
+
     .type-contractor {
         /* blue text with border */
         color: #e57346;
@@ -492,4 +501,12 @@
         border-radius: 5px;
         /* margin-bottom:.5rem; */
     }
+    
+    #footer {
+        position:absolute;
+        bottom:0;
+        width:100%;
+        height:60px;   /* Height of the footer */
+        background:#6cf;
+     }
 }
