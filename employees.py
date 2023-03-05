@@ -90,7 +90,7 @@ def get_trainig_data(team_id, employee_id, role_id):
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute('''
-            SELECT module.module_id, module_title, training.status as status
+            SELECT module.module_id, module_title, training.status as status, module.module_description
             ''', (team_id, employee_id))
         modules = cur.fetchall()
         if not modules:

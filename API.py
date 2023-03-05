@@ -13,6 +13,8 @@ from pathlib import Path
 import re
 import random
 
+
+from chatbot import *
 from employee_auth import *
 from employees import *
 from classes import *
@@ -22,6 +24,7 @@ from company import *
 from managers import *
 from roles import *
 from training import *
+
 
 app = FastAPI()
 BASE_PATH = Path(__file__).resolve().parent
@@ -920,7 +923,7 @@ def add_software_module(response: Response, request: Request) -> dict:
     return response
 
 
-@api_router.get("/company/add_software_process", status_code=200)
+@app.get("/company/add_software_process", status_code=200)
 def add_software_module(response: Response, request: Request) -> dict:
     """
     Add new module
@@ -1067,9 +1070,10 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
     return response
 
 
-
-@app.get("/chat", status_code=200)
-def chat_feature(response: Response, request: Request) -> dict:
+@app.get("/member/chat/{training_id}", status_code=200)
+def chat_feature(response: Response, request: Request, training_id: str, user: User = Depends(get_current_employee)) -> dict:
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
     # filter_status =  request.query_params.get('filter')
     #Hardcoded stuff for now
     role_names = [["first", "second"], ["first", "second"], ["first", "second"], ["first", "second"], ["first", "second"]]
@@ -1091,7 +1095,28 @@ def chat_feature(response: Response, request: Request) -> dict:
             "role" : role,
             "chat" : chat,
             "name": "Arda",
-            "chatbot-name":"Bard"
+            "chatbot-name":"Bard",
+            "training_id": training_id
         }
     )
     return response
+
+
+
+@app.post("/member/chat/{training_id}/chatresponse", status_code=200)
+def chat_response(response: Response, request : Request, user: User = Depends(get_current_employee)) -> dict:
+    """
+    Chatbot response
+    """
+    #For now just do the regular check.
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
+    #Check if chatbox is instantiated
+    response = {
+        "status": "success",
+        "response": {
+            "text" : "wooooo"
+        }
+    }
+    return response
+

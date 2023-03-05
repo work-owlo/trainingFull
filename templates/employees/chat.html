@@ -1,19 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <section>
-
-    <div class="container-fluid m-lg-5">
+    <div id= "fulltable" class="container-fluid m-lg-5">
   
       <div class="row">
   
         <div class="col-sm-3">
   
-          <h5 class="font-weight-bold mb-3 text-center text-lg-start">{{role[0]}}</h5>
-  
-          <div>
-            <div>
-                
-              <ul class="list-unstyled mb-0">
+          <h5 class="font-weight-bold mb-3 text-center text-lg-start">{{role[0]}}</h5>  
+              <ul id= "taskBox" class="list-unstyled mb-0">
                 {% for i in range(training_names|length) %}
                 <li>
                     <div class="fullheader">
@@ -55,11 +50,7 @@
                     </div>
                 </li>
                 {% endfor %}
-              </ul>
-  
-            </div>
-          </div>
-  
+              </ul>  
         </div>
   
         <div class="col-md">
@@ -77,10 +68,10 @@
           
 
   
-          <ul class="list-unstyled">
+          <ul id= "chatbox" class="list-unstyled">
             {% for i in range(chat["query"]|length) %}
               <li class="d-flex justify-content-between mb-4 align-items-center" style="margin-right:30%" >
-                <div class="card">
+                <div class="card w-100">
                   <div class="card-header d-flex justify-content-between p-3">
                     <p class="fw-bold mb-0">Owlo-Bot</p>
                   </div>
@@ -92,7 +83,7 @@
                 </div>
               </li>
               {% if i < chat["response"]|length %}
-              <li class="d-flex justify-content-between mb-4" style="margin-left:2c0%">
+              <li class="d-flex justify-content-between mb-4" style="margin-left:20%; margin-right: 5%;">
                 <div class="card w-100">
                   <div class="card-header d-flex justify-content-between p-3">
                     <p class="fw-bold mb-0">{{role[1]}}</p>
@@ -108,14 +99,13 @@
               </li>
               {% endif %}
             {% endfor %}
-            <li class="bg-white mb-3">
-              <div class="form-outline">
-                <textarea class="form-control" id="textAreaExample2" rows="4"></textarea>
-                <label class="form-label" for="textAreaExample2">Message</label>
-              </div>
-            </li>
-            <button type="button" class="btn btn-info btn-rounded float-end">Send</button>
           </ul>
+          <div class="form-outline">
+            <textarea class="form-control" id="inputTextArea" rows="4"></textarea>
+            <label class="form-label" for="textAreaExample2">Message</label>
+          </div>
+        </li>
+        <button type="button" id = "sendMessageToChat" class="btn btn-info btn-rounded float-end">Send</button>
   
         </div>
         <div class="col-sm-4">
@@ -131,6 +121,101 @@
       </div>
   
     </div>
+
+    <script type="text/javascript">
+
+
+
+      var textArea = document.getElementById("inputTextArea");
+      var sendButton = document.getElementById("sendMessageToChat");
+  
+      sendButton.addEventListener("click", (event) =>{
+        var text = textArea.value;
+        request_data = {
+          "query" : text,
+        }
+        // First add the field into the chat
+        var chatbox = document.getElementById("chatbox");
+        var newChat = document.createElement("li");
+        newChat.className = "d-flex justify-content-between mb-4 align-items-center";
+        newChat.style = "margin-left:20%; margin-right: 5%;";
+        var card = document.createElement("div");
+        card.className = "card w-100";
+        var cardHeader = document.createElement("div");
+        cardHeader.className = "card-header d-flex justify-content-between p-3";
+        var p = document.createElement("p");
+        p.className = "fw-bold mb-0";
+        var temp = {{ role|tojson }};
+        var role = temp[1];
+        p.innerHTML = role;
+        cardHeader.appendChild(p);
+        card.appendChild(cardHeader);
+        var cardBody = document.createElement("div");
+        cardBody.className = "card-body";
+        var p = document.createElement("p");
+        p.className = "mb-0";
+        p.innerHTML = text;
+        cardBody.appendChild(p);
+        card.appendChild(cardBody);
+        newChat.appendChild(card);
+        var img = document.createElement("img");
+        img.src = "https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp";
+        img.alt = "avatar";
+        img.className = "rounded-circle d-flex align-self-start ms-3 shadow-1-strong";
+        img.width = "60";
+        newChat.appendChild(img);
+        chatbox.appendChild(newChat); 
+        chatbox.scrollTop = chatbox.scrollHeight;
+        // Now send the request to the server
+        
+        var training_id = {{ training_id }};
+        fetch(`/member/chat/${training_id}/chatresponse`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(request_data),
+        })
+        .then(response => {
+          // Here, add the new stuff to the list like the above way.
+          return response.json();
+        }).
+        then(response => {
+          console.log("Bot responding..")
+          console.log(response);
+          var chatbox = document.getElementById("chatbox");
+          var newChat = document.createElement("li");
+          newChat.className = "d-flex justify-content-between mb-4 align-items-center";
+          newChat.style = "margin-right: 30%;";
+          var card = document.createElement("div");
+          card.className = "card w-100";
+          var cardHeader = document.createElement("div");
+          cardHeader.className = "card-header d-flex justify-content-between p-3";
+          var p = document.createElement("p");
+          p.className = "fw-bold mb-0";
+          p.innerHTML = "Owlo-Bot";
+          cardHeader.appendChild(p);
+          card.appendChild(cardHeader);
+          var cardBody = document.createElement("div");
+          cardBody.className = "card-body";
+          var p = document.createElement("p");
+          p.className = "mb-0";
+          p.innerHTML = response["response"]["text"];
+          cardBody.appendChild(p);
+          card.appendChild(cardBody);
+          newChat.appendChild(card);
+          chatbox.appendChild(newChat);
+          chatbox.scrollTop = chatbox.scrollHeight;
+        })
+        .catch(error => {
+          console.log("error")
+        })
+      })
+  
+    
+    </script>
   </section>
+
+
 
 {% endblock %}
