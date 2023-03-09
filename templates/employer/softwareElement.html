@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<html>
+
+<script>
+    // if window is resized, console log the new width and height
+    var adjusted_size = {{size['width']}}
+    const og_size = 1200 - 2
+    var adjustment_factor = adjusted_size/og_size
+    var element_dict = {{element_size_dict|tojson}}
+    var screenshot_dict = {{screenshot_size_dict|tojson}}
+    // onload resize
+    window.onload = function() {
+        resize()
+    }
+    window.addEventListener('resize', function(event){
+        resize()
+    });
+
+    function resize() {
+        var screenshots = document.getElementsByClassName('screenshot')
+        var screenshot = screenshots[0]
+        adjusted_size = screenshot.clientWidth
+        adjustment_factor = adjusted_size/og_size
+        console.log(adjustment_factor)
+        
+        for (var id in element_dict) {
+            var element_val = element_dict[id]
+            var element = document.getElementById(id)
+            console.log(element_val)
+            
+            element.style.fontSize = 16 * adjustment_factor + 'px'
+            element.style.left = element_val['x'] * adjustment_factor + 'px'
+            element.style.top = element_val['y'] * adjustment_factor + 'px'
+            element.style.width = element_val['width'] * adjustment_factor + 'px'
+            element.style.height = element_val['height'] * adjustment_factor + 'px'
+        }
+
+        for (var id in screenshot_dict) {
+            var screenshot = screenshot_dict[id]
+            var y = screenshot['y']
+            var screenshot = document.getElementById(id)
+            screenshot.style.top = y * adjustment_factor + 'px'
+        }
+    }
+
+
+    function fillInput() {
+        var ai_inputs = document.querySelectorAll('[id^="ai"]')
+        for (var i = 0; i < ai_inputs.length; i++) {
+            var ai_input = ai_inputs[i]
+            var id = ai_input.id
+            var input_id = id.substring(2)
+            var input = document.getElementById(input_id)
+            input.value = ai_input.value
+        }
+    }
+
+</script>
+
+    <div class="row" style="display:flex;position: relative;width:100%">
+    <div style="margin-bottom:.2rem">
+        <h5>Add Custom Input</h5>
+        <p>Fill the inputs and click the black button below to continue</p>
+    </div>
+    <div class="col-8 screenshot-col">
+            {% for image in screenshots %}
+            <img src="https://s3.us-west-1.wasabisys.com/owlo/{{image['screenshot_name']}}" 
+            class="screenshot"
+            style="
+            top: {{image['y'] * image['img_counter'] }}px;
+            z-index:{{image['img_counter'] * -1}};"
+            id="{{image['screenshot_name']}}">
+            {% endfor %}
+        
+            <form action="/company/processSoftware/element/{{parse_id}}" method="post" autocomplete="off">
+                    {% for input in form['input'] %}
+                        <input
+                        type = "{{input['subtype']}}"
+                        placeholder="Type your input here"
+                        value="{{input['value'] or ''}}"
+                        name="{{input['id']}}"
+                        id = "{{input['id']}}"
+                        class="screenshot-input"
+                        style="
+                        top: {{input['y']}}px;
+                        left: {{input['x']}}px;
+                        height: {{input['height']}}px;
+                        width: {{input['width']}}px;"
+                        autocomplete="new-password"
+                        required
+                        >
+                    {% endfor %}
+                    {% for select in form['select'] %}
+                        <select class="screenshot-input" aria-label="Default select example"
+                        id = "{{select['id']}}"
+                        name="{{select['id']}}"
+                        style="
+                        top: {{select['y']}}px;
+                        left: {{select['x']}}px;
+                        height: {{select['height']}}px;
+                        width: {{select['width']}}px;
+                        position:absolute;
+                        ">
+                        {% for option in select_options[select['id']] %}
+                            <option value="{{option['option_id']}}" {{'selected' if option['option_id'] == 1 }}>{{option['option_value']}}</option>
+                        {% endfor %}
+                          </select>
+                        </select>
+                    {% endfor %}
+
+                    {% for button in form['button'] %}
+                        <input
+                        type="submit"
+                        value="Continue"
+                        id="{{button['id']}}"
+                        class="screenshot-button"
+                        style="
+                        background-color: black;
+                        color:white;
+                        opacity:1;
+                        top: {{button['y']}}px;
+                        left: {{button['x']}}px;
+                        height: {{button['height']}}px;
+                        width: {{button['width']}}px;">     
+                    {% endfor %}
+            </form>
+    </div>
+    <div class="col-3" style="z-index:10;">
+        <!-- AI Recs -->
+        <h4 class="">Autofill</h4>
+        <div style="margin-bottom:.5rem">
+            {% for rec in ai_recs %}
+                {% if rec['rec'] != '' %}
+                    <div class="mb-3">
+                        <input
+                        type = "text"
+                        placeholder="AI Input"
+                        value="{{rec['rec']}}"
+                        name="{{rec['id']}}"
+                        id = "ai{{rec['id']}}"
+                        class="form-control"
+                        disabled
+                        required
+                        >
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+            <button class="btn btn-success"  onclick="fillInput()">Use Autofill</button>
+            <br><br>
+            <hr>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteElement">
+            Not Important</button>
+    </div>
+
+</div>
+<!-- Modal -->
+<div class="modal fade" id="deleteElement" tabindex="-1" aria-labelledby="deleteElementLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deleteElementLabel">Delete Element</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          If this element is not important, you can delete it.  All elements that result in completing
+          this element will be deleted as well.
+          <br><br>
+          For example, if you delete Login inputs, all elements that result in logging in will be deleted.
+
+        </div>
+        <div class="modal-footer">
+            <form class="not-important" action="{{url_for('processSoftwareDeleteElements', form_id=form_id, parse_id=parse_id)}}" method="POST">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>
+
+
+{% endblock %}

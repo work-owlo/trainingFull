@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+        $("#form").on("submit", function(){
+            $(".add-module-load").show();
+        });//submit
+    });//document ready
+</script>
+<div class="spinner-grow add-module-load" role="status" style="display:none">
+    <span class="visually-hidden">Loading...</span>
+</div>
+<div class="row">
+    <div class="col">
+        <form id="form" action="/company/add_module/compliance" method="POST" class="container-form">
+            <h4>Add Compliance Module</h4>
+            <div class="mb-3">
+                <label for="moduleName" class="form-label">Module Title</label>
+                <input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="ex. Fire Hazard Policy" value="{{data['moduleName'] if data['moduleName']}}" required>
+            </div>
+            <div class="mb-3">
+                <label for="textInput" class="form-label">Input Text</label>
+                <textarea class="form-control" id="textInput" rows="5" name="textInput" placeholder="ex. SAFETY..." required>{{data['textInput'] if data['textInput']}}</textarea>
+            </div>
+            <button type="submit" class="btn btn-success" onclick="showLoad()">Generate Questions</button>
+        </form>
+    </div>
+    <div class="col">
+        {% if data|length > 0 %}
+        <form action="/company/save_module/compliance" method="POST">
+            <input type="hidden" name="moduleName" value="{{data['moduleName']}}">
+            <input type="hidden" name="textInput" value="{{data['textInput']}}">
+            <h2 class="label question-label">Edit Questions</h2>
+            <!-- for loop over questions -->
+            {% for i in range(questions|length) %}
+            <div class="mb-3 question-div">
+                <input type="text" class="form-control question" id="question{{i}}" name="question{{i}}" value="{{ questions[i] }}" required>
+                <!-- delete button that deletes input field if clicked -->
+                <button type="button" class="btn btn-danger-outline delete-question" id="deleteQuestion{{i}}"><ion-icon name="close-outline"></ion-icon></button>
+                <script>
+                    $(document).ready(function() {
+                        $("#deleteQuestion{{i}}").click(function() {
+                            $(this).parent().remove();
+                        });
+                    });
+                </script>
+                <br>
+            </div>
+            {% endfor %}
+            <!-- JS button when clicked adds a new input field -->
+            <button type="button" class="btn btn-success-outline" id="addQuestion">Add Question</button>
+            <script>
+                $(document).ready(function() {
+                    $("#addQuestion").click(function() {
+                        var questionCount = $(".question-div").length;
+                        var newQuestion = '<div class="mb-3 question-div"><input type="text" class="form-control question" name="question' + questionCount + '" id="question' + questionCount + '" placeholder="Question" required><button type="button" class="btn btn-danger-outline delete-question" id="deleteQuestion' + questionCount + '"><ion-icon name="close-outline"></ion-icon></button><br></div>';
+                        $(".question-label").after(newQuestion);
+                        $("#deleteQuestion" + questionCount).click(function() {
+                            $(this).parent().remove();
+                        });
+                    });
+                });
+            </script>
+            <!-- Add question input form -->
+            <button type="submit" class="btn btn-success">Create</button>
+        {% endif %}
+        </form>
+        
+    </div>
+</div>
+{% endblock %}

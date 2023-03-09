@@ -22,6 +22,10 @@ from company import *
 from managers import *
 from roles import *
 from training import *
+from soft_training import *
+from parse import *
+from element import *
+from graph import *
 
 app = FastAPI()
 api_router = APIRouter()
@@ -1039,6 +1043,614 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
         )
     return response
 
+
+# COMPANY TRAINING ROUTES
+
+
+@api_router.get("/company/add_module/software", status_code=200)
+def add_software_module(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Add new module
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addSoftware.html",
+        {
+            "request": request,
+            "name": manager.first_name
+        }
+    )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
+
+
+@api_router.get("/company/processSoftware/load/{parse_id}", status_code=200)
+def processSoftware(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+    
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT status FROM parse
+                    WHERE parse_id = %s""", (parse_id,))
+        parse_status = cur.fetchone()
+        if parse_status[0] == 'parsed':
+            return RedirectResponse(url=f"/company/processSoftware/complete/{parse_id}", status_code=302)
+        elif parse_status[0] == 'completed':
+            return RedirectResponse(url="/company/add_module/software", status_code=302)
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "softwareLoading.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "parse_id": parse_id
+        }
+    )
+    return response
+
+
+@api_router.post("/company/add_module/software", status_code=200)
+def addSoftwarePost(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), url: str = Form(...), website_name: str = Form(...), website_description: str = Form(...)) -> dict:
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+    parse_id = Parse('ai', url, software_name=website_name, company_id  = manager.company_id, description=website_description, add_to_db=True).id
+    return RedirectResponse(url=f"/company/processSoftware/load/{parse_id}", status_code=302)
+
+
+@api_router.get("/company/processSoftware/element/{parse_id}", status_code=200)
+def processSoftwareElement(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Comment'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT status FROM parse
+                    WHERE parse_id = %s""", (parse_id,))
+        parse_status = cur.fetchone()
+        if parse_status[0] == 'parsed':
+            return RedirectResponse(url=f"/company/processSoftware/complete/{parse_id}", status_code=302)
+        elif parse_status[0] == 'completed':
+            return RedirectResponse(url="/company/add_module/software", status_code=302)
+
+    form_id = parser(parse_id)
+    if not form_id:
+        return RedirectResponse(url=f"/company/processSoftware/complete/{parse_id}", status_code=302)
+    
+    # get the form
+    form = {}
+    elements = Webform.get_elements(form_id)
+    form['input'] = [element for element in elements if element.type == 'input']
+    form['select'] = [element for element in elements if element.type == 'select']
+    form['button'] = [element for element in elements if element.type == 'button']
+    screenshots = [dict(screenshot) for screenshot in Webform.get_screenshots(form_id, parse_id)]
+
+    element_size_dict = {}
+    for element in (elements):
+        element_size_dict[element.id] = {'width': element.width, 'height': element.height, 'x': element.x, 'y': element.y}
+
+    select_options = {}
+    for select in form['select']:
+        select_options[select.id] = [option for option in select.get_select_options()]
+
+    screenshot_size_dict = {}
+    for screenshot in screenshots:
+        screenshot_size_dict[screenshot['screenshot_name']] = {'y': screenshot['y']}
+    
+    original_size = {'width': 1000, 'height': 700}
+    adjusted_size = {'width': 800, 'height': 300}
+
+    ai_recs = []
+    for input in form['input']:
+        # random 5 alphanumeric string
+        ai_dict = {}
+        ai_dict['id'] = input.id
+        ai_dict['rec'] = input.generate_sample()
+        ai_recs.append(ai_dict)
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "softwareElement.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "select_options": select_options,
+            "original_size": original_size,
+            "size": adjusted_size,
+            "form": form,
+            "ai_recs": ai_recs,
+            "screenshots": screenshots,
+            "form_id": form_id,
+            "element_size_dict": element_size_dict,
+            "screenshot_size_dict": screenshot_size_dict,
+            "parse_id": parse_id
+        }
+    )
+    return response
+
+
+@api_router.post("/company/processSoftware/element/{parse_id}", status_code=200)
+def processSoftwareElementSubmit(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT status FROM parse
+                    WHERE parse_id = %s""", (parse_id,))
+        parse_status = cur.fetchone()
+        if parse_status[0] == 'parsed':
+            return RedirectResponse(url=f"/company/processSoftware/complete/{parse_id}", status_code=302)
+        elif parse_status[0] == 'complete':
+            return RedirectResponse(url="/company/add_module/software", status_code=302)
+
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        for request_key, request_value in request.form.items():
+            cur.execute("""UPDATE element 
+                        SET generated_value = %s 
+                        WHERE id = %s AND parse_id = %s""", (request_value, request_key, parse_id))
+            conn.commit()
+
+    return RedirectResponse(url=f"/company/processSoftware/element/{parse_id}", status_code=302)
+
+
+@api_router.post("/company/processSoftware/deleteElements/{form_id}/{parse_id}", status_code=200)
+def processSoftwareDeleteElements(form_id:str, parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT status FROM parse
+                    WHERE parse_id = %s""", (parse_id,))
+        parse_status = cur.fetchone()
+        if parse_status[0] == 'parsed':
+            return RedirectResponse(url=f"/company/processSoftware/complete/{parse_id}", status_code=302)
+        elif parse_status[0] == 'complete':
+            return RedirectResponse(url="/company/add_module/software", status_code=302)
+
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""DELETE FROM element 
+                    WHERE form_id = %s AND parse_id = %s""", (form_id, parse_id))
+        conn.commit()
+    return RedirectResponse(url=f"/company/processSoftware/element/{parse_id}", status_code=302)
+
+
+@api_router.get("/company/processSoftware/complete/{parse_id}", status_code=200)
+def processSoftwareComplete(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT status FROM parse
+                    WHERE parse_id = %s""", (parse_id,))
+        parse_status = cur.fetchone()
+        if parse_status[0] == 'pending':
+            return RedirectResponse(url=f"/company/processSoftware/{parse_id}", status_code=302)
+        elif parse_status[0] == 'complete':
+            return RedirectResponse(url="/company/add_module/software", status_code=302)
+
+    screenshots = Parse.get_screenshots(parse_id)
+    screenshot_size_dict = {}
+    for screenshot in screenshots:
+        for s in screenshot:
+            screenshot_size_dict[s['screenshot_name']] = {'y': s['y']}
+    original_size = {'width': 1000, 'height': 700}
+    adjusted_size = {'width': 800, 'height': 300}
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "softwareComplete.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "screenshot_size_dict": screenshot_size_dict,
+            "size": adjusted_size,
+            "screenshots": screenshots,
+            "parse_id": parse_id
+        }
+    )
+    return response
+
+
+@api_router.post("/company/processSoftware/deletePage/{parse_id}", status_code=200)
+def processSoftwareDeletePage(parse_id:str, page_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    page_id = page_id or request.form['deletingPage']
+
+    # if a child of this page only has one parent, delete it
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        # get the children of the page
+        cur.execute("""SELECT DISTINCT to_page_id FROM element_action WHERE page_id = %s AND page_id != to_page_id""", (page_id,))
+        children = cur.fetchall()
+        for child in children:
+            if int(child[0]) > int(page_id):
+                cur.execute("""SELECT COUNT(distinct page_id) FROM element_action WHERE to_page_id = %s AND page_id != to_page_id""", (child[0],))
+                count = cur.fetchone()
+                if count[0] == '1':
+                    processSoftwareDeletePage(parse_id, child[0])
+
+    # verify page is in parse
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""DELETE FROM page
+                    WHERE page_id = %s AND parse_id = %s""", (page_id, parse_id))
+        cur.execute("""DELETE FROM screenshot
+                    WHERE node_id = %s AND parse_id = %s""", (page_id, parse_id))
+        cur.execute("""DELETE FROM element
+                    WHERE page_id = %s AND parse_id = %s""", (page_id, parse_id))
+        cur.execute("""DELETE FROM element_action 
+                    WHERE page_id = %s""", (page_id,))
+        cur.execute("""DELETE FROM cookie 
+                    WHERE page_id = %s""", (page_id,))
+        cur.execute("""DELETE FROM form
+                    WHERE page_id = %s AND parse_id = %s""", (page_id, parse_id))
+        conn.commit()
+
+    return RedirectResponse(url=f"/company/processSoftware/complete/{parse_id}", status_code=302)
+
+
+@api_router.post("/company/processSoftware/completeProcess/{parse_id}", status_code=200)
+def completeProcess(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT status FROM parse
+                    WHERE parse_id = %s""", (parse_id,))
+        parse_status = cur.fetchone()
+        if parse_status[0] == 'pending':
+            # return redirect(url_for('testProcess', parse_id=parse_id))
+            return RedirectResponse(url=f"/company/processSoftware/{parse_id}", status_code=302)
+        elif parse_status[0] == 'complete':
+            return RedirectResponse(url="/company/add_module/software", status_code=302)
+    module_id = graph(parse_id) 
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""UPDATE parse SET status = 'complete'
+                    WHERE parse_id = %s""", (parse_id,))
+        conn.commit()
+    return RedirectResponse(url="/company/add_module/software", status_code=302)
+
+
+@api_router.get("/company/processSoftware/testProcess/{module_id}", status_code=200)
+def testProcess(module_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+
+    offsetX = 0
+    offsetY = 0
+    team_id = manager.company_id
+    pending = has_pending_training(team_id, module_id)
+    if not pending:
+        # return render_template('testSoftware.html', training_id=None, display_next=False, offsetX = offsetX, offsetY = offsetY, size = {'width': 800, 'height': 300}, form = {}, images = [])
+        print('ERROR IS HERE')
+        response = EMPLOYER_TEMPLATES.TemplateResponse(
+            "testSoftware.html",
+            {
+                "request": request,
+                "name": manager.first_name,
+                "training_id": None,
+                "display_next": False,
+                "offsetX": offsetX,
+                'element_dict': [{}],
+                'screenshot_dict': [{}],
+                "offsetY": offsetY,
+                "size": {'width': 800, 'height': 300},
+                "form": {},
+                "images": []
+            }
+        )
+        return response
+    original_size = {'width': 1000, 'height': 700}
+    adjusted_size = {'width': 800, 'height': 300}
+    adjustment_factor =  adjusted_size['width']/original_size['width']
+    
+    training_id, elements, screenshots = get_next_page(team_id, module_id, adjustment_factor)
+    element_size_dict = {}
+    for element in (elements['input'] + elements['button']):
+        element_size_dict[element['id']] = {'width': element['width'], 'height': element['height'], 'x': element['x'], 'y': element['y']}
+    screenshot_size_dict = {}
+    for screenshot in screenshots:
+        screenshot_size_dict[screenshot['screenshot_name']] = {'y': screenshot['y']}
+    
+    # get vertical menu
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT training_status, query_element.element_id
+                        FROM training, query_element 
+                        WHERE training.module_id = %s AND training.query_id = query_element.query_id
+                        ORDER BY training.id ASC
+                        """, (module_id,))
+        training_status = cur.fetchall()
+        training = [dict(status) for status in training_status]
+        # get context for each training
+        for i in range(len(training)):
+            cur.execute("""SELECT context, element_value
+                            FROM element
+                            WHERE id = %s""", (training[i]['element_id'],))
+            context = cur.fetchone()
+            training[i]['context'] = context['context']
+    
+    status_ratio = sum([1 if training[i]['training_status'] == 'completed' else 0 for i in range(len(training))])//len(training)
+    display_next = False
+    if len(elements['button'] + elements['input']) == 0:
+        display_next = True
+    
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "testSoftware.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "status_ratio": status_ratio,
+            "training": training,
+            "screenshot_size_dict": screenshot_size_dict,
+            "element_size_dict": element_size_dict,
+            "training_id": training_id,
+            "display_next": display_next,
+            "offsetX": offsetX,
+            "offsetY": offsetY,
+            "original_size": original_size,
+            "size": adjusted_size,
+            "form": elements,
+            "images": screenshots
+        }
+    )
+    return response
+
+
+@api_router.post("/company/training/reset/{training_id}", status_code=200)
+def resetProgress(training_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Update training set status to pending '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT team_id, module_id FROM training WHERE training_id = %s""", (training_id,))
+        team_id, module_id = cur.fetchone()
+        cur.execute("""UPDATE training SET training_status = 'pending', response = ''
+                    WHERE team_id = %s AND module_id = %s""", (team_id, module_id))
+        conn.commit()
+    return RedirectResponse(url=f"/company/processSoftware/testProcess/{module_id}", status_code=302)
+
+
+@api_router.get("/company/add_module/compliance", status_code=200)
+def addCompliance(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addCompliance.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "data": [],
+            "questions": []
+        }
+    )
+    return response
+
+
+@api_router.post("/company/add_module/compliance", status_code=200)
+def addComplianceSubmit(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), textInput: str = Form(...), moduleName: str = Form(...)) -> dict:
+    # textInput = request.form['textInput']
+    # moduleName = request.form['moduleName']
+    data = {'textInput': textInput, 'moduleName': moduleName}
+    questions = generate_compliance_questions(textInput)
+    questions = format_questions(questions)
+    # return render_template('addCompliance.html', questions=questions, data=data)
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addCompliance.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "data": data,
+            "questions": questions
+        }
+    )
+    return response
+
+
+@api_router.post("/company/add_module/simulator", status_code=200)
+def addSimulatorSubmit(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...)) -> dict:
+    # moduleName = request.form['moduleName']
+    # num_chats = int(request.form['num_chats'])
+    # customer = request.form['customer']
+    # situation = request.form['situation']
+    # problem = request.form['problem']
+    # respond = request.form['respond']
+    company_id = '1'
+    tool_id = 2
+    desc = generate_description(customer + situation + problem + respond)
+    module_id = add_module_simulator(company_id, moduleName, desc, tool_id, num_chats, customer, situation, problem, respond)
+    # generate first chat
+    first_chat = generate_simulator(num_chats, customer, situation, problem, respond)
+    # get everything after colon if there is a colon
+    if ":" in first_chat:
+        first_chat = first_chat.split(':')[-1]
+    q_list = []
+    q_list.append(first_chat)
+    # add num_chats - 1 empty chats
+    for i in range(num_chats - 1):
+        q_list.append(None)
+    save_queries(module_id, q_list)
+    add_training_sample(module_id, company_id)
+    # /company/test_module/simulator/
+    return RedirectResponse(url=f"/company/test_module/simulator/{module_id}", status_code=302)
+
+
+@api_router.get("/company/add_module/simulator", status_code=200)
+def addSimulator(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addSimulator.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "chat": [],
+            "data": []
+        }
+    )
+    return response
+
+
+@api_router.post("/company/save_module/compliance", status_code=200)
+def saveCompliance(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), textInput: str = Form(...)) -> dict:
+    company_id = manager.company_id
+    moduleName = request.form['moduleName']
+    # text = request.form['textInput']
+    text = textInput
+    description = generate_description(text)
+    questions = []
+    for key in request.form:
+        if key.startswith('question'):
+            questions.append(request.form[key])
+    module_id = add_module(company_id, moduleName, description, 1, text)
+    save_queries(module_id, questions)
+    add_training_sample(module_id, company_id)
+    return RedirectResponse(url=f"/company/processSoftware/testCompliance/{module_id}", status_code=302)
+
+
+@api_router.get("/company/test_module/compliance/{module_id}", status_code=200)
+def testCompliance(response: Response, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+    team_id = manager.company_id
+    chat = get_training_compliance(module_id, team_id)
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_title, module_text FROM module WHERE module_id = %s""", (module_id,))
+        info = cur.fetchone()
+        name = info['module_title']
+        text = info['module_text']
+        # get training id
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
+        completed = cur.fetchone()['count']
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
+        total = cur.fetchone()['count']
+        if completed < total:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+        else:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "testCompliance.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "chat": chat,
+            "text": text,
+            "title": name,
+            "completed": completed,
+            "total": total,
+            "module_id": module_id,
+            "training_id": training_id,
+        }
+    )
+    return response
+
+
+@api_router.get("/company/test_module/simulator/{module_id}", status_code=200)
+def testSimulator(response: Response, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+    team_id = manager.company_id
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_title, customer, situation, problem, respond FROM module WHERE module_id = %s""", (module_id,))
+        module_info = cur.fetchone()
+        name = module_info['module_title']
+        text = 'Customer: ' + module_info['customer'] + 'Situation: ' + module_info['situation'] + 'Problem: ' + module_info['problem'] + 'Respond: ' + module_info['respond']
+        chat = get_training_simulator(module_id, team_id)
+
+        # get training id
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
+        completed = cur.fetchone()['count']
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
+        total = cur.fetchone()['count']
+        if completed < total:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+        else:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+    # return render_template('testSimulator.html', chat=chat, title=name, completed=completed, total=total, module_id=module_id, training_id=training_id, customer=module_info['customer'], situation=module_info['situation'], problem=module_info['problem'], respond=module_info['respond'])
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "testSimulator.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "chat": chat,
+            "text": text,
+            "title": name,
+            "completed": completed,
+            "total": total,
+            "module_id": module_id,
+            "training_id": training_id,
+            "customer": module_info['customer'],
+            "situation": module_info['situation'],
+            "problem": module_info['problem'],
+            "respond": module_info['respond'],
+        }
+    )
+    return response
+
+
+@api_router.post("/company/submit_simulator/{module_id}", status_code=200)
+def submitSimulator(response: Response, request: Request, module_id: str, training_id: str, chat: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    # training_id = request.form['training_id']
+    # chat = request.form['chat']
+    company_id = '1'
+    time.sleep(1)
+    update_training_status(training_id, chat, 'completed')
+    response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}")
+    return response
+
+
+@api_router.post("/company/submit_compliance/{module_id}", status_code=200)
+def submitCompliance(response: Response, request: Request, module_id: str, training_id: str, chat: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    training_id = request.form['training_id']
+    chat = request.form['chat']
+    company_id = '1'
+    time.sleep(1)
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+        context = cur.fetchone()['module_text']
+        cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, company_id))
+        question = cur.fetchone()['query_id']
+    score = check_response(context, question, chat)
+    if 'Yes' in score:
+        update_training_status(training_id, chat, 'completed', score)
+    else:
+        update_training_status(training_id, chat, 'pending', score)
+    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}")
+    return response
+
+
+@api_router.post("/company/test_module/reset/compliance/{training_id}", status_code=200)
+def resetCompliance(response: Response, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Update training set status to pending '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT team_id, module_id FROM training WHERE training_id = %s""", (training_id,))
+        team_id, module_id = cur.fetchone()
+        cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                    WHERE team_id=%s AND module_id = %s""", ('pending', team_id, module_id))
+        conn.commit()
+    # return redirect(url_for('testCompliance', module_id=module_id))
+    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}")
+    return response
+
+
+@api_router.post("/company/test_module/reset/simulator/{training_id}", status_code=200)
+def resetSimulator(response: Response, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Update training set status to pending '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT team_id, module_id FROM training WHERE training_id = %s""", (training_id,))
+        team_id, module_id = cur.fetchone()
+        cur.execute("""UPDATE training SET response=NULL, query_id=NULL, training_status=%s
+                    WHERE team_id=%s AND module_id = %s and id > 0""", ('pending', team_id, module_id))
+        cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                    WHERE team_id=%s AND module_id = %s and id = 0""", ('pending', team_id, module_id))
+        conn.commit()
+    response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}")
+    return response
 
 
 app.include_router(api_router)

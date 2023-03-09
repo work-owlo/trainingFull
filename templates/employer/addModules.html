@@ -31,9 +31,23 @@
                 </div>
                 <div class="col">
                     <p style="text-align: right;">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                            Add Modules
-                          </button>
+                      {% if tool['tool_id'] == '1' %}
+                        <a type="button" class="btn btn-success" href="/company/add_module/simulator">
+                            Add Module
+                        </a>
+                      {% elif tool['tool_id'] == '2' %}
+                        <a type="button" class="btn btn-success" href="/company/add_module/simulator">
+                          Add Module
+                        </a>
+                      {% elif tool['tool_id'] == '3' %}
+                        <a type="button" class="btn btn-success" href="/company/add_module/compliance">
+                          Add Module
+                        </a>
+                      {% elif tool['tool_id'] == '4' %}
+                        <a type="button" class="btn btn-success" href="/company/add_module/software">
+                          Add Module
+                        </a>
+                      {% endif %}
                     </p>
                 </div>
             </div>

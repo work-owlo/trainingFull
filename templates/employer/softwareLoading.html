@@ -3,21 +3,19 @@
 {% block content %}
 <script type="text/javascript">
     // every 3 seconds generate a number between 1-10
-    
-    var interval = setInterval(function() {
-        var random = Math.floor(Math.random() * 3) + 1;
-        console.log(random); 
-        if (random >= 3) {
-            // hide the loading class
-            $('.loading').hide();
-            $('.add_input').show();
-            // STOP THE INTERVAL
-            clearInterval(interval);
 
-        }
-    }, 3000);
+    //  redirect to /processSoftware/element/<parse_id> on pageload
+    
+    // onload submit form with id submitForm onload
+    window.onload = function() {
+        document.getElementById("submitForm").submit();
+    };
+    
 
 </script>
+
+<!-- form submit get to processSoftwareElement with parse_id as parameter -->
+<form id="submitForm" action="{{ url_for('processSoftwareElement', parse_id=parse_id)}}" method="GET"></form>
     
 <div class="container-employer-85" >
     <div class="row search-row">
@@ -30,52 +28,14 @@
                 </div>
                 <br>
                 <div class="d-flex justify-content-center" style="text-align: center;">
-                    <label>This may take a few minutes <br> Please stay on this page </label>
+                    <label>This may take a few minutes <br> Please keep this window open </label>
                 </div>
             </div>
-            <div class="add_input" style="display: none;">
-                <div class="row">
-                    <div class="col">
-                        <h5>Add Custom Text</h5>
-                    </div>
-                    <div class="col">
-                        <form class="not-important"  >
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteElement">
-                               Not Important</button>
-                        </form>
-                    </div>
-                </div>
-                <br>
 
-                <img src="/static/3screenshot0.png" alt="3screenshot0" width="100%" class="screenshot">
-                <form class="screenshot-form">
-                    <input type="text" class="screenshot-input"  required>
-                    <button type="button" class="btn btn-dark screenshot-btn">Add Input</button>
-                </form>
 
             </div>
         </div>
     </div>
 </div>  
-<!-- Modal -->
-<div class="modal fade" id="deleteElement" tabindex="-1" aria-labelledby="deleteElementLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="deleteElementLabel">Delete Element</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          If this element is not important, you can delete it.  All elements that result in completing
-          this element will be deleted as well.
-          <br><br>
-          For example, if you delete Login inputs, all elements that result in logging in will be deleted.
 
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger">Delete</button>
-        </div>
-      </div>
-    </div>
-  </div>
 {% endblock %} 

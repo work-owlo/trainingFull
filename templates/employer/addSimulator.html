@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+        $("#form").on("submit", function(){
+            $(".add-module-load").show();
+        });//submit
+    });//document ready
+</script>
+<div class="spinner-grow add-module-load" role="status" style="display:none">
+    <span class="visually-hidden">Loading...</span>
+</div>
+<div class="row">
+    <div class="col">
+        <form id="form" class="container-form" action="/company/add_module/simulator" method="POST">
+            <h4>Add Simulation Module</h4>
+            <div class="mb-3">
+                <label for="moduleName" class="form-label">Module Title</label>
+                <input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="ex. Return Policy" value="{{data['moduleName'] if data['moduleName']}}" required>
+            </div>
+            <!-- file upload -->
+            <h4 class="label">Scenario Information</h4>
+            <!-- Text area -->
+            <div class="mb-3">
+                <label for="num_chats" class="form-label">Number of Responses</label>
+                <input type="number" class="form-control" name="num_chats" id="num_chats" placeholder="12" min="3" mx="20" value="{{data['num_chats'] if data['num_chats'] else 10}}" required>
+            </div>
+            <div class="mb-3">
+                <label for="customer" class="form-label">Who is being simulated?</label>
+                <textarea class="form-control" id="customer" name="customer" placeholder="ex. an angry customer or a helpful co-worker" required>{{data['customer'] if data['customer']}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="situation" class="form-label">Describe the situation</label>
+                <textarea class="form-control" id="situation" name="situation" placeholder="ex. Customer wants to return a damaged item" required>{{data['situation'] if data['situation']}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="problem" class="form-label">What is the problem?</label>
+                <textarea class="form-control" name="problem"  id="problem" placeholder="ex. We do not accept damaged items" required>{{data['problem'] if data['problem']}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="respond" class="form-label">How should the employee respond? (Goal)</label>
+                <textarea class="form-control" name="respond" id="respond" placeholder="ex. Politely reject the item " required>{{data['respond'] if data['respond']}}</textarea>
+            </div>
+            <button type="submit" class="btn btn-success" onclick="showLoad()">Create Simulator</button>
+        </form>
+    </div>
+    <!-- <div class="col">
+        {% if chat|length > 0 %}
+        <h4 class="label">Test Chat Information</h4>
+        <div class="test-chat">
+            <div class="texts">
+            {% for c in chat %} 
+                {% if c['from'] == 'bot' %}
+                <div class="chat-bot">
+                    {{ c['text'] }}
+                </div>
+                {% else %}
+                <div class="chat-user">
+                    {{ c['text'] }}
+                </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+            <!-- automatically scroll to the last text -->
+            <script>
+                var objDiv = document.getElementsByClassName("texts")[0];
+                objDiv.scrollTop = objDiv.scrollHeight;
+            </script>
+            <div class="text-input">
+                <form>
+                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
+                 </form>
+            </div>
+        </div>
+        {% endif %}
+
+    </div> -->
+</div>
+{% endblock %}
