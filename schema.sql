@@ -220,7 +220,8 @@ CREATE TABLE query_element (
 -- Element
 DROP TABLE IF EXISTS element;
 CREATE TABLE element (
-    id SERIAL PRIMARY KEY,
+    pk_val SERIAL PRIMARY KEY,
+    id TEXT NOT NULL,
     parse_id TEXT NOT NULL,
     context TEXT,
     page_id TEXT NOT NULL,
