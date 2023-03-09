@@ -21,9 +21,6 @@
                     <p style="text-align: right;">
                         <a href="/company/add_role" class="add-btn">Add Role</a>
                     </p>
-                    <p style="text-align: right;">
-                      <a href="/company/add_role" class="add-btn">Refresh Statistics</a>
-                    </p>
                 </div>
             </div>
             <!-- Search Bar -->
@@ -56,7 +53,7 @@
                 <tbody>
                   {% if roles|length == 0 %}
                     <tr>
-                        <td colspan="8" style="text-align: center;">No roles found</td>
+                        <td colspan="10" style="text-align: center;">No roles found</td>
                     </tr>
                   {% endif %}
                   {% for role in roles %}

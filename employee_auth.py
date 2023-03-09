@@ -48,6 +48,7 @@ def employee_email_exists(email):
             return False
         return True
 
+
 def check_password(password):
     ''' Check if password is valid '''
     if len(password) < 6:
@@ -62,13 +63,14 @@ def check_password(password):
         return return_error("Password must contain at least one lowercase letter")
     return True
 
+
 def employee_create_account(first_name, last_name, email, password):
     ''' Use Firebase to create a manager account '''
     try:
         uid = generate_uid()
         verify_password = check_password(password)
-        if verify_password['status'] == 'error':
-            return verify_password
+        if not verify_password:
+            return return_error('Password Must Contain At Least One Number, One Uppercase Letter, One Lowercase Letter, and Be Between 6 and 20 Characters')
         # create user in firebase
         user = auth.create_user(uid=uid, email=email, password=password)
         # create user in db

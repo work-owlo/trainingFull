@@ -12,6 +12,8 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/mobile.css') }}" />
+    
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWN1PX74ZK"></script>
     <script>
@@ -23,6 +25,7 @@
     </script>
   </head>
   <body>
+    
     <!-- Navbar that is fixed to the top, has a white background, and an icon on the left -->
     <div class="" style="height: 5rem;width:100%">
         <a class="navbar-brand" href="/company" style="float:left">
@@ -39,7 +42,6 @@
         </a>
 
         <!-- User profile dropdown on the right side -->
-
         <div class="nav-dropdown"  >
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           {{name}}
@@ -50,8 +52,30 @@
         </ul>
       </div>
     </div>
-    <div class="row">
-        <div class="col-md-2">
+    <div class="menu-popup">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="vert-menu">
+              <li class="menu-list">
+                  <a href="/company/team" class="menu-tab"> <ion-icon class="menu-icon" name="people-outline"></ion-icon>  Team</a>
+              </li>
+              <li class="menu-list">
+                  <a href="/company/roles" class="menu-tab"> <ion-icon class="menu-icon" name="color-wand-outline"></ion-icon> Roles</a>
+              </li>
+              <li class="menu-list">
+                  <a href="/company/account" class="menu-tab"> <ion-icon class="menu-icon" name="settings-outline"></ion-icon>  Account</a>
+              </li>
+          </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="row ">
+        <div class="col-md-2 menu-side">
             <ul class="vert-menu">
                 <li class="menu-list">
                     <a href="/company/team" class="menu-tab"> <ion-icon class="menu-icon" name="people-outline"></ion-icon>  Team</a>
@@ -62,10 +86,9 @@
                 <li class="menu-list">
                     <a href="/company/account" class="menu-tab"> <ion-icon class="menu-icon" name="settings-outline"></ion-icon>  Account</a>
                 </li>
-                
             </ul>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10 content">
         {% if alert %}
         <div class="alert alert-warning" role="alert" style="width: 100%;margin:0 auto; margin-bottom: 2rem;">
           {{alert}}
@@ -76,8 +99,8 @@
         </div>
     </div>
 
-       <!-- footer that sticks to the bottom -->
-   <footer class="container-main py-5" style="text-align: center;">
+   <!-- footer that sticks to the bottom -->
+   <footer id="footer" class="py-5" style="text-align: center;">
     <div class="row" style="width: 100%;"> 
       <div class="col col-md">
         <h5>Resources</h5>

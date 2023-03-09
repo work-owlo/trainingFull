@@ -11,6 +11,8 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/mobile.css') }}" />
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWN1PX74ZK"></script>
     <script>
@@ -24,7 +26,7 @@
   <body>
     <!-- Navbar that is fixed to the top, has a white background, and an icon on the left -->
     <!-- Navbar that is fixed to the top, has a white background, and an icon on the left -->
-    <div class="" style="height: 5rem;width:100%">
+    <div class="navbar" style="height: 5rem;width:100%">
       <a class="navbar-brand" href="/member" style="float:left">
         <svg class="logo" width="35px" height="35px" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0_128_16527)">
@@ -145,7 +147,7 @@
     {% endif %}
 
     <div class="container my-5">
-      <div class="row p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
+      <div class="hero row p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
         <div class="col-lg-7 p-3 p-lg-5 pt-lg-3">
           <h1 class="display-4 fw-bold lh-1">Say Goodbye to Boring Onboarding Videos</h1>
           <p class="lead">A learning platform that simulates your new job for faster and more interactive onboarding</p>

@@ -11,12 +11,12 @@
             <!-- Search Bar -->
             <form method="get" action="/member">
             <div class="row g-2 inputs">
-                <div class="col-md">
+                <div class="col">
                     <div class="mb-3">
                         <input type="text" name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search" value="{{keyword}}">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <select class="form-select search-inputs" name="filter" id="filter" aria-label="Filter" onchange="this.form.submit()">
                         <option value="all" {{'selected' if filter == 'all'}}>All</option>
                         <option value="complete" {{'selected' if filter == 'complete'}}>Completed</option>

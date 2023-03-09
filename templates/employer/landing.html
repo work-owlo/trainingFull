@@ -11,6 +11,8 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/mobile.css') }}" />
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWN1PX74ZK"></script>
     <script>
@@ -109,7 +111,7 @@
               <input name="password" type="password" class="form-control" id="passwordVal" required>
             </div>
             <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="legalCheckbox" required>
+              <input type="checkbox" name="legalCheckbox" class="form-check-input" id="legalCheckbox" required>
               <label class="form-check-label" for="legalCheckbox">I agree to the <a href="/company/terms" target="_blank">Terms and Conditions</a> and <a href="/company/privacy" target="_blank">Privacy Policy</a> </label>
             </div>
             <button type="submit" class="btn btn-success">Sign Up</button>
@@ -252,7 +254,7 @@
           <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               <div class="carousel-item active">
-                <svg width="604" height="746" viewBox="0 0 604 746" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <svg class="mobile-hero" width="604" height="746" viewBox="0 0 604 746" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                   <g filter="url(#filter0_d_128_17002)">
                   <rect width="584" height="726" rx="10" fill="url(#pattern0)" shape-rendering="crispEdges"/>
                   </g>
@@ -291,7 +293,7 @@
     <!-- Footer -->
        <!-- footer that sticks to the bottom -->
    <footer class="footer mt-auto py-3">
-    <div class="container">
+    <div class="">
       <div class="row" style="width: 100%;">
         <div class="col">
           <span class="text-muted">© Owlo 2023</span>
