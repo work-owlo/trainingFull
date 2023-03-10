@@ -1032,3 +1032,1610 @@ Checking if there is a next element
 	Finding element at 1020, 23
 	Found element at 1020, 23
 			Button found,<selenium.webdriver.remote.webelement.WebElement (session="4343aa704d3557de13e10d3c7f996f23", element="2fb1e958-ef9c-4e66-a4c7-6d52ed9172b2")>
+Parse initialized
+Adding parse to database
+Getting parse from database
+Parse initialized
+Getting page count
+	Page is scrollable
+	Setting current page to 0
+First page added 0
+	Adding element fr0zXAfhvlRn9GVjzQKdF7jJH with value  to db
+	Adding element UI8jlsAXIInceQW537wBjqbTI with value Create Employee Account to db
+	Adding element CWrfGDPzKG83UadA6q86bS3T5 with value Create Company Account to db
+	Adding element NQDLZtpwcPm96JIGYKaTbRm55 with value Login to db
+	Adding element IBLD4SskyaJ6nwM45F0dgUpam with value Sign Up to db
+Getting forms
+	Getting Forms 
+ 	 Found 0 forms
+
+Checking if there is a next element
+	Found next element fr0zXAfhvlRn9GVjzQKdF7jJH value:  on page 0
+	Found next element fr0zXAfhvlRn9GVjzQKdF7jJH value:  on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ace2e0>
+		Clicking Button
+	Finding element at 0, 10
+	Found element at 0, 10
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="645ae86f12c24505ae65e4164a12221b", element="3a72b0fd-2739-4651-b63e-3917a0112bca")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 2 0
+	Page already visited - 0
+	Redirected to same page
+	Deleting element for reason: Redirected to same page
+
+Checking if there is a next element
+	Found next element CWrfGDPzKG83UadA6q86bS3T5 value: Create Company Account on page 0
+	Found next element CWrfGDPzKG83UadA6q86bS3T5 value: Create Company Account on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ae5c70>
+		Clicking Button
+	Finding element at 726, 988
+	Found element at 726, 988
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="645ae86f12c24505ae65e4164a12221b", element="6666ff20-c384-46f5-a206-f99860d1c160")>
+	Deleting element for reason: Deviating from domain
+
+Checking if there is a next element
+	Found next element UI8jlsAXIInceQW537wBjqbTI value: Create Employee Account on page 0
+	Found next element UI8jlsAXIInceQW537wBjqbTI value: Create Employee Account on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ad49d0>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="645ae86f12c24505ae65e4164a12221b", element="97e509b0-a54e-4c29-b2ed-cf436b831a44")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 2.9766956573896355
+	MSE2: 16.004715690978887
+	MSE: 16.004715690978887
+	New page added 2
+	Adding element yZdqoHZmGNeLUPpEFTjHHYK2C with value  to db
+	Adding element kHJkWvTFU9nrWMl6Utj1TBhSn with value Create Employee Account to db
+	Adding element Fp6xz1eDL8Rh3wme2hOHWDvjK with value Terms and Conditions to db
+	Adding element QfwK3HqPZcp5C8FrnCkUAnwTV with value Privacy Policy to db
+	Adding element TppXuNxsdfhYo6KYBIVGwBDPc with value  to db
+	Adding element Vwi5dEQbHLL1LOfvtkSZZdWXd with value Login to db
+	Adding element iEF3lgKrPQsM7NpdbfaLvMcyv with value Sign Up to db
+Getting forms
+	Adding element LLk4mQ33uKs6AZk06C9om3VA4 with value  to db
+	Adding element zbegwe1fmIors6dz5fPXWrpMe with value  to db
+	Adding element WuxqqvA5gJr0TMy6NGiKXzuf6 with value  to db
+	Adding element MoVK2pK9WF0OWZJtR3LizFwPn with value  to db
+	Adding element Uq4fI3hFSYGzS0YiHxypELzQG with value on to db
+	Adding element YK35SLNVNUOT2tCcoF7ue7SKj with value Sign Up to db
+	Getting Forms 
+ 	 Found 1 forms
+	Setting current page to 2
+
+Checking if there is a next element
+	Found next element LLk4mQ33uKs6AZk06C9om3VA4 value:  on page 2
+	Found next element LLk4mQ33uKs6AZk06C9om3VA4 value:  on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Input object at 0x125a4e790>
+		Submitting Form
+	Getting elements for form
+	Checking if input has value
+		No value
+			Incomplete input
+	Getting elements for form
+Getting parse from database
+Parse initialized
+Getting page count
+	Setting current page to 0
+
+Checking if there is a next element
+	Found next element yZdqoHZmGNeLUPpEFTjHHYK2C value:  on page 2
+	Found next element yZdqoHZmGNeLUPpEFTjHHYK2C value:  on page 2
+	Source page: 2
+	Checking if element UI8jlsAXIInceQW537wBjqbTI has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 2
+	Checking if element UI8jlsAXIInceQW537wBjqbTI has action state_change
+			Traversing up to: 2
+			Traversing down to: 0
+	Getting to page id for element UI8jlsAXIInceQW537wBjqbTI
+	Getting actions for element UI8jlsAXIInceQW537wBjqbTI
+	Performing action: <element.Element object at 0x125bb2280>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="4e81fef1-273a-4d4c-932f-282d999ec1d4")>
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125bb2490>
+		Clicking Button
+	Finding element at 0, 10
+	Found element at 0, 10
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="f3b882f2-f10a-40a6-b095-04fdf642902f")>
+			\Intercepted click: Message: element click intercepted: Element <a class="navbar-brand" href="/member" style="float:left">...</a> is not clickable at point (30, 31). Other element would receive the click: <div class="modal fade show" id="signupModal" tabindex="-1" aria-labelledby="signupModalArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001037f5428 chromedriver + 4899880
+1   chromedriver                        0x0000000103772a23 chromedriver + 4364835
+2   chromedriver                        0x00000001033bcbf6 chromedriver + 474102
+3   chromedriver                        0x0000000103409d81 chromedriver + 789889
+4   chromedriver                        0x0000000103406dde chromedriver + 777694
+5   chromedriver                        0x0000000103403a54 chromedriver + 764500
+6   chromedriver                        0x000000010340243f chromedriver + 758847
+7   chromedriver                        0x00000001033f2cf3 chromedriver + 695539
+8   chromedriver                        0x0000000103426562 chromedriver + 906594
+9   chromedriver                        0x00000001033f2361 chromedriver + 693089
+10  chromedriver                        0x000000010342671e chromedriver + 907038
+11  chromedriver                        0x0000000103441b5b chromedriver + 1018715
+12  chromedriver                        0x0000000103426333 chromedriver + 906035
+13  chromedriver                        0x00000001033f055f chromedriver + 685407
+14  chromedriver                        0x00000001033f1a7e chromedriver + 690814
+15  chromedriver                        0x00000001037c279e chromedriver + 4691870
+16  chromedriver                        0x00000001037c7961 chromedriver + 4712801
+17  chromedriver                        0x00000001037ce2ff chromedriver + 4739839
+18  chromedriver                        0x00000001037c885a chromedriver + 4716634
+19  chromedriver                        0x000000010379afce chromedriver + 4530126
+20  chromedriver                        0x00000001037e85c8 chromedriver + 4847048
+21  chromedriver                        0x00000001037e8747 chromedriver + 4847431
+22  chromedriver                        0x00000001037fd87f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 0, 10
+	Found element at 0, 10
+			<a class="navbar-brand" href="/member" style="float:left">
+        <svg class="logo" width="35px" height="35px" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_128_16527)">
+          <path d="M22.5 3.75C26.9755 3.75 31.2677 5.5279 34.4324 8.69257C37.5971 11.8572 39.375 16.1495 39.375 20.625V34.6875C39.3757 36.0899 38.9271 37.4556 38.095 38.5845C37.2629 39.7133 36.0911 40.5459 34.7513 40.9602C33.4115 41.3746 31.9742 41.3488 30.6501 40.8867C29.326 40.4246 28.1848 39.5505 27.3937 38.3925C26.9039 39.26 26.1925 39.9818 25.3321 40.4841C24.4718 40.9863 23.4934 41.251 22.4972 41.251C21.501 41.251 20.5226 40.9863 19.6623 40.4841C18.8019 39.9818 18.0904 39.26 17.6006 38.3925C16.8263 39.5228 15.7176 40.3825 14.43 40.8508C13.1424 41.3192 11.7405 41.3728 10.4209 41.0041C9.10126 40.6354 7.93015 39.863 7.07175 38.7951C6.21335 37.7272 5.71073 36.4174 5.63438 35.0494L5.625 34.6856V20.625C5.625 16.1495 7.4029 11.8572 10.5676 8.69257C13.7322 5.5279 18.0245 3.75 22.5 3.75V3.75ZM22.5 7.5C19.0969 7.49994 15.8268 8.82167 13.3796 11.1864C10.9323 13.5511 9.49918 16.7739 9.3825 20.175L9.375 20.625V34.5862L9.37875 34.845C9.41106 35.4071 9.61132 35.9465 9.95363 36.3935C10.2959 36.8406 10.7645 37.1745 11.2987 37.3523C11.833 37.53 12.4082 37.5433 12.9501 37.3905C13.492 37.2376 13.9755 36.9257 14.3381 36.495L14.5031 36.2775C14.8622 35.7511 15.3494 35.3248 15.9189 35.0389C16.4884 34.7531 17.1214 34.617 17.758 34.6437C18.3947 34.6703 19.014 34.8588 19.5577 35.1912C20.1013 35.5237 20.5512 35.9892 20.865 36.5437C21.0276 36.8331 21.2642 37.074 21.5506 37.2418C21.8369 37.4097 22.1627 37.4985 22.4946 37.499C22.8265 37.4996 23.1526 37.412 23.4395 37.2451C23.7264 37.0782 23.9639 36.8381 24.1275 36.5494C24.4277 36.0166 24.8536 35.5653 25.3681 35.2348C25.8826 34.9043 26.4702 34.7046 27.0796 34.6532C27.6889 34.6018 28.3016 34.7002 28.8642 34.9399C29.4269 35.1795 29.9223 35.5531 30.3075 36.0281L30.4894 36.2719C30.8149 36.7499 31.2798 37.1159 31.8208 37.3202C32.3619 37.5244 32.9527 37.5569 33.5129 37.4132C34.073 37.2695 34.5753 36.9567 34.9512 36.5172C35.3272 36.0778 35.5585 35.5332 35.6137 34.9575L35.625 34.6875V20.625C35.625 17.144 34.2422 13.8056 31.7808 11.3442C29.3194 8.88281 25.981 7.5 22.5 7.5V7.5ZM30 24.375C30 26.3317 29.2354 28.2109 27.8692 29.6116C26.5031 31.0124 24.6436 31.8238 22.6876 31.8728C20.7315 31.9217 18.8338 31.2043 17.3993 29.8736C15.9648 28.5428 15.1072 26.7042 15.0094 24.75L15 24.375H18.75C18.75 25.3696 19.1451 26.3234 19.8484 27.0266C20.5516 27.7299 21.5054 28.125 22.5 28.125C23.4946 28.125 24.4484 27.7299 25.1516 27.0266C25.8549 26.3234 26.25 25.3696 26.25 24.375H30ZM22.5 13.125C23.4946 13.125 24.4484 13.5201 25.1516 14.2233C25.8549 14.9266 26.25 15.8804 26.25 16.875C26.25 17.8696 25.8549 18.8234 25.1516 19.5266C24.4484 20.2299 23.4946 20.625 22.5 20.625C21.5054 20.625 20.5516 20.2299 19.8484 19.5266C19.1451 18.8234 18.75 17.8696 18.75 16.875C18.75 15.8804 19.1451 14.9266 19.8484 14.2233C20.5516 13.5201 21.5054 13.125 22.5 13.125Z" fill="#70ABAF"></path>
+          </g>
+          <defs>
+          <clipPath id="clip0_128_16527">
+          <rect width="45" height="45" fill="white"></rect>
+          </clipPath>
+          </defs>
+          </svg>
+      </a>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element TppXuNxsdfhYo6KYBIVGwBDPc value:  on page 2
+	Found next element TppXuNxsdfhYo6KYBIVGwBDPc value:  on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ad4520>
+		Clicking Button
+	Finding element at 809, 44
+	Found element at 809, 44
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="aec36acd-afcf-4364-8d70-7a567119db93")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 3 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 2 to 0
+
+Checking if there is a next element
+	Found next element kHJkWvTFU9nrWMl6Utj1TBhSn value: Create Employee Account on page 2
+	Found next element kHJkWvTFU9nrWMl6Utj1TBhSn value: Create Employee Account on page 2
+	Source page: 2
+	Checking if element UI8jlsAXIInceQW537wBjqbTI has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 2
+	Checking if element UI8jlsAXIInceQW537wBjqbTI has action state_change
+			Traversing up to: 2
+			Traversing down to: 0
+	Getting to page id for element UI8jlsAXIInceQW537wBjqbTI
+	Getting actions for element UI8jlsAXIInceQW537wBjqbTI
+	Performing action: <element.Element object at 0x125b7ccd0>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="fa972298-efa7-4842-b9b3-64cff5e9a930")>
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125bb24f0>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="fa972298-efa7-4842-b9b3-64cff5e9a930")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (388, 453). Other element would receive the click: <div class="mb-3 form-check">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001037f5428 chromedriver + 4899880
+1   chromedriver                        0x0000000103772a23 chromedriver + 4364835
+2   chromedriver                        0x00000001033bcbf6 chromedriver + 474102
+3   chromedriver                        0x0000000103409d81 chromedriver + 789889
+4   chromedriver                        0x0000000103406dde chromedriver + 777694
+5   chromedriver                        0x0000000103403a54 chromedriver + 764500
+6   chromedriver                        0x000000010340243f chromedriver + 758847
+7   chromedriver                        0x00000001033f2cf3 chromedriver + 695539
+8   chromedriver                        0x0000000103426562 chromedriver + 906594
+9   chromedriver                        0x00000001033f2361 chromedriver + 693089
+10  chromedriver                        0x000000010342671e chromedriver + 907038
+11  chromedriver                        0x0000000103441b5b chromedriver + 1018715
+12  chromedriver                        0x0000000103426333 chromedriver + 906035
+13  chromedriver                        0x00000001033f055f chromedriver + 685407
+14  chromedriver                        0x00000001033f1a7e chromedriver + 690814
+15  chromedriver                        0x00000001037c279e chromedriver + 4691870
+16  chromedriver                        0x00000001037c7961 chromedriver + 4712801
+17  chromedriver                        0x00000001037ce2ff chromedriver + 4739839
+18  chromedriver                        0x00000001037c885a chromedriver + 4716634
+19  chromedriver                        0x000000010379afce chromedriver + 4530126
+20  chromedriver                        0x00000001037e85c8 chromedriver + 4847048
+21  chromedriver                        0x00000001037e8747 chromedriver + 4847431
+22  chromedriver                        0x00000001037fd87f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 240, 672
+	Found element at 240, 672
+			<button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">Create Employee Account</button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element Vwi5dEQbHLL1LOfvtkSZZdWXd value: Login on page 2
+	Found next element Vwi5dEQbHLL1LOfvtkSZZdWXd value: Login on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ba1f10>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="8d5ac461-b091-4760-9fed-2337f8d53e4c")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">...</button> is not clickable at point (1053, 18). Other element would receive the click: <div class="modal fade show" id="signupModal" tabindex="-1" aria-labelledby="signupModalArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001037f5428 chromedriver + 4899880
+1   chromedriver                        0x0000000103772a23 chromedriver + 4364835
+2   chromedriver                        0x00000001033bcbf6 chromedriver + 474102
+3   chromedriver                        0x0000000103409d81 chromedriver + 789889
+4   chromedriver                        0x0000000103406dde chromedriver + 777694
+5   chromedriver                        0x0000000103403a54 chromedriver + 764500
+6   chromedriver                        0x000000010340243f chromedriver + 758847
+7   chromedriver                        0x00000001033f2cf3 chromedriver + 695539
+8   chromedriver                        0x0000000103426562 chromedriver + 906594
+9   chromedriver                        0x00000001033f2361 chromedriver + 693089
+10  chromedriver                        0x000000010342671e chromedriver + 907038
+11  chromedriver                        0x0000000103441b5b chromedriver + 1018715
+12  chromedriver                        0x0000000103426333 chromedriver + 906035
+13  chromedriver                        0x00000001033f055f chromedriver + 685407
+14  chromedriver                        0x00000001033f1a7e chromedriver + 690814
+15  chromedriver                        0x00000001037c279e chromedriver + 4691870
+16  chromedriver                        0x00000001037c7961 chromedriver + 4712801
+17  chromedriver                        0x00000001037ce2ff chromedriver + 4739839
+18  chromedriver                        0x00000001037c885a chromedriver + 4716634
+19  chromedriver                        0x000000010379afce chromedriver + 4530126
+20  chromedriver                        0x00000001037e85c8 chromedriver + 4847048
+21  chromedriver                        0x00000001037e8747 chromedriver + 4847431
+22  chromedriver                        0x00000001037fd87f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">
+          Login
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element QfwK3HqPZcp5C8FrnCkUAnwTV value: Privacy Policy on page 2
+	Found next element QfwK3HqPZcp5C8FrnCkUAnwTV value: Privacy Policy on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125b7ca90>
+		Clicking Button
+	Finding element at 699, 454
+	Found element at 699, 454
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="1eea5668-5d47-4868-a81a-ef430b32d753")>
+Getting page count
+	Checking if scrollable: False
+	Page is not scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE: 1
+	Comparing to 2
+	Comparing to 2screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE: 1
+	New page added 3
+	Adding element Ln8wTPkOkJSFacEU6TjLsaPRb with value  to db
+Getting forms
+	Getting Forms 
+ 	 Found 0 forms
+	Setting current page to 3
+
+Checking if there is a next element
+	Found next element Ln8wTPkOkJSFacEU6TjLsaPRb value:  on page 3
+	Found next element Ln8wTPkOkJSFacEU6TjLsaPRb value:  on page 3
+	Source page: 3
+	Current page: 3
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ba1250>
+		Clicking Button
+	Finding element at 0, 0
+	Found element at 0, 0
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="dd04f7f4-a404-4c0d-85d7-93e6c29e68f6")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 4 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 3 to 0
+
+Checking if there is a next element
+	Found next element iEF3lgKrPQsM7NpdbfaLvMcyv value: Sign Up on page 2
+	Found next element iEF3lgKrPQsM7NpdbfaLvMcyv value: Sign Up on page 2
+	Source page: 2
+	Checking if element UI8jlsAXIInceQW537wBjqbTI has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 2
+	Checking if element UI8jlsAXIInceQW537wBjqbTI has action state_change
+			Traversing up to: 2
+			Traversing down to: 0
+	Getting to page id for element UI8jlsAXIInceQW537wBjqbTI
+	Getting actions for element UI8jlsAXIInceQW537wBjqbTI
+	Performing action: <element.Element object at 0x125bc1e20>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="ea51e67a-6b73-40e4-b49a-ee696c579b3d")>
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125ad49d0>
+		Clicking Button
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="2b0cf598-487d-417d-9509-68399cb85e90")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (1132, 19). Other element would receive the click: <div class="modal fade show" id="signupModal" tabindex="-1" aria-labelledby="signupModalArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001037f5428 chromedriver + 4899880
+1   chromedriver                        0x0000000103772a23 chromedriver + 4364835
+2   chromedriver                        0x00000001033bcbf6 chromedriver + 474102
+3   chromedriver                        0x0000000103409d81 chromedriver + 789889
+4   chromedriver                        0x0000000103406dde chromedriver + 777694
+5   chromedriver                        0x0000000103403a54 chromedriver + 764500
+6   chromedriver                        0x000000010340243f chromedriver + 758847
+7   chromedriver                        0x00000001033f2cf3 chromedriver + 695539
+8   chromedriver                        0x0000000103426562 chromedriver + 906594
+9   chromedriver                        0x00000001033f2361 chromedriver + 693089
+10  chromedriver                        0x000000010342671e chromedriver + 907038
+11  chromedriver                        0x0000000103441b5b chromedriver + 1018715
+12  chromedriver                        0x0000000103426333 chromedriver + 906035
+13  chromedriver                        0x00000001033f055f chromedriver + 685407
+14  chromedriver                        0x00000001033f1a7e chromedriver + 690814
+15  chromedriver                        0x00000001037c279e chromedriver + 4691870
+16  chromedriver                        0x00000001037c7961 chromedriver + 4712801
+17  chromedriver                        0x00000001037ce2ff chromedriver + 4739839
+18  chromedriver                        0x00000001037c885a chromedriver + 4716634
+19  chromedriver                        0x000000010379afce chromedriver + 4530126
+20  chromedriver                        0x00000001037e85c8 chromedriver + 4847048
+21  chromedriver                        0x00000001037e8747 chromedriver + 4847431
+22  chromedriver                        0x00000001037fd87f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			<button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">
+          Sign Up
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element Fp6xz1eDL8Rh3wme2hOHWDvjK value: Terms and Conditions on page 2
+	Found next element Fp6xz1eDL8Rh3wme2hOHWDvjK value: Terms and Conditions on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125bb2130>
+		Clicking Button
+	Finding element at 496, 454
+	Found element at 496, 454
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="0dc672b7-8f65-473a-8691-3899f1d1492e")>
+Getting page count
+	Checking if scrollable: False
+	Page is not scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE: 1
+	Comparing to 2
+	Comparing to 2screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE: 1
+	Comparing to 3
+	Comparing to 3screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 0.023698697916666667
+	MSE2: 0.03677630208333333
+	MSE: 0.03677630208333333
+	New page added 4
+	Adding element yZ4Rnj0cPaslvvbSwbDL9TgJX with value  to db
+Getting forms
+	Getting Forms 
+ 	 Found 0 forms
+	Setting current page to 4
+
+Checking if there is a next element
+	Found next element yZ4Rnj0cPaslvvbSwbDL9TgJX value:  on page 4
+	Found next element yZ4Rnj0cPaslvvbSwbDL9TgJX value:  on page 4
+	Source page: 4
+	Current page: 4
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125baee20>
+		Clicking Button
+	Finding element at 0, 0
+	Found element at 0, 0
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="97193a64-4f0e-4a6a-8852-406b61891723")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 5 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 4 to 0
+
+Checking if there is a next element
+	Found next element NQDLZtpwcPm96JIGYKaTbRm55 value: Login on page 0
+	Found next element NQDLZtpwcPm96JIGYKaTbRm55 value: Login on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x125bc1760>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="2acf728cdf65c8f686a0903af1abf945", element="87a647a9-1e48-4dfd-aaf9-dbb45e57fec4")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 1.5912100127959052
+	MSE2: 16.52227167306462
+	MSE: 16.52227167306462
+	Comparing to 2
+	Comparing to 2screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE1: 0.3948694417786308
+	MSE2: 1.6975931701855407
+	MSE: 1.6975931701855407
+	Comparing to 3
+	Comparing to 3screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE: 1
+	Comparing to 4
+	Comparing to 4screenshotsfN3wVBYIaC0SIWVhC0uQ3KsK.png
+	MSE: 1
+	New page added 5
+	Adding element pAxTaEMdPKfqctMJ3MRBqnl59 with value  to db
+	Adding element PymHtnf3eHV4BlgEkPEgJl9Qv with value Create Employee Account to db
+	Adding element kcoBL1YnIG9GJgjWUdT8ZsaH6 with value Forgot password? to db
+	Adding element 2JKL7y4qIDFNE1dRjdfopV0YY with value  to db
+	Adding element NwECF7QoUPB9mE6NoTLcpwln8 with value Login to db
+	Adding element 3Oj2XeZBRiCFLV0LFY7Dj64u5 with value Sign Up to db
+Getting forms
+	Adding element BkszqVILeQcDvPJonSvoyc4RD with value  to db
+	Adding element ZWLLqBtcLRqFGvz9dAGqbh5kM with value  to db
+	Adding element mFNeadO08ZPx1jYq86VB6vefY with value Login to db
+	Getting Forms 
+ 	 Found 1 forms
+	Setting current page to 5
+
+Checking if there is a next element
+	Found next element BkszqVILeQcDvPJonSvoyc4RD value:  on page 5
+	Found next element BkszqVILeQcDvPJonSvoyc4RD value:  on page 5
+	Source page: 5
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Input object at 0x125bae4f0>
+		Submitting Form
+	Getting elements for form
+	Checking if input has value
+		No value
+			Incomplete input
+	Getting elements for form
+Parse initialized
+Adding parse to database
+Getting parse from database
+Parse initialized
+Getting page count
+	Page is scrollable
+	Setting current page to 0
+First page added 0
+	Adding element Uaz70CtGGZkV9HVkOzLfEvCID with value  to db
+	Adding element YHtZHmungTC9BfTTlKbQqhYMJ with value Create Employee Account to db
+	Adding element EXA3467BS0OlMIFD5FRTvtcUo with value Create Company Account to db
+	Adding element b047CSjGhWQYdtXB9SP5zvmXJ with value Login to db
+	Adding element yk7EGEOdvgxo0JdpPTAr35pah with value Sign Up to db
+
+Checking if there is a next element
+	Found next element Uaz70CtGGZkV9HVkOzLfEvCID value:  on page 0
+	Found next element Uaz70CtGGZkV9HVkOzLfEvCID value:  on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1295bf2b0>
+		Clicking Button
+	Finding element at 0, 10
+	Found element at 0, 10
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="cde65d6c-cb4d-4b3a-ae3b-aaef077bfae6")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 2 0
+	Page already visited - 0
+	Redirected to same page
+	Deleting element for reason: Redirected to same page
+
+Checking if there is a next element
+	Found next element EXA3467BS0OlMIFD5FRTvtcUo value: Create Company Account on page 0
+	Found next element EXA3467BS0OlMIFD5FRTvtcUo value: Create Company Account on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1295c55e0>
+		Clicking Button
+	Finding element at 726, 988
+	Found element at 726, 988
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="1dfec46b-f713-49b8-9fbf-b50c07f9661b")>
+	Deleting element for reason: Deviating from domain
+
+Checking if there is a next element
+	Found next element YHtZHmungTC9BfTTlKbQqhYMJ value: Create Employee Account on page 0
+	Found next element YHtZHmungTC9BfTTlKbQqhYMJ value: Create Employee Account on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129641400>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="ff57d2b5-757c-4ed8-895e-3df7c5ef935c")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 2.9766956573896355
+	MSE2: 16.004715690978887
+	MSE: 16.004715690978887
+	New page added 2
+	Adding element O7PKVtUJ3D3gzVF6AUr5GS1Mj with value  to db
+	Adding element Q8N9UP1tfsqGoYKN3OrstXP8c with value Create Employee Account to db
+	Adding element Eka43PJims4eV4VwS2zQYHfGO with value Terms and Conditions to db
+	Adding element 9ZRYhJ6EcCpbLBDKzM3pKuZ76 with value Privacy Policy to db
+	Adding element 7uv8TfF4awiJp1U4DZyV4lDj1 with value  to db
+	Adding element lQCxbDa5SLPXyYiHIbHolgLXu with value Login to db
+	Adding element SolJJtwQ7YzhmMyL4Zs84jYKQ with value Sign Up to db
+	Setting current page to 2
+
+Checking if there is a next element
+	Found next element O7PKVtUJ3D3gzVF6AUr5GS1Mj value:  on page 2
+	Found next element O7PKVtUJ3D3gzVF6AUr5GS1Mj value:  on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1295359a0>
+		Clicking Button
+	Finding element at 0, 10
+	Found element at 0, 10
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="cf4ca1e9-2f2a-4e60-a8e8-0ef54b8b5b4c")>
+			\Intercepted click: Message: element click intercepted: Element <a class="navbar-brand" href="/member" style="float:left">...</a> is not clickable at point (30, 31). Other element would receive the click: <div class="modal fade show" id="signupModal" tabindex="-1" aria-labelledby="signupModalArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 0, 10
+	Found element at 0, 10
+			<a class="navbar-brand" href="/member" style="float:left">
+        <svg class="logo" width="35px" height="35px" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_128_16527)">
+          <path d="M22.5 3.75C26.9755 3.75 31.2677 5.5279 34.4324 8.69257C37.5971 11.8572 39.375 16.1495 39.375 20.625V34.6875C39.3757 36.0899 38.9271 37.4556 38.095 38.5845C37.2629 39.7133 36.0911 40.5459 34.7513 40.9602C33.4115 41.3746 31.9742 41.3488 30.6501 40.8867C29.326 40.4246 28.1848 39.5505 27.3937 38.3925C26.9039 39.26 26.1925 39.9818 25.3321 40.4841C24.4718 40.9863 23.4934 41.251 22.4972 41.251C21.501 41.251 20.5226 40.9863 19.6623 40.4841C18.8019 39.9818 18.0904 39.26 17.6006 38.3925C16.8263 39.5228 15.7176 40.3825 14.43 40.8508C13.1424 41.3192 11.7405 41.3728 10.4209 41.0041C9.10126 40.6354 7.93015 39.863 7.07175 38.7951C6.21335 37.7272 5.71073 36.4174 5.63438 35.0494L5.625 34.6856V20.625C5.625 16.1495 7.4029 11.8572 10.5676 8.69257C13.7322 5.5279 18.0245 3.75 22.5 3.75V3.75ZM22.5 7.5C19.0969 7.49994 15.8268 8.82167 13.3796 11.1864C10.9323 13.5511 9.49918 16.7739 9.3825 20.175L9.375 20.625V34.5862L9.37875 34.845C9.41106 35.4071 9.61132 35.9465 9.95363 36.3935C10.2959 36.8406 10.7645 37.1745 11.2987 37.3523C11.833 37.53 12.4082 37.5433 12.9501 37.3905C13.492 37.2376 13.9755 36.9257 14.3381 36.495L14.5031 36.2775C14.8622 35.7511 15.3494 35.3248 15.9189 35.0389C16.4884 34.7531 17.1214 34.617 17.758 34.6437C18.3947 34.6703 19.014 34.8588 19.5577 35.1912C20.1013 35.5237 20.5512 35.9892 20.865 36.5437C21.0276 36.8331 21.2642 37.074 21.5506 37.2418C21.8369 37.4097 22.1627 37.4985 22.4946 37.499C22.8265 37.4996 23.1526 37.412 23.4395 37.2451C23.7264 37.0782 23.9639 36.8381 24.1275 36.5494C24.4277 36.0166 24.8536 35.5653 25.3681 35.2348C25.8826 34.9043 26.4702 34.7046 27.0796 34.6532C27.6889 34.6018 28.3016 34.7002 28.8642 34.9399C29.4269 35.1795 29.9223 35.5531 30.3075 36.0281L30.4894 36.2719C30.8149 36.7499 31.2798 37.1159 31.8208 37.3202C32.3619 37.5244 32.9527 37.5569 33.5129 37.4132C34.073 37.2695 34.5753 36.9567 34.9512 36.5172C35.3272 36.0778 35.5585 35.5332 35.6137 34.9575L35.625 34.6875V20.625C35.625 17.144 34.2422 13.8056 31.7808 11.3442C29.3194 8.88281 25.981 7.5 22.5 7.5V7.5ZM30 24.375C30 26.3317 29.2354 28.2109 27.8692 29.6116C26.5031 31.0124 24.6436 31.8238 22.6876 31.8728C20.7315 31.9217 18.8338 31.2043 17.3993 29.8736C15.9648 28.5428 15.1072 26.7042 15.0094 24.75L15 24.375H18.75C18.75 25.3696 19.1451 26.3234 19.8484 27.0266C20.5516 27.7299 21.5054 28.125 22.5 28.125C23.4946 28.125 24.4484 27.7299 25.1516 27.0266C25.8549 26.3234 26.25 25.3696 26.25 24.375H30ZM22.5 13.125C23.4946 13.125 24.4484 13.5201 25.1516 14.2233C25.8549 14.9266 26.25 15.8804 26.25 16.875C26.25 17.8696 25.8549 18.8234 25.1516 19.5266C24.4484 20.2299 23.4946 20.625 22.5 20.625C21.5054 20.625 20.5516 20.2299 19.8484 19.5266C19.1451 18.8234 18.75 17.8696 18.75 16.875C18.75 15.8804 19.1451 14.9266 19.8484 14.2233C20.5516 13.5201 21.5054 13.125 22.5 13.125Z" fill="#70ABAF"></path>
+          </g>
+          <defs>
+          <clipPath id="clip0_128_16527">
+          <rect width="45" height="45" fill="white"></rect>
+          </clipPath>
+          </defs>
+          </svg>
+      </a>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element 7uv8TfF4awiJp1U4DZyV4lDj1 value:  on page 2
+	Found next element 7uv8TfF4awiJp1U4DZyV4lDj1 value:  on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129637b20>
+		Clicking Button
+	Finding element at 809, 44
+	Found element at 809, 44
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="8d81daf6-aa2f-430e-b367-46f1d4c843b6")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 3 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 2 to 0
+
+Checking if there is a next element
+	Found next element Q8N9UP1tfsqGoYKN3OrstXP8c value: Create Employee Account on page 2
+	Found next element Q8N9UP1tfsqGoYKN3OrstXP8c value: Create Employee Account on page 2
+	Source page: 2
+	Checking if element YHtZHmungTC9BfTTlKbQqhYMJ has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 2
+	Checking if element YHtZHmungTC9BfTTlKbQqhYMJ has action state_change
+			Traversing up to: 2
+			Traversing down to: 0
+	Getting to page id for element YHtZHmungTC9BfTTlKbQqhYMJ
+	Getting actions for element YHtZHmungTC9BfTTlKbQqhYMJ
+	Performing action: <element.Element object at 0x1296631f0>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="78e95eaa-588d-49da-81dd-2125740ba16d")>
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129663550>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="78e95eaa-588d-49da-81dd-2125740ba16d")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (388, 453). Other element would receive the click: <div class="mb-3 form-check">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 240, 672
+	Found element at 240, 672
+			<button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">Create Employee Account</button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element lQCxbDa5SLPXyYiHIbHolgLXu value: Login on page 2
+	Found next element lQCxbDa5SLPXyYiHIbHolgLXu value: Login on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129637880>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="23398018-707a-45a2-9b73-4c883709eb05")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">...</button> is not clickable at point (1053, 18). Other element would receive the click: <div class="modal fade show" id="signupModal" tabindex="-1" aria-labelledby="signupModalArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">
+          Login
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element 9ZRYhJ6EcCpbLBDKzM3pKuZ76 value: Privacy Policy on page 2
+	Found next element 9ZRYhJ6EcCpbLBDKzM3pKuZ76 value: Privacy Policy on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129663250>
+		Clicking Button
+	Finding element at 699, 454
+	Found element at 699, 454
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="3193e76b-d844-4aeb-ad38-01bc2b32980e")>
+Getting page count
+	Checking if scrollable: False
+	Page is not scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	Comparing to 2
+	Comparing to 2screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	New page added 3
+	Adding element 9pMY14dcXH0NMSbZ7d8EFvf9C with value  to db
+	Setting current page to 3
+
+Checking if there is a next element
+	Found next element 9pMY14dcXH0NMSbZ7d8EFvf9C value:  on page 3
+	Found next element 9pMY14dcXH0NMSbZ7d8EFvf9C value:  on page 3
+	Source page: 3
+	Current page: 3
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1296413d0>
+		Clicking Button
+	Finding element at 0, 0
+	Found element at 0, 0
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="2ff08ebe-e3bc-4db7-9df2-8310e1f5e0a2")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 4 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 3 to 0
+
+Checking if there is a next element
+	Found next element SolJJtwQ7YzhmMyL4Zs84jYKQ value: Sign Up on page 2
+	Found next element SolJJtwQ7YzhmMyL4Zs84jYKQ value: Sign Up on page 2
+	Source page: 2
+	Checking if element YHtZHmungTC9BfTTlKbQqhYMJ has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 2
+	Checking if element YHtZHmungTC9BfTTlKbQqhYMJ has action state_change
+			Traversing up to: 2
+			Traversing down to: 0
+	Getting to page id for element YHtZHmungTC9BfTTlKbQqhYMJ
+	Getting actions for element YHtZHmungTC9BfTTlKbQqhYMJ
+	Performing action: <element.Element object at 0x129689eb0>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="7041b723-ee16-42d9-aefd-01f9c80123b0")>
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1295a7a00>
+		Clicking Button
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="cae7f2c0-cae4-4505-b083-ef19e55c1fe6")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (1132, 19). Other element would receive the click: <div class="modal fade show" id="signupModal" tabindex="-1" aria-labelledby="signupModalArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			<button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">
+          Sign Up
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element Eka43PJims4eV4VwS2zQYHfGO value: Terms and Conditions on page 2
+	Found next element Eka43PJims4eV4VwS2zQYHfGO value: Terms and Conditions on page 2
+	Source page: 2
+	Current page: 2
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x12965eca0>
+		Clicking Button
+	Finding element at 496, 454
+	Found element at 496, 454
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="16c959e5-c1ff-4a13-a23a-72867c628373")>
+Getting page count
+	Checking if scrollable: False
+	Page is not scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	Comparing to 2
+	Comparing to 2screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	Comparing to 3
+	Comparing to 3screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.023698697916666667
+	MSE2: 0.03677630208333333
+	MSE: 0.03677630208333333
+	New page added 4
+	Adding element eCaV1tAIidTroBDQDo296DcxE with value  to db
+	Setting current page to 4
+
+Checking if there is a next element
+	Found next element eCaV1tAIidTroBDQDo296DcxE value:  on page 4
+	Found next element eCaV1tAIidTroBDQDo296DcxE value:  on page 4
+	Source page: 4
+	Current page: 4
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129673e80>
+		Clicking Button
+	Finding element at 0, 0
+	Found element at 0, 0
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="7371a281-09af-49b8-bf85-cdad2698280a")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 5 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 4 to 0
+
+Checking if there is a next element
+	Found next element b047CSjGhWQYdtXB9SP5zvmXJ value: Login on page 0
+	Found next element b047CSjGhWQYdtXB9SP5zvmXJ value: Login on page 0
+	Source page: 0
+	Current page: 0
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1296855b0>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="1d07dd35-0ab5-493e-8c9b-d40e6280eabc")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 1.5912100127959052
+	MSE2: 16.52227167306462
+	MSE: 16.52227167306462
+	Comparing to 2
+	Comparing to 2screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.3948694417786308
+	MSE2: 1.6975931701855407
+	MSE: 1.6975931701855407
+	Comparing to 3
+	Comparing to 3screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	Comparing to 4
+	Comparing to 4screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	New page added 5
+	Adding element Ovo5DSnjVXzeQQ9CS62itYDiu with value  to db
+	Adding element uTjYVVuk28Y5ibxUY7aF0zJ9k with value Create Employee Account to db
+	Adding element bjy7ueXn23RE3ajkzDhXs5nZ3 with value Forgot password? to db
+	Adding element WtzVKjufN21zAzoxOZfORiYFb with value  to db
+	Adding element zb6rSLWeK8zWGLb6y2KrSW8M5 with value Login to db
+	Adding element HYItU5oTuIn6ztzDQyYfZxlPm with value Sign Up to db
+	Setting current page to 5
+
+Checking if there is a next element
+	Found next element Ovo5DSnjVXzeQQ9CS62itYDiu value:  on page 5
+	Found next element Ovo5DSnjVXzeQQ9CS62itYDiu value:  on page 5
+	Source page: 5
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1296945b0>
+		Clicking Button
+	Finding element at 0, 10
+	Found element at 0, 10
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="adb04da4-bd1b-43ab-aa87-d5a32bd59e4b")>
+			\Intercepted click: Message: element click intercepted: Element <a class="navbar-brand" href="/member" style="float:left">...</a> is not clickable at point (30, 31). Other element would receive the click: <div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 0, 10
+	Found element at 0, 10
+			<a class="navbar-brand" href="/member" style="float:left">
+        <svg class="logo" width="35px" height="35px" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_128_16527)">
+          <path d="M22.5 3.75C26.9755 3.75 31.2677 5.5279 34.4324 8.69257C37.5971 11.8572 39.375 16.1495 39.375 20.625V34.6875C39.3757 36.0899 38.9271 37.4556 38.095 38.5845C37.2629 39.7133 36.0911 40.5459 34.7513 40.9602C33.4115 41.3746 31.9742 41.3488 30.6501 40.8867C29.326 40.4246 28.1848 39.5505 27.3937 38.3925C26.9039 39.26 26.1925 39.9818 25.3321 40.4841C24.4718 40.9863 23.4934 41.251 22.4972 41.251C21.501 41.251 20.5226 40.9863 19.6623 40.4841C18.8019 39.9818 18.0904 39.26 17.6006 38.3925C16.8263 39.5228 15.7176 40.3825 14.43 40.8508C13.1424 41.3192 11.7405 41.3728 10.4209 41.0041C9.10126 40.6354 7.93015 39.863 7.07175 38.7951C6.21335 37.7272 5.71073 36.4174 5.63438 35.0494L5.625 34.6856V20.625C5.625 16.1495 7.4029 11.8572 10.5676 8.69257C13.7322 5.5279 18.0245 3.75 22.5 3.75V3.75ZM22.5 7.5C19.0969 7.49994 15.8268 8.82167 13.3796 11.1864C10.9323 13.5511 9.49918 16.7739 9.3825 20.175L9.375 20.625V34.5862L9.37875 34.845C9.41106 35.4071 9.61132 35.9465 9.95363 36.3935C10.2959 36.8406 10.7645 37.1745 11.2987 37.3523C11.833 37.53 12.4082 37.5433 12.9501 37.3905C13.492 37.2376 13.9755 36.9257 14.3381 36.495L14.5031 36.2775C14.8622 35.7511 15.3494 35.3248 15.9189 35.0389C16.4884 34.7531 17.1214 34.617 17.758 34.6437C18.3947 34.6703 19.014 34.8588 19.5577 35.1912C20.1013 35.5237 20.5512 35.9892 20.865 36.5437C21.0276 36.8331 21.2642 37.074 21.5506 37.2418C21.8369 37.4097 22.1627 37.4985 22.4946 37.499C22.8265 37.4996 23.1526 37.412 23.4395 37.2451C23.7264 37.0782 23.9639 36.8381 24.1275 36.5494C24.4277 36.0166 24.8536 35.5653 25.3681 35.2348C25.8826 34.9043 26.4702 34.7046 27.0796 34.6532C27.6889 34.6018 28.3016 34.7002 28.8642 34.9399C29.4269 35.1795 29.9223 35.5531 30.3075 36.0281L30.4894 36.2719C30.8149 36.7499 31.2798 37.1159 31.8208 37.3202C32.3619 37.5244 32.9527 37.5569 33.5129 37.4132C34.073 37.2695 34.5753 36.9567 34.9512 36.5172C35.3272 36.0778 35.5585 35.5332 35.6137 34.9575L35.625 34.6875V20.625C35.625 17.144 34.2422 13.8056 31.7808 11.3442C29.3194 8.88281 25.981 7.5 22.5 7.5V7.5ZM30 24.375C30 26.3317 29.2354 28.2109 27.8692 29.6116C26.5031 31.0124 24.6436 31.8238 22.6876 31.8728C20.7315 31.9217 18.8338 31.2043 17.3993 29.8736C15.9648 28.5428 15.1072 26.7042 15.0094 24.75L15 24.375H18.75C18.75 25.3696 19.1451 26.3234 19.8484 27.0266C20.5516 27.7299 21.5054 28.125 22.5 28.125C23.4946 28.125 24.4484 27.7299 25.1516 27.0266C25.8549 26.3234 26.25 25.3696 26.25 24.375H30ZM22.5 13.125C23.4946 13.125 24.4484 13.5201 25.1516 14.2233C25.8549 14.9266 26.25 15.8804 26.25 16.875C26.25 17.8696 25.8549 18.8234 25.1516 19.5266C24.4484 20.2299 23.4946 20.625 22.5 20.625C21.5054 20.625 20.5516 20.2299 19.8484 19.5266C19.1451 18.8234 18.75 17.8696 18.75 16.875C18.75 15.8804 19.1451 14.9266 19.8484 14.2233C20.5516 13.5201 21.5054 13.125 22.5 13.125Z" fill="#70ABAF"></path>
+          </g>
+          <defs>
+          <clipPath id="clip0_128_16527">
+          <rect width="45" height="45" fill="white"></rect>
+          </clipPath>
+          </defs>
+          </svg>
+      </a>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element WtzVKjufN21zAzoxOZfORiYFb value:  on page 5
+	Found next element WtzVKjufN21zAzoxOZfORiYFb value:  on page 5
+	Source page: 5
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1296894f0>
+		Clicking Button
+	Finding element at 809, 44
+	Found element at 809, 44
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="1de06d85-9681-4135-b67f-4fa857661633")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 6 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 5 to 0
+
+Checking if there is a next element
+	Found next element uTjYVVuk28Y5ibxUY7aF0zJ9k value: Create Employee Account on page 5
+	Found next element uTjYVVuk28Y5ibxUY7aF0zJ9k value: Create Employee Account on page 5
+	Source page: 5
+	Checking if element b047CSjGhWQYdtXB9SP5zvmXJ has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 5
+	Checking if element b047CSjGhWQYdtXB9SP5zvmXJ has action state_change
+			Traversing up to: 5
+			Traversing down to: 0
+	Getting to page id for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Getting actions for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Performing action: <element.Element object at 0x1296944c0>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="46d057d7-3680-41c9-a7b6-10d5159949a7")>
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129694670>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="033ee583-6a9a-4b24-a1d9-5f99fbaa1adc")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (388, 453). Other element would receive the click: <div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 240, 672
+	Found element at 240, 672
+			<button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">Create Employee Account</button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element bjy7ueXn23RE3ajkzDhXs5nZ3 value: Forgot password? on page 5
+	Found next element bjy7ueXn23RE3ajkzDhXs5nZ3 value: Forgot password? on page 5
+	Source page: 5
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x12967a730>
+		Clicking Button
+	Finding element at 367, 340
+	Found element at 367, 340
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="0cccf69f-2dfa-4071-9bb3-1b91614b9434")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.5794665706973768
+	MSE2: 17.07619401791427
+	MSE: 17.07619401791427
+	Comparing to 2
+	Comparing to 2screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.3251211612284069
+	MSE2: 2.5019059900831735
+	MSE: 2.5019059900831735
+	Comparing to 3
+	Comparing to 3screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	Comparing to 4
+	Comparing to 4screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE: 1
+	Comparing to 5
+	Comparing to 5screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.15966930582213693
+	MSE2: 1.3212244081893794
+	MSE: 1.3212244081893794
+	New page added 6
+	Adding element 9Aye4lNDevOaz0xqmBZdFW7Ip with value  to db
+	Adding element KgO61KEIvOPNfb4JyM7wZHlCB with value Create Employee Account to db
+	Adding element TsCzJ0Iy6aa1qahCr0NAfEo12 with value  to db
+	Adding element x5OycuQH0DrnyISbRCdsBHFMz with value Login to db
+	Adding element iqXWwTsGswAEJe7twibQkjVJB with value Sign Up to db
+	Setting current page to 6
+
+Checking if there is a next element
+	Found next element 9Aye4lNDevOaz0xqmBZdFW7Ip value:  on page 6
+	Found next element 9Aye4lNDevOaz0xqmBZdFW7Ip value:  on page 6
+	Source page: 6
+	Current page: 6
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1294e0910>
+		Clicking Button
+	Finding element at 0, 10
+	Found element at 0, 10
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="73b9a437-7835-4962-9cb2-05d2b8208c4f")>
+			\Intercepted click: Message: element click intercepted: Element <a class="navbar-brand" href="/member" style="float:left">...</a> is not clickable at point (30, 31). Other element would receive the click: <div class="modal fade show" id="forgotPassword" tabindex="-1" aria-labelledby="forgotPasswordArea" style="display: block;" aria-modal="true" role="dialog">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 0, 10
+	Found element at 0, 10
+			<a class="navbar-brand" href="/member" style="float:left">
+        <svg class="logo" width="35px" height="35px" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_128_16527)">
+          <path d="M22.5 3.75C26.9755 3.75 31.2677 5.5279 34.4324 8.69257C37.5971 11.8572 39.375 16.1495 39.375 20.625V34.6875C39.3757 36.0899 38.9271 37.4556 38.095 38.5845C37.2629 39.7133 36.0911 40.5459 34.7513 40.9602C33.4115 41.3746 31.9742 41.3488 30.6501 40.8867C29.326 40.4246 28.1848 39.5505 27.3937 38.3925C26.9039 39.26 26.1925 39.9818 25.3321 40.4841C24.4718 40.9863 23.4934 41.251 22.4972 41.251C21.501 41.251 20.5226 40.9863 19.6623 40.4841C18.8019 39.9818 18.0904 39.26 17.6006 38.3925C16.8263 39.5228 15.7176 40.3825 14.43 40.8508C13.1424 41.3192 11.7405 41.3728 10.4209 41.0041C9.10126 40.6354 7.93015 39.863 7.07175 38.7951C6.21335 37.7272 5.71073 36.4174 5.63438 35.0494L5.625 34.6856V20.625C5.625 16.1495 7.4029 11.8572 10.5676 8.69257C13.7322 5.5279 18.0245 3.75 22.5 3.75V3.75ZM22.5 7.5C19.0969 7.49994 15.8268 8.82167 13.3796 11.1864C10.9323 13.5511 9.49918 16.7739 9.3825 20.175L9.375 20.625V34.5862L9.37875 34.845C9.41106 35.4071 9.61132 35.9465 9.95363 36.3935C10.2959 36.8406 10.7645 37.1745 11.2987 37.3523C11.833 37.53 12.4082 37.5433 12.9501 37.3905C13.492 37.2376 13.9755 36.9257 14.3381 36.495L14.5031 36.2775C14.8622 35.7511 15.3494 35.3248 15.9189 35.0389C16.4884 34.7531 17.1214 34.617 17.758 34.6437C18.3947 34.6703 19.014 34.8588 19.5577 35.1912C20.1013 35.5237 20.5512 35.9892 20.865 36.5437C21.0276 36.8331 21.2642 37.074 21.5506 37.2418C21.8369 37.4097 22.1627 37.4985 22.4946 37.499C22.8265 37.4996 23.1526 37.412 23.4395 37.2451C23.7264 37.0782 23.9639 36.8381 24.1275 36.5494C24.4277 36.0166 24.8536 35.5653 25.3681 35.2348C25.8826 34.9043 26.4702 34.7046 27.0796 34.6532C27.6889 34.6018 28.3016 34.7002 28.8642 34.9399C29.4269 35.1795 29.9223 35.5531 30.3075 36.0281L30.4894 36.2719C30.8149 36.7499 31.2798 37.1159 31.8208 37.3202C32.3619 37.5244 32.9527 37.5569 33.5129 37.4132C34.073 37.2695 34.5753 36.9567 34.9512 36.5172C35.3272 36.0778 35.5585 35.5332 35.6137 34.9575L35.625 34.6875V20.625C35.625 17.144 34.2422 13.8056 31.7808 11.3442C29.3194 8.88281 25.981 7.5 22.5 7.5V7.5ZM30 24.375C30 26.3317 29.2354 28.2109 27.8692 29.6116C26.5031 31.0124 24.6436 31.8238 22.6876 31.8728C20.7315 31.9217 18.8338 31.2043 17.3993 29.8736C15.9648 28.5428 15.1072 26.7042 15.0094 24.75L15 24.375H18.75C18.75 25.3696 19.1451 26.3234 19.8484 27.0266C20.5516 27.7299 21.5054 28.125 22.5 28.125C23.4946 28.125 24.4484 27.7299 25.1516 27.0266C25.8549 26.3234 26.25 25.3696 26.25 24.375H30ZM22.5 13.125C23.4946 13.125 24.4484 13.5201 25.1516 14.2233C25.8549 14.9266 26.25 15.8804 26.25 16.875C26.25 17.8696 25.8549 18.8234 25.1516 19.5266C24.4484 20.2299 23.4946 20.625 22.5 20.625C21.5054 20.625 20.5516 20.2299 19.8484 19.5266C19.1451 18.8234 18.75 17.8696 18.75 16.875C18.75 15.8804 19.1451 14.9266 19.8484 14.2233C20.5516 13.5201 21.5054 13.125 22.5 13.125Z" fill="#70ABAF"></path>
+          </g>
+          <defs>
+          <clipPath id="clip0_128_16527">
+          <rect width="45" height="45" fill="white"></rect>
+          </clipPath>
+          </defs>
+          </svg>
+      </a>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element TsCzJ0Iy6aa1qahCr0NAfEo12 value:  on page 6
+	Found next element TsCzJ0Iy6aa1qahCr0NAfEo12 value:  on page 6
+	Source page: 6
+	Current page: 6
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x12965e940>
+		Clicking Button
+	Finding element at 809, 44
+	Found element at 809, 44
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="f2886f92-0ddc-4105-a5f5-e80c2ad72260")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 7 0
+	Page already visited - 0
+	Setting current page to 0
+	Current page: 0
+	Adding actions from 6 to 0
+
+Checking if there is a next element
+	Found next element KgO61KEIvOPNfb4JyM7wZHlCB value: Create Employee Account on page 6
+	Found next element KgO61KEIvOPNfb4JyM7wZHlCB value: Create Employee Account on page 6
+	Source page: 6
+	Checking if element bjy7ueXn23RE3ajkzDhXs5nZ3 has action state_change
+		Traversing to state change root
+			Current page: 0
+			Source page: 6
+	Checking if element bjy7ueXn23RE3ajkzDhXs5nZ3 has action state_change
+			Traversing up to: 6
+	Checking if element b047CSjGhWQYdtXB9SP5zvmXJ has action state_change
+			Traversing up to: 5
+			Traversing down to: 0
+	Getting to page id for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Getting actions for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Performing action: <element.Element object at 0x12967a850>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="1500eaca-3663-4dab-a83b-248ad72feb46")>
+			Traversing down to: 5
+	Getting to page id for element bjy7ueXn23RE3ajkzDhXs5nZ3
+	Getting actions for element bjy7ueXn23RE3ajkzDhXs5nZ3
+	Performing action: <element.Element object at 0x12967aaf0>
+		Clicking Button
+	Finding element at 367, 340
+	Found element at 367, 340
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="147a4bdb-7447-4e4f-838b-1523b8efd425")>
+	Current page: 6
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x1294e01f0>
+		Clicking Button
+	Finding element at 240, 672
+	Found element at 240, 672
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="a2644a67-e7b6-4ebd-a645-bb723a1e1f57")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (388, 453). Other element would receive the click: <div class="modal fade show" id="forgotPassword" tabindex="-1" aria-labelledby="forgotPasswordArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 240, 672
+	Found element at 240, 672
+			<button type="button" class="btn btn-success btn-lg px-4 me-md-2 fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">Create Employee Account</button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element x5OycuQH0DrnyISbRCdsBHFMz value: Login on page 6
+	Found next element x5OycuQH0DrnyISbRCdsBHFMz value: Login on page 6
+	Source page: 6
+	Current page: 6
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x12967ad30>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="1500eaca-3663-4dab-a83b-248ad72feb46")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">...</button> is not clickable at point (1053, 18). Other element would receive the click: <div class="modal fade show" id="forgotPassword" tabindex="-1" aria-labelledby="forgotPasswordArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">
+          Login
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element iqXWwTsGswAEJe7twibQkjVJB value: Sign Up on page 6
+	Found next element iqXWwTsGswAEJe7twibQkjVJB value: Sign Up on page 6
+	Source page: 6
+	Current page: 6
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x12965e220>
+		Clicking Button
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="b86c5598-6108-451c-b2c5-d557677f4111")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (1132, 19). Other element would receive the click: <div class="modal fade show" id="forgotPassword" tabindex="-1" aria-labelledby="forgotPasswordArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			<button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">
+          Sign Up
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element zb6rSLWeK8zWGLb6y2KrSW8M5 value: Login on page 5
+	Found next element zb6rSLWeK8zWGLb6y2KrSW8M5 value: Login on page 5
+	Source page: 5
+	Checking if element b047CSjGhWQYdtXB9SP5zvmXJ has action state_change
+		Traversing to state change root
+			Current page: 6
+			Source page: 5
+	Checking if element b047CSjGhWQYdtXB9SP5zvmXJ has action state_change
+			Traversing up to: 5
+			Traversing down to: 0
+	Getting to page id for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Getting actions for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Performing action: <element.Element object at 0x12967a400>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="26e5693c-3843-4330-b6f9-97bc93a9f81a")>
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x12967a790>
+		Clicking Button
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="26e5693c-3843-4330-b6f9-97bc93a9f81a")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">...</button> is not clickable at point (1053, 18). Other element would receive the click: <div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1020, 23
+	Found element at 1020, 23
+			<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">
+          Login
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element HYItU5oTuIn6ztzDQyYfZxlPm value: Sign Up on page 5
+	Found next element HYItU5oTuIn6ztzDQyYfZxlPm value: Sign Up on page 5
+	Source page: 5
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129685790>
+		Clicking Button
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="25822267-fd26-47f2-9996-345e04c5265e")>
+			\Intercepted click: Message: element click intercepted: Element <button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">...</button> is not clickable at point (1132, 19). Other element would receive the click: <div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalArea" aria-modal="true" role="dialog" style="display: block;">...</div>
+  (Session info: headless chrome=111.0.5563.64)
+Stacktrace:
+0   chromedriver                        0x00000001056cb428 chromedriver + 4899880
+1   chromedriver                        0x0000000105648a23 chromedriver + 4364835
+2   chromedriver                        0x0000000105292bf6 chromedriver + 474102
+3   chromedriver                        0x00000001052dfd81 chromedriver + 789889
+4   chromedriver                        0x00000001052dcdde chromedriver + 777694
+5   chromedriver                        0x00000001052d9a54 chromedriver + 764500
+6   chromedriver                        0x00000001052d843f chromedriver + 758847
+7   chromedriver                        0x00000001052c8cf3 chromedriver + 695539
+8   chromedriver                        0x00000001052fc562 chromedriver + 906594
+9   chromedriver                        0x00000001052c8361 chromedriver + 693089
+10  chromedriver                        0x00000001052fc71e chromedriver + 907038
+11  chromedriver                        0x0000000105317b5b chromedriver + 1018715
+12  chromedriver                        0x00000001052fc333 chromedriver + 906035
+13  chromedriver                        0x00000001052c655f chromedriver + 685407
+14  chromedriver                        0x00000001052c7a7e chromedriver + 690814
+15  chromedriver                        0x000000010569879e chromedriver + 4691870
+16  chromedriver                        0x000000010569d961 chromedriver + 4712801
+17  chromedriver                        0x00000001056a42ff chromedriver + 4739839
+18  chromedriver                        0x000000010569e85a chromedriver + 4716634
+19  chromedriver                        0x0000000105670fce chromedriver + 4530126
+20  chromedriver                        0x00000001056be5c8 chromedriver + 4847048
+21  chromedriver                        0x00000001056be747 chromedriver + 4847431
+22  chromedriver                        0x00000001056d387f chromedriver + 4933759
+23  libsystem_pthread.dylib             0x00007ff815b23259 _pthread_start + 125
+24  libsystem_pthread.dylib             0x00007ff815b1ec7b thread_start + 15
+
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			<button type="button" class="btn btn-success-outline" data-bs-toggle="modal" data-bs-target="#signupModal">
+          Sign Up
+        </button>
+	Deleting element for reason: Intercepted click
+
+Checking if there is a next element
+	Found next element yk7EGEOdvgxo0JdpPTAr35pah value: Sign Up on page 0
+	Found next element yk7EGEOdvgxo0JdpPTAr35pah value: Sign Up on page 0
+	Source page: 0
+	Directly go to page
+	Current page: 5
+	Element Traveresed: True
+	Performing action: <element.Button object at 0x129652340>
+		Clicking Button
+	Finding element at 1090, 22
+	Found element at 1090, 22
+			Button found,<selenium.webdriver.remote.webelement.WebElement (session="9420512ebf9ccfc4b6f6bb268a8a1682", element="965634ca-39dc-4743-ab9f-7dffa71487e1")>
+Getting page count
+	Page is scrollable
+	Checking if page has been visited
+	Comparing to 0
+	Comparing to 0screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 2.9766956573896355
+	MSE2: 16.004715690978887
+	MSE: 16.004715690978887
+	Comparing to 2
+	Comparing to 2screenshotfsYorxTI2v9pGeR5DZDtTIapJ.png
+	MSE1: 0.0
+	MSE2: 0.0
+	MSE: 0.0
+	Identical pages found 7 2
+	Page already visited - 2
+	Setting current page to 2
+	Current page: 2
+	Adding actions from 0 to 2
+
+Checking if there is a next element
+	 No next element found
+Completing parse
+	Getting real actions for element YHtZHmungTC9BfTTlKbQqhYMJ
+	Getting real actions for element b047CSjGhWQYdtXB9SP5zvmXJ
+	Getting real actions for element yk7EGEOdvgxo0JdpPTAr35pah
+	Getting real actions for element Uaz70CtGGZkV9HVkOzLfEvCID
+	Getting real actions for element EXA3467BS0OlMIFD5FRTvtcUo
+	Getting real actions for element Eka43PJims4eV4VwS2zQYHfGO
+	Getting real actions for element 9ZRYhJ6EcCpbLBDKzM3pKuZ76
+	Getting real actions for element 7uv8TfF4awiJp1U4DZyV4lDj1
+	Getting real actions for element O7PKVtUJ3D3gzVF6AUr5GS1Mj
+	Getting real actions for element Q8N9UP1tfsqGoYKN3OrstXP8c
+	Getting real actions for element lQCxbDa5SLPXyYiHIbHolgLXu
+	Getting real actions for element 9pMY14dcXH0NMSbZ7d8EFvf9C
+	Getting real actions for element SolJJtwQ7YzhmMyL4Zs84jYKQ
+	Getting real actions for element eCaV1tAIidTroBDQDo296DcxE
+	Getting real actions for element bjy7ueXn23RE3ajkzDhXs5nZ3
+	Getting real actions for element WtzVKjufN21zAzoxOZfORiYFb
+	Getting real actions for element Ovo5DSnjVXzeQQ9CS62itYDiu
+	Getting real actions for element uTjYVVuk28Y5ibxUY7aF0zJ9k
+	Getting real actions for element TsCzJ0Iy6aa1qahCr0NAfEo12
+	Getting real actions for element 9Aye4lNDevOaz0xqmBZdFW7Ip
+	Getting real actions for element KgO61KEIvOPNfb4JyM7wZHlCB
+	Getting real actions for element x5OycuQH0DrnyISbRCdsBHFMz
+	Getting real actions for element iqXWwTsGswAEJe7twibQkjVJB
+	Getting real actions for element zb6rSLWeK8zWGLb6y2KrSW8M5
+	Getting real actions for element HYItU5oTuIn6ztzDQyYfZxlPm

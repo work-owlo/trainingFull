@@ -3,11 +3,10 @@ from element import *
 from utils import *
 from scrape import *
 
-def graph(parse_id):
+def graph(parse_id, company_id):
     # create directed graph
     G = nx.DiGraph()
     root = '0'
-    clean_table()
     pages = [p[0] for p in Parse.get_pages(parse_id)]
     context_list = []
     for element in Element.get_all_elements(parse_id):
@@ -43,11 +42,11 @@ def graph(parse_id):
         Element.add_context(e)
     
             
-    module_id = add_module(parse_id)
+    module_id = add_module_graph(parse_id, company_id)
     paths = find_paths(G, parse_id)
     print('Paths', paths)
     add_query(module_id, paths)
-    add_training(module_id)
+    add_training_graph(module_id)
     return module_id
 
 
@@ -114,11 +113,10 @@ def add_query(module_id, paths):
             path_id += 1
 
 
-def add_module(parse_id):
+def add_module_graph(parse_id, company_id):
     '''Create a new module'''
     module_id = generate_id()
-    company_id = 1
-    tool_id = 1
+    tool_id = 4
     access = 'private'
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -132,7 +130,7 @@ def add_module(parse_id):
     return module_id
 
         
-def add_training(module_id):
+def add_training_graph(module_id):
     '''Add sample training data'''
     team_id = 1
     training_status = 'pending'

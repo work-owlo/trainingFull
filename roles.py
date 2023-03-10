@@ -37,7 +37,7 @@ def assign_employee_role(company_id, id_input, first_name, last_name, email, rol
         with get_db_connection() as conn:
             cur = conn.cursor()
             cur.execute(
-                "SELECT * FROM team WHERE role_id = %s AND email = %s AND status != 'deleted'", (role_id, email))
+                "SELECT * FROM team WHERE role_id = %s AND email = %s AND (status = 'pending' or status='completed')", (role_id, email))
             employee = cur.fetchone()
             if employee != None:
                 return return_error("Employee already exists for this role")
@@ -56,12 +56,24 @@ def add_training_tasks(team_id, role_id):
         cur = conn.cursor()
         training_id = generate_uid()
         cur.execute(
-            "SELECT module.module_id FROM module, role_module WHERE module.module_id = role_module.module_id AND role_id = %s AND status = 'active'", (role_id,))
+            "SELECT module.module_id, module.tool_id FROM module, role_module WHERE module.module_id = role_module.module_id AND role_id = %s AND status = 'active'", (role_id,))
         modules = cur.fetchall()
         for module in modules:
-            cur.execute(
-                "INSERT INTO training (training_id, team_id, module_id, status) VALUES (%s, %s, %s, %s)", (training_id, team_id, module, "pending"))
-            conn.commit()
+            cur.execute("SELECT query_id, query FROM query WHERE module_id = %s", (module[0],))
+            queries = cur.fetchall()
+            if module[1] == '4':
+                for query in queries:
+                    training_id = generate_uid()
+                    cur.execute(
+                        "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module, query[0], 'pending'))
+                    conn.commit()
+            else:
+                for query in queries:
+                    training_id = generate_uid()
+                    print(query)
+                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module, query[1], 'pending'))
+                    conn.commit()
+
 
 
 def get_employee_id(email):
@@ -97,8 +109,34 @@ def get_team(company_id, keyword=None, status=None):
         team_list = []
         if employees != None:
             for employee in employees:
-                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=employee[9]))
+                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=int(get_training_status(employee[0]))))
+    
+    
     return team_list
+
+
+def get_training_status(team_id):
+    # get training status (in percentage) for a role
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute('''
+            SELECT COUNT(*) as count
+            FROM training
+            WHERE training.team_id = %s
+              AND training.training_status = 'completed'
+        ''', (team_id,))
+        completed = cur.fetchone()['count']
+        cur.execute('''
+            SELECT COUNT(*) as count
+            FROM training
+            WHERE training.team_id = %s
+        ''', (team_id,))
+        total = cur.fetchone()['count']
+        print('value', completed, total)
+        if total and completed:
+            return round(completed/total*100)
+    return 0
+
 
 
 def get_roles(company_id):

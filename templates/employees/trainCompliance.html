@@ -76,33 +76,8 @@
             <h4>{{title}}</h4>
             {{text}}
         </div>
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteElement" style="margin-top:1rem">
-            Reset Progress
-        </button>
-        <a type="button" class="btn btn-light" href="/company/roles" style="margin-top:1rem">
-            Done Testing
-        </a>
 
     </div>
 </div>
-<div class="modal fade" id="deleteElement" tabindex="-1" aria-labelledby="deleteElementLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="deleteElementLabel">Reset Progress</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Are you sure you want to reset your progress? This action cannot be undone. 
-        </div>
-        <div class="modal-footer">
-            <form class="not-important" action="{{url_for('resetCompliance', training_id=training_id)}}" method="post">
-                <input type="text" value="" name="deletingPage" id="deletingPage" hidden>
-                <button type="submit" class="btn btn-danger">Reset</button>
-            </form>
-        </div>
-      </div>
-    </div>
-  </div>
 </html>
 {% endblock %}

@@ -14,6 +14,7 @@ def get_training_invited(uid, keyword=None, filter_status=None):
             FROM job_roles as r, company as c, team as t
             WHERE r.company_id = c.company_id AND t.role_id = r.role_id AND t.employee_id = %s AND r.status = 'active'
             AND (lower(r.role_name) LIKE %s or lower(r.role_description) LIKE %s or lower(c.company_name) LIKE %s)
+            AND (t.status = 'pending' or t.status = 'incomplete')
         ''', (uid, '%'+keyword.lower()+'%', '%'+keyword.lower()+'%', '%'+keyword.lower()+'%' ))
         training = cur.fetchall()
         for t in training:
@@ -92,19 +93,18 @@ def get_training_status(team_id):
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute('''
             SELECT COUNT(*) as count
-            FROM team, training
-            WHERE team.team_id = training.team_id
-              AND team.team_id = %s
-              AND training.status = 'completed'
+            FROM training
+            WHERE training.team_id = %s
+              AND training.training_status = 'completed'
         ''', (team_id,))
-        completed = cur.fetchone()
+        completed = cur.fetchone()['count']
         cur.execute('''
             SELECT COUNT(*) as count
-            FROM team, role_module
-            WHERE team.role_id = role_module.role_id
-             AND team.team_id = %s
+            FROM training
+            WHERE training.team_id = %s
         ''', (team_id,))
-        total = cur.fetchone()
+        total = cur.fetchone()['count']
+        print('value', completed, total)
         if total and completed:
-            return round(completed['count']/total['count']*100)
+            return round(completed/total*100)
     return 0
