@@ -1,17 +1,18 @@
 from fastapi import FastAPI, Header, HTTPException, Depends, status, Response, Request, APIRouter, Form
-from pydantic import BaseModel
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel, EmailStr
+# from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.datastructures import URL
 from fastapi.encoders import jsonable_encoder
+from starlette.responses import JSONResponse
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 
-from typing import Optional, Any
+from typing import List
 from pathlib import Path
 import re
-import random
 
 from employee_auth import *
 from employees import *
@@ -28,35 +29,59 @@ from element import *
 from graph import *
 
 app = FastAPI()
+
+origins = [
+    "https://owlo.co",
+    "https://www.owlo.co",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# MAIL CONFIG
+conf = ConnectionConfig(
+    MAIL_USERNAME = "username",
+    MAIL_PASSWORD = "**********",
+    MAIL_FROM = "test@email.com",
+    MAIL_PORT = 587,
+    MAIL_SERVER = "mail server",
+    MAIL_FROM_NAME="Desired Name",
+    MAIL_STARTTLS = True,
+    MAIL_SSL_TLS = False,
+    USE_CREDENTIALS = True,
+    VALIDATE_CERTS = True
+)
+class EmailSchema(BaseModel):
+    email: List[EmailStr]
+
+
 api_router = APIRouter()
 BASE_PATH = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory="static"), name="static")
 EMPLOYEE_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employees"))
 EMPLOYER_TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / "templates/employer"))
 
-favicon_path = 'favicon.ico'
-
-@app.get('/favicon.ico', include_in_schema=False)
-async def favicon():
-    return FileResponse(favicon_path)
-
-# # Add the allowed origins here
-# origins = ["http://localhost:3000"]
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
 
 oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
 
+@api_router.get("/testCors")
+def test_cors(request: Request):
+    return {"message": "success"}
+    
 
 """MUTUAL AUTH"""
+favicon_path = 'favicon.ico'
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse(favicon_path)
+
 
 @app.get("/privacy", response_class=HTMLResponse)
 def privacy_policy(request: Request):
@@ -66,6 +91,7 @@ def privacy_policy(request: Request):
             "request": request,
         }
     )
+
 
 @app.get("/terms", response_class=HTMLResponse)
 def privacy_policy(request: Request):
@@ -1860,10 +1886,36 @@ def trainCompliance(response: Response, request: Request, team_id:str, module_id
     return response
 
 
-
-
 # SOFTWARE
 
-# MUTUAL
 
+# MAIL
+
+''' create account welcome email for new employees'''
+# async def simple_send(email: EmailSchema) -> JSONResponse:
+#     html = """<p>Hi this test mail, thanks for using Fastapi-mail</p> """
+
+#     message = MessageSchema(
+#         subject="Fastapi-Mail module",
+#         recipients=email.dict().get("email"),
+#         body=html,
+#         subtype=MessageType.html)
+
+#     fm = FastMail(conf)
+#     await fm.send_message(message)
+#     return JSONResponse(status_code=200, content={"message": "email has been sent"})
+
+''' create account welcome email for company accounts'''
+
+
+'''training invite email'''
+
+
+'''training reminder email'''
+
+
+'''training completion email for company'''
+
+
+''' training completion email for employee'''
 app.include_router(api_router)

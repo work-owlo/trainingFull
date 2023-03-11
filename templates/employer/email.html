@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to our website</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* Add your own CSS styles here */
+
+      /* Body */
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        background-color: #f4f4f4;
+      }
+
+      /* Header */
+      .header {
+        background-color: #f8f8f8;
+        padding: 20px;
+        text-align: center;
+      }
+
+      /* Logo */
+      .logo {
+        max-width: 200px;
+        height: auto;
+        margin: 0 auto;
+        display: block;
+      }
+
+      /* Content */
+      .content {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Button */
+      .button {
+        display: inline-block;
+        background-color: #0066ff;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-top: 20px;
+      }
+
+      /* Button hover */
+      .button:hover {
+        background-color: #0044cc;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        color: #999;
+        font-size: 12px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <img class="logo" src="https://example.com/logo.png" alt="Logo">
+    </div>
+    <div class="content">
+      <h1>Welcome to our website, {{ user.username }}!</h1>
+      <p>We are excited to have you as a new member of our community.</p>
+      <p>To get started, simply log in to your account and explore our features.</p>
+      <a class="button" href="https://example.com/login">Log in now</a>
+    </div>
+    <div class="footer">
+      <p>If you have any questions or need assistance, feel free to contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
+      <p>Thank you for joining us!</p>
+      <p>Best regards,<br>
+         The {{ company_name }} Team</p>
+    </div>
+  </body>
+</html>
