@@ -189,6 +189,18 @@ def check_emp_in_team(company_id, team_id):
     return True
 
 
+def get_employee_email(team_id):
+    '''Get employee email'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT email FROM employee_user, team WHERE employee_user.employee_id = team.employee_id AND team.team_id = %s" , (team_id,))
+        employee = cur.fetchone()
+        if employee == None:
+            return False
+    return employee[0]
+
+
 def check_role_in_company(company_id, role_id):
     '''Check if role is in company'''
     with get_db_connection() as conn:

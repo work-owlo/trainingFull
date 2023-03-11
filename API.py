@@ -32,33 +32,15 @@ app = FastAPI()
 
 origins = [
     "https://owlo.co",
-    "https://www.owlo.co",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
-
-
-# MAIL CONFIG
-conf = ConnectionConfig(
-    MAIL_USERNAME = "username",
-    MAIL_PASSWORD = "**********",
-    MAIL_FROM = "test@email.com",
-    MAIL_PORT = 587,
-    MAIL_SERVER = "mail server",
-    MAIL_FROM_NAME="Desired Name",
-    MAIL_STARTTLS = True,
-    MAIL_SSL_TLS = False,
-    USE_CREDENTIALS = True,
-    VALIDATE_CERTS = True
-)
-class EmailSchema(BaseModel):
-    email: List[EmailStr]
 
 
 api_router = APIRouter()
@@ -71,7 +53,8 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
 
 oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
 
-@api_router.get("/testCors")
+
+@api_router.post("/testCors")
 def test_cors(request: Request):
     return {"message": "success"}
     
@@ -209,6 +192,7 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     state = employee_create_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await login(response, email, password)
+        create_account_emp(email)
         return rr
     else:
         redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
@@ -533,6 +517,8 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     state = manager_create_admin_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await company_login(response, email, password)
+        uid = state['body']['uid']
+        create_account_comp(email)
         return rr
         # redirect_url = URL(request.url_for('member_root'))
         # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
@@ -701,13 +687,14 @@ def assign_employee(response: Response, request: Request,  id_input: str = Form(
     email = email.strip()
     assign = assign_employee_role(manager.company_id, id_input, first_name, last_name, email, role_id, employment_type)
     if assign['status'] == 'success':
+        training_invite_email(email)
         return RedirectResponse(url='/company/team', status_code=302)
     else:
         return RedirectResponse(url='/company/team?alert='+str(assign['body']), status_code=302)
     
 
-@api_router.get("/company/employee/view/{employee_id}", status_code=200)
-def view_employee(response: Response, request: Request, employee_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.get("/company/employee/view/{team_id}", status_code=200)
+def view_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the roles of this company
     """
@@ -716,7 +703,7 @@ def view_employee(response: Response, request: Request, employee_id: str, manage
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company", status_code=302)
     # employee = get_employee(manager.company_id, employee_id)
-    if not check_emp_in_team(manager.company_id, employee_id):
+    if not check_emp_in_team(manager.company_id, team_id):
         return RedirectResponse(url="/company/team", status_code=302)
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "employee.html",
@@ -734,6 +721,41 @@ def view_employee(response: Response, request: Request, employee_id: str, manage
             httponly=True
         )
     return response
+
+
+@api_router.post("/company/employee/remind/{team_id}", status_code=200)
+def remind_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Get all the roles of this company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout", status_code=302)
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company", status_code=302)
+    # employee = get_employee(manager.company_id, team_id)
+    if not check_emp_in_team(manager.company_id, team_id):
+        return RedirectResponse(url="/company/team", status_code=302)
+    email = get_employee_email(team_id)
+    if email == None:
+        return RedirectResponse(url="/company/team", status_code=302)
+    training_reminder_email(email)
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "employee.html",
+        {
+            "request": request,
+            "employee": 'Hi',
+            "name": manager.first_name
+        }
+    )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
+
 
 
 @api_router.get("/company/add_role", status_code=200)
@@ -1882,6 +1904,16 @@ def trainCompliance(response: Response, request: Request, team_id:str, module_id
         update_training_status(training_id, chat, 'completed', score)
     else:
         update_training_status(training_id, chat, 'pending', score)
+    
+    
+    progress = get_training_progress(team_id)
+    if progress == 1:
+        # email comp and emp
+        email = get_employee_email(team_id)
+        training_completion_comp(email)
+        training_completion_emp(email)
+    
+
     response = RedirectResponse(url=f"/member/training/compliance/{module_id}/{team_id}", status_code=303)
     return response
 
@@ -1891,31 +1923,227 @@ def trainCompliance(response: Response, request: Request, team_id:str, module_id
 
 # MAIL
 
+# MAIL CONFIG
+conf = ConnectionConfig(
+    MAIL_USERNAME = "info@owlo.co",
+    MAIL_PASSWORD = rds_config.mail_password,
+    MAIL_FROM = "info@owlo.co",
+    MAIL_PORT = 587,
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    TEMPLATE_FOLDER="./templates/employer"
+)
+class EmailSchema(BaseModel):
+    email: List[EmailStr]
+
+
+@api_router.get("/visualize_email", status_code=200)
+async def visualize_email(request: Request):
+    # test email in browser
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "email.html",
+        {
+            "request": request,
+            "title": "Welcome to Owlo",
+            "main_message": "Thanks for joining Owlo",
+            "sub_message": "We're excited to have you on board.",
+            "link_desc": "Click here to get started",
+            "link": "https://www.owlo.co",
+            "link_cta": "Get Started",
+            "unsubscribe_url" : "https://www.owlo.co",
+        }
+    )
+    return response
+
+
+def get_email_info(email):
+    '''Get user info from employee_user or manager_user'''
+    uid = None
+    first_name = None
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT * FROM employee_user WHERE email = %s""", (email,))
+        info = cur.fetchone()
+        if info:
+            uid = info['user_id']
+            first_name = info['first_name']
+        else:
+            # get from company AKA manager_user
+            cur.execute("""SELECT * FROM manager_user WHERE email = %s""", (email,))
+            info = cur.fetchone()
+            if info:
+                uid = info['user_id']
+                first_name = info['first_name']
+            
+    return uid, first_name
+
 ''' create account welcome email for new employees'''
-# async def simple_send(email: EmailSchema) -> JSONResponse:
-#     html = """<p>Hi this test mail, thanks for using Fastapi-mail</p> """
+def create_account_emp(email):
+    user_id, first_name = get_email_info(email)
+    template_data = {
+        "title": "Welcome to Owlo, " + first_name + ",",
+        "main_message": "Thanks for joining Owlo",
+        "sub_message": "We're excited to have you on board.",
+        "link_desc": "Click here to start onboarding",
+        "link": "https://www.owlo.co",
+        "link_cta": "Get Started",
+        "user_id": user_id,
+        "email": email
+    }
+    subject = "Welcome to Owlo"
+    if user_id and first_name:
+        send_email(email, template_data, subject)
 
-#     message = MessageSchema(
-#         subject="Fastapi-Mail module",
-#         recipients=email.dict().get("email"),
-#         body=html,
-#         subtype=MessageType.html)
-
-#     fm = FastMail(conf)
-#     await fm.send_message(message)
-#     return JSONResponse(status_code=200, content={"message": "email has been sent"})
 
 ''' create account welcome email for company accounts'''
+def create_account_comp(email):
+    user_id, first_name = get_email_info(email)
+    template_data = {
+        "title": "Welcome to Owlo",
+        "main_message": "Thanks for joining Owlo",
+        "sub_message": "We're excited to have you on board.",
+        "link_desc": "Click here to start onboarding your new team members",
+        "link": "https://www.owlo.co/company",
+        "link_cta": "Get Started",
+        "user_id": user_id,
+        "email": email
+    }
+    subject = "Welcome to Owlo"
+    if user_id and first_name:
+        send_email(email, template_data, subject)
 
 
 '''training invite email'''
+def training_invite_email(email):
+    user_id, first_name = get_email_info(email)
+    template_data = {
+        "title": "Onboarding Invite",
+        "main_message": "Hi " + first_name + "! ",
+        "sub_message": "A company has invited you to onboard for a new role.",
+        "link_desc": "Log in or Create an Account below to start onboarding",
+        "link": f"https://www.owlo.co/",
+        "link_cta": "Begin",
+        "user_id": user_id,
+        "email": email
+    }
+    subject = "Let's get started"
+    if user_id and first_name:
+        send_email(email, template_data, subject)
 
 
 '''training reminder email'''
+def training_reminder_email(email):
+    user_id, first_name = get_email_info(email)
+    template_data = {
+        "title": "Onboarding Reminder",
+        "main_message": "Hi " + first_name + "! ",
+        "sub_message": "You have pending onboarding for one or more roles",
+        "link_desc": "Log in or Create an Account below to start onboarding",
+        "link": f"https://www.owlo.co/",
+        "link_cta": "Begin",
+        "user_id": user_id,
+        "email": email
+    }
+    subject = "Your onboarding is waiting!"
+    if user_id and first_name:
+        send_email(email, template_data, subject)
 
 
-'''training completion email for company'''
+'''training completion email for employee'''
+def training_completion_emp(email):
+    user_id, first_name = get_email_info(email)
+    template_data = {
+        "title": "Onboarding Complete",
+        "main_message": "Hi " + first_name + "! ",
+        "sub_message": "You have completed onboarding for a role",
+        "link_desc": "We have notified the hiring manager that you are ready to begin. In the meantime, you can log in to your account to view your training history.",
+        "link": f"https://www.owlo.co/",
+        "link_cta": "Owlo",
+        "user_id": user_id,
+        "email": email
+    }
+    subject = "Your onboarding is complete!"
+    if user_id and first_name:
+        send_email(email, template_data, subject)
 
 
-''' training completion email for employee'''
+'''training completion email for employer'''
+def training_completion_comp(email):
+    user_id, first_name = get_email_info(email)
+    template_data = {
+        "title": "Onboarding Complete",
+        "main_message": "Hi " + user_name + "! ",
+        "sub_message": "A team member has completed onboarding. ",
+        "link_desc": "You can log in to your account to view their onboarding history and analysis.",
+        "link": f"https://www.owlo.co/company",
+        "link_cta": "Analysis",
+        "user_id": user_id,
+        "email": email
+    }
+    subject = " A member has completed onboarding!"
+    if user_id and first_name:
+        send_email(email, template_data, subject)
+
+
+'''Unsubscribe email'''
+def send_unsubscribe_email(email):
+    template_data = {
+        "title": "Unsubscribe",
+        "main_message": "Sorry to see you go!",
+        "sub_message": "You have been unsubscribed from Owlo emails. ",
+        "link_desc": "You will no longer receive emails from us. You can further change settings in your account.",
+        "link": f"https://www.owlo.co/account",
+        "link_cta": "Account",
+        "email": email,
+    }
+    subject = "Unsubscribed from Owlo"
+    if email:
+        send_email(email, template_data, subject)
+
+
+'''Unsubscribe email'''
+@app.get("/unsubscribe/{user_id}/{email}", status_code=200)
+def unsubscribe_email(user_id:str, email:str):
+    ''' Add user_id to unsubscribe table'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO unsubscribe (user_id, email, status) VALUES (%s, %s, %s)", (user_id, email, 'unsubscribed')
+        )
+        conn.commit()
+    # redirect to index
+    send_unsubscribe_email(email)
+    return RedirectResponse(url='https://www.owlo.co?alert="Unsubscribed!"', status_code=302)
+
+
+''' Check if email is unsubscribed'''
+def check_unsubscribe(email):
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM unsubscribe WHERE email = %s", (email,)
+            )
+            unsubscribe = cursor.fetchone()
+            if unsubscribe:
+                return True
+            else:
+                return False
+
+
+'''SEND EMAIL'''
+async def send_email(email:str, template_data: dict, subject: str):
+    if not check_unsubscribe(email):
+        message = MessageSchema(
+            subject=subject,
+            recipients=[email],
+            template_body=template_data,
+            subtype=MessageType.html
+        )
+        fm = FastMail(conf)
+        await fm.send_message(message, template_name="email.html") 
+        return JSONResponse(status_code=200, content={"message": "email has been sent"})
+
+
 app.include_router(api_router)

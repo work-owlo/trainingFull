@@ -184,5 +184,4 @@ def update_training_status(training_id, response, status, score=None):
         cur = conn.cursor()
         cur.execute("UPDATE training SET training_status = %s, response = %s, responsetoresponse = %s WHERE training_id = %s", (status, response, score, training_id))
         conn.commit()
-    
-    print('updated training status')
+
