@@ -30,25 +30,11 @@
                     <h5>{{tool['tool_name']}}</h5>
                 </div>
                 <div class="col">
-                    <p style="text-align: right;">
-                      {% if tool['tool_id'] == '1' %}
-                        <a type="button" class="btn btn-success" href="/company/add_module/simulator">
-                            Add Module
-                        </a>
-                      {% elif tool['tool_id'] == '2' %}
-                        <a type="button" class="btn btn-success" href="/company/add_module/simulator">
-                          Add Module
-                        </a>
-                      {% elif tool['tool_id'] == '3' %}
-                        <a type="button" class="btn btn-success" href="/company/add_module/compliance">
-                          Add Module
-                        </a>
-                      {% elif tool['tool_id'] == '4' %}
-                        <a type="button" class="btn btn-success" href="/company/add_module/software">
-                          Add Module
-                        </a>
-                      {% endif %}
-                    </p>
+                    <form action="{{url_for('add_module_redirect', tool_id=tool['tool_id'], role_id=role_id)}}" method="POST">
+                      <button type="submit" class="btn btn-success">
+                        Add Module
+                      </button>
+                    </form>
                 </div>
             </div>
             <div class="row g-2 inputs">
@@ -74,9 +60,13 @@
                 <div class="checkCard">
                   <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
                   <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
-                  {{module['name']}} - {{module['description']}}
+                  {{module['name']}} <br> {{module['description']}}
                   </label>
-                </div>
+                  <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
+                  href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
+                    >Test Module</a>
+                  </div>
+                
                 {% endfor %}
               </div>
               <label>Explore Library</label>
@@ -90,8 +80,11 @@
                 <div class="checkCard">
                   <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
                   <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
-                  {{module['name']}} - {{module['description']}}
+                  {{module['name']}} <br> {{module['description']}}
                   </label>
+                    <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
+                    href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
+                    >Test Module</a>
                 </div>
                 {% endfor %}
               </div>

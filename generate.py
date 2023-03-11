@@ -24,7 +24,7 @@ def generate_compliance_questions(text):
 
 
 def generate_description(text):
-    # prompt = "Generate a 1 sentence description of the following policy"
+    # prompt = "Generate a 1 phrase description of the following policy maximum 20 words"
     # prompt += text
     # completion = openai.ChatCompletion.create(
     #     model="gpt-3.5-turbo",
@@ -34,7 +34,7 @@ def generate_description(text):
     #     )
     # return completion.choices[0].message['content']
     # time.sleep(2)
-    return "This policy outlines the expectations for employee compensation, flexible scheduling, and communication regarding scheduling and time off requests, including guidelines for calling in sick and potential consequences for no call/no show situations"
+    return "Expectations for employee compensation, flexible scheduling, and communication regarding scheduling and time off requests"
 
 def format_questions(questions):
     #     {

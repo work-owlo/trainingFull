@@ -68,19 +68,37 @@ def save_queries(module_id, q_list):
             conn.commit()
 
 
-def add_training_sample(module_id, company_id):
+def add_training_sample(module_id, company_id, tool_id):
     '''Add sample training data'''
-    team_id = company_id
-    training_status = 'pending'
-    # get data from query
+    # check if training data already exists
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("SELECT query FROM query WHERE module_id = %s", (module_id,))
-        query_ids = cur.fetchall()
-        for query_id in query_ids:
-            training_id = generate_id()
-            cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module_id, query_id[0], training_status))
-            conn.commit()
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s", (module_id, company_id))
+        training = cur.fetchall()
+        if training:
+            if tool_id in ['1', '2']:
+                cur.execute("""UPDATE training SET response=NULL, query_id=NULL, training_status=%s
+                            WHERE team_id=%s AND module_id = %s and id > 0""", ('pending', company_id, module_id))
+                cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                            WHERE team_id=%s AND module_id = %s and id = 0""", ('pending', company_id, module_id))
+                conn.commit()
+            else:
+                cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                            WHERE team_id=%s AND module_id = %s""", ('pending', company_id, module_id))
+                conn.commit()
+        else:
+            team_id = company_id
+            training_status = 'pending'
+            # get data from query
+            with get_db_connection() as conn:
+                cur = conn.cursor()
+                cur.execute("SELECT query FROM query WHERE module_id = %s", (module_id,))
+                query_ids = cur.fetchall()
+                for query_id in query_ids:
+                    print(query_id[0])
+                    training_id = generate_id()
+                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module_id, query_id[0], training_status))
+                    conn.commit()
 
 
 def get_training_compliance(module_id, team_id):

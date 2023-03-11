@@ -1019,6 +1019,41 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
     return response
 
 
+@api_router.post("/company/add_module_redirect/{tool_id}/{role_id}", status_code=200)
+def add_module_redirect(tool_id:str, role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+    # print(tool_id)
+    # if not manager:
+    #     return RedirectResponse(url="/company/logout")
+    # elif manager.company_id == None:
+    #     return RedirectResponse(url="/company/add_company")
+    
+    # # check role belongs to company
+    # permission = check_role_in_company(manager.company_id, role_id)
+    # if not permission:
+    #     return RedirectResponse(url="/company/roles", status_code=302)
+    
+    # # check that role is in process of being edited
+    # tool = get_role_tools_remaining(role_id)
+    # if not tool:
+    #     complete = complete_role(manager.company_id, role_id)
+    #     if complete['status'] == 'error':
+    #         return RedirectResponse(url="/company/roles?alert="+str(complete['body']), status_code=302)
+    #     else:
+    #         return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
+    # print(tool_id)
+    if tool_id == '1':
+        return RedirectResponse(url="/company/add_module/simulator/"+str(role_id) + "/" + str(tool_id), status_code=302)
+    elif tool_id == '2':
+        return RedirectResponse(url="/company/add_module/simulator/"+str(role_id) + "/" + str(tool_id), status_code=302)
+    elif tool_id == '3':
+        return RedirectResponse(url="/company/add_module/compliance/"+str(role_id), status_code=302)
+    elif tool_id == '4':
+        return RedirectResponse(url="/company/add_module/software/"+str(role_id), status_code=302)
+    else:
+        return RedirectResponse(url="/company/roles", status_code=302)
+        
+
+
 @api_router.post("/company/add_modules", status_code=200)
 async def add_modules_api(response: Response, request: Request, tool_id:str = Form(), role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     '''Add modules to role'''
@@ -1059,34 +1094,6 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
     update_role_tool_status(role_id, tool_id, 'active')
 
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
-
-
-@api_router.get("/company/add_software_module", status_code=200)
-def add_software_module(response: Response, request: Request) -> dict:
-    """
-    Add new module
-    """
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "addSoftware.html",
-        {
-            "request": request,
-        }
-    )
-    return response
-
-
-@api_router.get("/company/add_software_process", status_code=200)
-def add_software_module(response: Response, request: Request) -> dict:
-    """
-    Add new module
-    """
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "softwareLoading.html",
-        {
-            "request": request,
-        }
-    )
-    return response
 
 
 @api_router.get("/company/role/edit/{role_id}", status_code=200)
@@ -1224,7 +1231,7 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
 
 # COMPANY TRAINING ROUTES
 
-
+# SOFTWARE TRAINING ROUTES
 @api_router.get("/company/add_module/software", status_code=200)
 def add_software_module(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
@@ -1589,14 +1596,16 @@ def resetProgress(training_id:str, response: Response, request: Request,  manage
         conn.commit()
     return RedirectResponse(url=f"/company/processSoftware/testProcess/{module_id}", status_code=302)
 
+# COMPLIANCE TRAINING
 
-@api_router.get("/company/add_module/compliance", status_code=200)
-def addCompliance(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.get("/company/add_module/compliance/{role_id}", status_code=200)
+def addCompliance(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addCompliance.html",
         {
             "request": request,
             "name": manager.first_name,
+            "role_id": role_id,
             "data": [],
             "questions": []
         }
@@ -1604,8 +1613,8 @@ def addCompliance(response: Response, request: Request,  manager: Manager = Depe
     return response
 
 
-@api_router.post("/company/add_module/compliance", status_code=200)
-def addComplianceSubmit(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), textInput: str = Form(...), moduleName: str = Form(...)) -> dict:
+@api_router.post("/company/add_module/compliance/{role_id}", status_code=200)
+def addComplianceSubmit(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager), textInput: str = Form(...), moduleName: str = Form(...)) -> dict:
     # textInput = request.form['textInput']
     # moduleName = request.form['moduleName']
     data = {'textInput': textInput, 'moduleName': moduleName}
@@ -1616,6 +1625,7 @@ def addComplianceSubmit(response: Response, request: Request,  manager: Manager 
         "addCompliance.html",
         {
             "request": request,
+            "role_id": role_id,
             "name": manager.first_name,
             "data": data,
             "questions": questions
@@ -1624,68 +1634,8 @@ def addComplianceSubmit(response: Response, request: Request,  manager: Manager 
     return response
 
 
-@api_router.post("/company/add_module/simulator", status_code=200)
-def addSimulatorSubmit(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...)) -> dict:
-    # moduleName = request.form['moduleName']
-    # num_chats = int(request.form['num_chats'])
-    # customer = request.form['customer']
-    # situation = request.form['situation']
-    # problem = request.form['problem']
-    # respond = request.form['respond']
-    company_id = manager.company_id
-    tool_id = 2
-    desc = generate_description(customer + situation + problem + respond)
-    module_id = add_module_simulator(company_id, moduleName, desc, tool_id, num_chats, customer, situation, problem, respond)
-    # generate first chat
-    first_chat = generate_simulator(num_chats, customer, situation, problem, respond)
-    # get everything after colon if there is a colon
-    if ":" in first_chat:
-        first_chat = first_chat.split(':')[-1]
-    q_list = []
-    q_list.append(first_chat)
-    # add num_chats - 1 empty chats
-    for i in range(num_chats - 1):
-        q_list.append(None)
-    save_queries(module_id, q_list)
-    add_training_sample(module_id, company_id)
-    return RedirectResponse(url=f"/company/test_module/simulator/{module_id}", status_code=302)
-
-
-@api_router.get("/company/add_module/simulator", status_code=200)
-def addSimulator(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "addSimulator.html",
-        {
-            "request": request,
-            "name": manager.first_name,
-            "chat": [],
-            "data": []
-        }
-    )
-    return response
-
-
-@api_router.post("/company/save_module/compliance", status_code=200)
-async def saveCompliance(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), textInput: str = Form(...)) -> dict:
-    company_id = manager.company_id
-    # moduleName = request.form['moduleName']
-    # text = request.form['textInput']
-    text = textInput
-    description = generate_description(text)
-    questions = []
-    form_data = await request.form()
-    form_data = jsonable_encoder(form_data)
-    for key in form_data:
-        if key.startswith('question'):
-            questions.append(form_data[key])
-    module_id = add_module(company_id, moduleName, description, 3, text)
-    save_queries(module_id, questions)
-    add_training_sample(module_id, company_id)
-    return RedirectResponse(url=f"/company/test_module/compliance/{module_id}", status_code=302)
-
-
-@api_router.get("/company/test_module/compliance/{module_id}", status_code=200)
-def testCompliance(response: Response, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.get("/company/test_module/compliance/{module_id}/{role_id}", status_code=200)
+def testCompliance(response: Response, role_id:str, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
     team_id = manager.company_id
     chat = get_training_compliance(module_id, team_id)
     with get_db_connection() as conn:
@@ -1711,6 +1661,7 @@ def testCompliance(response: Response, request: Request, module_id: str,  manage
         "testCompliance.html",
         {
             "request": request,
+            "role_id": role_id,
             "name": manager.first_name,
             "chat": chat,
             "text": text,
@@ -1724,8 +1675,144 @@ def testCompliance(response: Response, request: Request, module_id: str,  manage
     return response
 
 
-@api_router.get("/company/test_module/simulator/{module_id}", status_code=200)
-def testSimulator(response: Response, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.post("/company/submit_compliance/{module_id}/{role_id}", status_code=200)
+def submitCompliance(response: Response, role_id:str, request: Request, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+    # training_id = request.form['training_id']
+    # chat = request.form['chat']
+    company_id = manager.company_id
+    time.sleep(1)
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+        context = cur.fetchone()['module_text']
+        cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, company_id))
+        question = cur.fetchone()['query_id']
+    score = check_response(context, question, chat)
+    if 'Yes' in score:
+        update_training_status(training_id, chat, 'completed', score)
+    else:
+        update_training_status(training_id, chat, 'pending', score)
+    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=303)
+    return response
+
+
+@api_router.post("/company/test_module/reset/compliance/{training_id}/{role_id}", status_code=200)
+def resetCompliance(response: Response, role_id:str, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Update training set status to pending '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT team_id, module_id FROM training WHERE training_id = %s""", (training_id,))
+        team_id, module_id = cur.fetchone()
+        cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                    WHERE team_id=%s AND module_id = %s""", ('pending', team_id, module_id))
+        conn.commit()
+    # return redirect(url_for('testCompliance', module_id=module_id))
+    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=303)
+    return response
+
+
+@api_router.post("/company/save_module/compliance/{role_id}", status_code=200)
+async def saveCompliance(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), textInput: str = Form(...)) -> dict:
+    company_id = manager.company_id
+    # moduleName = request.form['moduleName']
+    # text = request.form['textInput']
+    text = textInput
+    description = generate_description(text)
+    questions = []
+    form_data = await request.form()
+    form_data = jsonable_encoder(form_data)
+    for key in form_data:
+        if key.startswith('question'):
+            questions.append(form_data[key])
+    module_id = add_module(company_id, moduleName, description, 3, text)
+    save_queries(module_id, questions)
+    return RedirectResponse(url=f"/company/add_modules/{role_id}", status_code=303)
+
+
+# SIMULATOR TRAINING
+
+@api_router.post("/company/add_module/simulator/{role_id}/{tool_id}", status_code=200)
+def addSimulatorSubmit(response: Response, request: Request, role_id:str, tool_id:str, manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...)) -> dict:
+    company_id = manager.company_id
+    if tool_id not in ['1', '2']:
+        # error
+        return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+    desc = generate_description(customer + situation + problem + respond)
+    module_id = add_module_simulator(company_id, moduleName, desc, tool_id, num_chats, customer, situation, problem, respond)
+    # generate first chat
+    first_chat = generate_simulator(num_chats, customer, situation, problem, respond)
+    # get everything after colon if there is a colon
+    if ":" in first_chat:
+        first_chat = first_chat.split(':')[-1]
+    q_list = []
+    q_list.append(first_chat)
+    # add num_chats - 1 empty chats
+    for i in range(num_chats - 1):
+        q_list.append(None)
+    save_queries(module_id, q_list)
+    return RedirectResponse(url=f"/company/add_modules/{role_id}", status_code=302)
+    # return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
+
+
+@api_router.get("/company/add_module/simulator/{role_id}/{tool_id}", status_code=200)
+def addSimulator(response: Response, request: Request, role_id:str, tool_id:str,  manager: Manager = Depends(get_current_manager)) -> dict:
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addSimulator.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "role_id": role_id,
+            "tool_id": tool_id,
+            "chat": [],
+            "data": []
+        }
+    )
+    return response
+
+
+# initiate test 
+@api_router.get("/company/test_module/start/{module_id}/{role_id}/{tool_id}", status_code=200)
+def startSimulator(response: Response, request: Request, role_id:str, module_id: str, tool_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s and tool_id = %s""", (module_id, tool_id))
+        module = cur.fetchone()
+        if module is None:
+            return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+        else:
+            access = module['access']
+            company_id = module['company_id']
+            if access == 'private' and company_id != manager.company_id:
+                return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+    
+    if tool_id != 4:
+        add_training_sample(module_id, manager.company_id, tool_id)
+    else:
+        add_training_graph(module_id, manager.company_id)
+
+    # redirect to testSimulator
+    if tool_id == '1' or tool_id == '2':
+        return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
+    elif tool_id == '3':
+        return RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=302)
+    elif tool_id == '4':
+        return RedirectResponse(url=f"/company/test_module/software/{module_id}", status_code=302)
+    else:
+        return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+
+
+@api_router.get("/company/test_module/simulator/{module_id}/{role_id}", status_code=200)
+def testSimulator(response: Response, request: Request, role_id:str, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+    # check that manager has permission to view the module (either access is public or manager is the creator)
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s""", (module_id,))
+        access, company_id = cur.fetchone()
+        if access == 'private' and company_id != manager.company_id:
+            # error
+            return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+    
     team_id = manager.company_id
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1755,6 +1842,7 @@ def testSimulator(response: Response, request: Request, module_id: str,  manager
             "name": manager.first_name,
             "chat": chat,
             "text": text,
+            "role_id": role_id,
             "title": name,
             "completed": completed,
             "total": total,
@@ -1769,56 +1857,19 @@ def testSimulator(response: Response, request: Request, module_id: str,  manager
     return response
 
 
-@api_router.post("/company/submit_simulator/{module_id}", status_code=200)
-def submitSimulator(response: Response, request: Request, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.post("/company/submit_simulator/{module_id}/{role_id}", status_code=200)
+def submitSimulator(response: Response, request: Request, role_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
     # training_id = request.form['training_id']
     # chat = request.form['chat']
     company_id = manager.company_id
     time.sleep(1)
     update_training_status(training_id, chat, 'completed')
-    response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}", status_code=303)
+    response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
     return response
 
 
-@api_router.post("/company/submit_compliance/{module_id}", status_code=200)
-def submitCompliance(response: Response, request: Request, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
-    # training_id = request.form['training_id']
-    # chat = request.form['chat']
-    company_id = manager.company_id
-    time.sleep(1)
-    with get_db_connection() as conn:
-        cur = conn.cursor()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
-        context = cur.fetchone()['module_text']
-        cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, company_id))
-        question = cur.fetchone()['query_id']
-    score = check_response(context, question, chat)
-    if 'Yes' in score:
-        update_training_status(training_id, chat, 'completed', score)
-    else:
-        update_training_status(training_id, chat, 'pending', score)
-    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}", status_code=303)
-    return response
-
-
-@api_router.post("/company/test_module/reset/compliance/{training_id}", status_code=200)
-def resetCompliance(response: Response, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
-    '''Update training set status to pending '''
-    with get_db_connection() as conn:
-        cur = conn.cursor()
-        cur.execute("""SELECT team_id, module_id FROM training WHERE training_id = %s""", (training_id,))
-        team_id, module_id = cur.fetchone()
-        cur.execute("""UPDATE training SET response=NULL, training_status=%s
-                    WHERE team_id=%s AND module_id = %s""", ('pending', team_id, module_id))
-        conn.commit()
-    # return redirect(url_for('testCompliance', module_id=module_id))
-    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}", status_code=303)
-    return response
-
-
-@api_router.post("/company/test_module/reset/simulator/{training_id}", status_code=200)
-def resetSimulator(response: Response, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+@api_router.post("/company/test_module/reset/simulator/{training_id}/{role_id}", status_code=200)
+def resetSimulator(response: Response, request: Request, role_id:str, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     '''Update training set status to pending '''
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -1829,7 +1880,7 @@ def resetSimulator(response: Response, request: Request, training_id: str, manag
         cur.execute("""UPDATE training SET response=NULL, training_status=%s
                     WHERE team_id=%s AND module_id = %s and id = 0""", ('pending', team_id, module_id))
         conn.commit()
-    response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}", status_code=302)
+    response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
     return response
 
 

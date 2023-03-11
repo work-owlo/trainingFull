@@ -13,7 +13,7 @@
 </div>
 <div class="row">
     <div class="col">
-        <form id="form" action="/company/add_module/compliance" method="POST" class="container-form">
+        <form id="form" action="{{url_for('addComplianceSubmit', role_id=role_id)}}" method="POST" class="container-form">
             <h4>Add Compliance Module</h4>
             <div class="mb-3">
                 <label for="moduleName" class="form-label">Module Title</label>
@@ -28,7 +28,7 @@
     </div>
     <div class="col">
         {% if data|length > 0 %}
-        <form action="/company/save_module/compliance" method="POST">
+        <form action="{{url_for('saveCompliance', role_id=role_id)}}" method="POST">
             <input type="hidden" name="moduleName" value="{{data['moduleName']}}">
             <input type="hidden" name="textInput" value="{{data['textInput']}}">
             <h2 class="label question-label">Edit Questions</h2>

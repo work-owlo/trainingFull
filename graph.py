@@ -46,7 +46,7 @@ def graph(parse_id, company_id):
     paths = find_paths(G, parse_id)
     print('Paths', paths)
     add_query(module_id, paths)
-    add_training_graph(module_id)
+    # add_training_graph(module_id)
     return module_id
 
 
@@ -130,9 +130,9 @@ def add_module_graph(parse_id, company_id):
     return module_id
 
         
-def add_training_graph(module_id):
+def add_training_graph(module_id, company_id):
     '''Add sample training data'''
-    team_id = 1
+    team_id = company_id
     training_status = 'pending'
     training_type = 'software'
     # get data from query

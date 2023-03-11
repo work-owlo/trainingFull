@@ -13,7 +13,7 @@
 </div>
 <div class="row">
     <div class="col">
-        <form id="form" class="container-form" action="/company/add_module/simulator" method="POST">
+        <form id="form" class="container-form" action="{{url_for('addSimulator', role_id=role_id, tool_id=tool_id)}}" method="POST" enctype="multipart/form-data">
             <h4>Add Simulation Module</h4>
             <div class="mb-3">
                 <label for="moduleName" class="form-label">Module Title</label>
@@ -45,36 +45,5 @@
             <button type="submit" class="btn btn-success" onclick="showLoad()">Create Simulator</button>
         </form>
     </div>
-    <!-- <div class="col">
-        {% if chat|length > 0 %}
-        <h4 class="label">Test Chat Information</h4>
-        <div class="test-chat">
-            <div class="texts">
-            {% for c in chat %} 
-                {% if c['from'] == 'bot' %}
-                <div class="chat-bot">
-                    {{ c['text'] }}
-                </div>
-                {% else %}
-                <div class="chat-user">
-                    {{ c['text'] }}
-                </div>
-                {% endif %}
-            {% endfor %}
-            </div>
-            <!-- automatically scroll to the last text -->
-            <script>
-                var objDiv = document.getElementsByClassName("texts")[0];
-                objDiv.scrollTop = objDiv.scrollHeight;
-            </script>
-            <div class="text-input">
-                <form>
-                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
-                 </form>
-            </div>
-        </div>
-        {% endif %}
-
-    </div> -->
 </div>
 {% endblock %}

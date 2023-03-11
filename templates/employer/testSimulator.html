@@ -30,7 +30,7 @@
     });
 </script>
 <div class="row" id="my-canvas">
-    <div class="col-1">
+    <div class="col-1 progress-num">
         {% for i in range(1, completed+1) %}
         <div class="compliance-progress-complete">{{i}}</div>
         {% endfor %}
@@ -61,7 +61,7 @@
                 objDiv.scrollTop = objDiv.scrollHeight;
             </script>
             <div class="text-input">
-                <form action="{{url_for('submitSimulator', module_id=module_id)}}" method="POST" id="form">
+                <form action="{{url_for('submitSimulator', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
                     <!-- disabled trianing id field -->
                     <input type="hidden" name="training_id" value="{{training_id}}">
                     <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
@@ -81,6 +81,9 @@
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteElement" style="margin-top:1rem">
             Reset Progress
         </button>
+        <a type="button" class="btn btn-light" href="/company/add_modules/{{role_id}}" style="margin-top:1rem">
+            Done Testing
+        </a>
 
     </div>
 </div>
@@ -95,7 +98,7 @@
           Are you sure you want to reset your progress? This action cannot be undone. 
         </div>
         <div class="modal-footer">
-            <form class="not-important" action="{{url_for('resetSimulator', training_id=training_id)}}" method="post">
+            <form class="not-important" action="{{url_for('resetSimulator', training_id=training_id, role_id=role_id)}}" method="POST">
                 <input type="text" value="" name="deletingPage" id="deletingPage" hidden>
                 <button type="submit" class="btn btn-danger">Reset</button>
             </form>

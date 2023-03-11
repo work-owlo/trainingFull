@@ -134,6 +134,7 @@ background-color: rgb(245, 245, 245);
     vertical-align: middle;
     text-align: center;
     margin: 0 auto;
+    margin-bottom:1rem;
     /* padding-bottom: 1rem; */
 }
 
@@ -141,16 +142,32 @@ background-color: rgb(245, 245, 245);
     border:1px solid #70ABAF;
     border-radius:3px;
     color:#686868;
-    width: 13rem;
+    width: 20rem;
     fill:#686868;
     margin:1rem;
     display: flex;
     justify-content: center;
-    /* padding:2rem; */
-    padding:2rem;
-    padding-top:2.5rem;
+    padding:1rem;
+    padding-top:1.5rem;
     text-align: center;
+
 }
+
+label.btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  label.btn ion-icon {
+    margin-bottom: 0.5rem;
+  }
+  
+  label.btn p {
+    margin: 0;
+  }
 
 
 .card-train:hover {
@@ -681,6 +698,11 @@ td {
 .action-btn {
     color:black !important;
     margin-left: .4rem ;
+}
+
+.progress-num {
+    max-height: 70vh;
+    overflow-y: scroll;
 }
 
 .container-form {
