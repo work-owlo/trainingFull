@@ -11,7 +11,7 @@ def get_tools():
         tools_list = []
         if tools != None:
             for tool in tools:
-                tools_list.append(Tool(id=tool[0], name=tool[1], icon=tool[2], status=tool[3]))
+                tools_list.append(Tool(id=tool[0], name=tool[1], icon=tool[2], status=tool[3], tool_id=tool[0]))
     return tools_list
 
 

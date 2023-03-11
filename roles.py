@@ -75,7 +75,6 @@ def add_training_tasks(team_id, role_id):
                     conn.commit()
 
 
-
 def get_employee_id(email):
     ''' Get employee_id from email '''
     with get_db_connection() as conn:
@@ -138,7 +137,6 @@ def get_training_status(team_id):
     return 0
 
 
-
 def get_roles(company_id):
     '''Get all active roles frmo job_roles table'''
     with get_db_connection() as conn:
@@ -194,7 +192,19 @@ def get_employee_email(team_id):
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute(
-            "SELECT email FROM employee_user, team WHERE employee_user.employee_id = team.employee_id AND team.team_id = %s" , (team_id,))
+            "SELECT email FROM team WHERE team_id = %s AND status != 'unassigned'" , (team_id,))
+        employee = cur.fetchone()
+        if employee == None:
+            return False
+    return employee[0]
+
+
+def get_comp_email(team_id):
+    '''Get company email'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT email FROM company WHERE company_id = (SELECT company_id FROM team WHERE team_id = %s)" , (team_id,))
         employee = cur.fetchone()
         if employee == None:
             return False
@@ -221,7 +231,6 @@ def get_role_tools_remaining(role_id):
             "SELECT r.tool_id, tool_name, tool_icon FROM tools as t, role_tools as r WHERE t.tool_id = r.tool_id AND role_id = %s AND r.status = 'pending' ORDER BY tool_name LIMIT 1", (role_id,))
         tool = cur.fetchone()
         return None if tool == None else Tool_info(tool_id=tool[0], tool_name=tool[1], tool_icon=tool[2])
-
 
 
 def unasign_employee_role(company_id, team_id):
@@ -288,6 +297,7 @@ def verify_pending_rool_tool_relationship(role_id, tool_id):
         if tool == None:
             return False
     return True
+
 
 def update_role_tool_status(role_id, tool_id, status):
     '''Update role tool status'''

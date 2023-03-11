@@ -55,7 +55,7 @@ oauth2_company = OAuth2PasswordBearerWithCookie(tokenUrl="/company/token")
 
 
 @api_router.post("/testCors")
-def test_cors(request: Request):
+async def test_cors(request: Request):
     return {"message": "success"}
     
 
@@ -67,7 +67,7 @@ async def favicon():
 
 
 @app.get("/privacy", response_class=HTMLResponse)
-def privacy_policy(request: Request):
+async def privacy_policy(request: Request):
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "privacyPolicy.html",
         {
@@ -77,7 +77,7 @@ def privacy_policy(request: Request):
 
 
 @app.get("/terms", response_class=HTMLResponse)
-def privacy_policy(request: Request):
+async def privacy_policy(request: Request):
     return EMPLOYEE_TEMPLATES.TemplateResponse(
         "terms.html",
         {
@@ -87,7 +87,7 @@ def privacy_policy(request: Request):
 
 
 @app.get("/company/privacy", response_class=HTMLResponse)
-def privacy_policy(request: Request):
+async def privacy_policy(request: Request):
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "privacyPolicy.html",
         {
@@ -96,7 +96,7 @@ def privacy_policy(request: Request):
     )
 
 @app.get("/company/terms", response_class=HTMLResponse)
-def privacy_policy(request: Request):
+async def privacy_policy(request: Request):
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "terms.html",
         {
@@ -108,7 +108,7 @@ def privacy_policy(request: Request):
 
 @app.post("/logout", response_class=HTMLResponse)
 @app.get("/logout", response_class=HTMLResponse)
-def logout_get(token: str = Depends(oauth2_scheme)):
+async def logout_get(token: str = Depends(oauth2_scheme)):
     response = RedirectResponse(url="/")
     delete_session_token_db(token)
     response.delete_cookie("access_token")
@@ -116,13 +116,13 @@ def logout_get(token: str = Depends(oauth2_scheme)):
 
 
 @app.post("/forgotPassword", response_class=HTMLResponse)
-def forgot_password(response:Response, request: Request, email: str = Form()):
+async def forgot_password(response:Response, request: Request, email: str = Form()):
     employee_forgot_password(email)
     return RedirectResponse(url="/?alert=Password Reset Email Sent", status_code=302)
 
 
 @app.post("/company/forgotPassword", response_class=HTMLResponse)
-def company_forgot_password(response:Response, request: Request, email: str = Form()):
+async def company_forgot_password(response:Response, request: Request, email: str = Form()):
     manager_forgot_password(email)
     return RedirectResponse(url="/company?alert=Password Reset Email Sent", status_code=302)
 
@@ -131,7 +131,7 @@ def company_forgot_password(response:Response, request: Request, email: str = Fo
 
 
 @api_router.get("/", status_code=200)
-def employee_landing(response:Response, request: Request, alert=None) -> dict:
+async def employee_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
     cookie = request.cookies.get('access_token')
     if cookie:
@@ -145,7 +145,7 @@ def employee_landing(response:Response, request: Request, alert=None) -> dict:
     )
 
 
-def get_current_employee(response: Response, token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_employee(response: Response, token: str = Depends(oauth2_scheme)) -> User:
     """
     Get the current user from the cookies in a request.
     Use this function when you want to lock down a route so that only 
@@ -192,7 +192,7 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     state = employee_create_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await login(response, email, password)
-        create_account_emp(email)
+        await create_account_emp(email)
         return rr
     else:
         redirect_url = URL(request.url_for('employee_landing')).include_query_params(alert=str(state['body']))
@@ -234,7 +234,7 @@ async def member_root(request: Request, response: Response, user: User = Depends
 
 
 @api_router.get("/member/onboard/{team_id}", status_code=200)
-def start_training(request: Request, response: Response, team_id:str, user: User = Depends(get_current_employee)):
+async def start_training(request: Request, response: Response, team_id:str, user: User = Depends(get_current_employee)):
     """
     Root GET
     """
@@ -300,7 +300,7 @@ async def view_module(request: Request, response: Response, rt_id:str, user: Use
 
 
 @api_router.get("/member/finish/{val}", status_code=200)
-def complete_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
+async def complete_training(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
     """    
@@ -342,7 +342,7 @@ def complete_training(request: Request, response: Response, user: User = Depends
 
 @api_router.post("/member/account", status_code=200)
 @api_router.get("/member/account", status_code=200)
-def member_view_account(request: Request, response: Response, user: User = Depends(get_current_employee)):
+async def member_view_account(request: Request, response: Response, user: User = Depends(get_current_employee)):
     """
     Root GET
     """
@@ -418,7 +418,7 @@ async def update_password(request: Request, response: Response, user: User = Dep
 """EMPLOYER ROUTES"""
 
 
-def get_current_manager(response: Response, token: str = Depends(oauth2_company)) -> User:
+async def get_current_manager(response: Response, token: str = Depends(oauth2_company)) -> User:
     """
     Get the current user from the cookies in a request.
     Use this function when you want to lock down a route so that only 
@@ -438,7 +438,7 @@ def get_current_manager(response: Response, token: str = Depends(oauth2_company)
 
 
 @api_router.get("/company/roles", status_code=200)
-def view_company_roles(response: Response, request: Request, manager: Manager = Depends(get_current_manager)) -> dict:
+async def view_company_roles(response: Response, request: Request, manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the roles of this company
     """
@@ -475,7 +475,7 @@ def view_company_roles(response: Response, request: Request, manager: Manager = 
 
 @api_router.post("/company", status_code=200)
 @api_router.get("/company", status_code=200)
-def company_landing(response:Response, request: Request, alert=None) -> dict:
+async def company_landing(response:Response, request: Request, alert=None) -> dict:
     '''Landing Page with auth options'''
     cookie = request.cookies.get('access_token')
     if cookie:
@@ -517,8 +517,7 @@ async def employee_signup(response: Response,request: Request, email: str = Form
     state = manager_create_admin_account(fName, lName, email, password)
     if state['status'] == 'success':
         rr = await company_login(response, email, password)
-        uid = state['body']['uid']
-        create_account_comp(email)
+        await create_account_comp(email)
         return rr
         # redirect_url = URL(request.url_for('member_root'))
         # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
@@ -529,7 +528,7 @@ async def employee_signup(response: Response,request: Request, email: str = Form
 
 @app.post("/company/logout", response_class=HTMLResponse)
 @app.get("/company/logout", response_class=HTMLResponse)
-def logout_get(token: str = Depends(oauth2_scheme)):
+async def logout_get(token: str = Depends(oauth2_scheme)):
     ''' Logout a user '''
     response = RedirectResponse(url="/company")
     delete_session_token_db(token)
@@ -538,7 +537,7 @@ def logout_get(token: str = Depends(oauth2_scheme)):
 
 
 @api_router.get("/company/add_company", status_code=200)
-def company_add_company(response:Response, request: Request, alert=None, manager: Manager = Depends(get_current_manager)) -> dict:
+async def company_add_company(response:Response, request: Request, alert=None, manager: Manager = Depends(get_current_manager)) -> dict:
     '''Form to input company information'''
     if not manager:
         return RedirectResponse(url="/company/logout")
@@ -638,7 +637,7 @@ async def company_update_password(request: Request, response: Response, manager:
 
 
 @api_router.get("/company/team", status_code=200)
-def view_company_team(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def view_company_team(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the members of this company
     """
@@ -678,7 +677,7 @@ def view_company_team(response: Response, request: Request,  manager: Manager = 
 
 
 @api_router.post("/company/assign_employee", status_code=200)
-def assign_employee(response: Response, request: Request,  id_input: str = Form(), first_name: str = Form(), last_name: str = Form(), email: str = Form(), role_id: str = Form(), employment_type: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+async def assign_employee(response: Response, request: Request,  id_input: str = Form(), first_name: str = Form(), last_name: str = Form(), email: str = Form(), role_id: str = Form(), employment_type: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     if not manager:
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
@@ -687,14 +686,14 @@ def assign_employee(response: Response, request: Request,  id_input: str = Form(
     email = email.strip()
     assign = assign_employee_role(manager.company_id, id_input, first_name, last_name, email, role_id, employment_type)
     if assign['status'] == 'success':
-        training_invite_email(email)
+        await training_invite_email(email)
         return RedirectResponse(url='/company/team', status_code=302)
     else:
         return RedirectResponse(url='/company/team?alert='+str(assign['body']), status_code=302)
     
 
 @api_router.get("/company/employee/view/{team_id}", status_code=200)
-def view_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+async def view_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the roles of this company
     """
@@ -724,7 +723,7 @@ def view_employee(response: Response, request: Request, team_id: str, manager: M
 
 
 @api_router.post("/company/employee/remind/{team_id}", status_code=200)
-def remind_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+async def remind_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Get all the roles of this company
     """
@@ -738,7 +737,7 @@ def remind_employee(response: Response, request: Request, team_id: str, manager:
     email = get_employee_email(team_id)
     if email == None:
         return RedirectResponse(url="/company/team", status_code=302)
-    training_reminder_email(email)
+    await training_reminder_email(email)
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "employee.html",
         {
@@ -759,7 +758,7 @@ def remind_employee(response: Response, request: Request, team_id: str, manager:
 
 
 @api_router.get("/company/add_role", status_code=200)
-def add_company_role(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def add_company_role(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Add new role to this company
     """
@@ -817,7 +816,7 @@ async def add_company_role(response: Response, request: Request,  role_name: str
 
 
 @api_router.post("/company/role/delete", status_code=200)
-def delete_role_api(response: Response, request: Request, delete_role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+async def delete_role_api(response: Response, request: Request, delete_role_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Delete role to this company
     """
@@ -834,7 +833,7 @@ def delete_role_api(response: Response, request: Request, delete_role_id: str = 
 
 
 @api_router.post("/company/employee/unassign", status_code=200)
-def unassign_role(response: Response, request: Request, team_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+async def unassign_role(response: Response, request: Request, team_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Unassign role to this company
     """
@@ -851,7 +850,7 @@ def unassign_role(response: Response, request: Request, team_id: str = Form(), m
 
 
 @api_router.get("/company/add_modules/{role_id}", status_code=200)
-def add_modules(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def add_modules(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Add new module
     """
@@ -898,7 +897,7 @@ def add_modules(role_id:str, response: Response, request: Request,  manager: Man
 
 
 @api_router.post("/company/add_module_redirect/{tool_id}/{role_id}", status_code=200)
-def add_module_redirect(tool_id:str, role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def add_module_redirect(tool_id:str, role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     # print(tool_id)
     # if not manager:
     #     return RedirectResponse(url="/company/logout")
@@ -975,7 +974,7 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
 
 
 @api_router.get("/company/role/edit/{role_id}", status_code=200)
-def edit_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def edit_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Preview the onboarding
     """
@@ -1014,7 +1013,7 @@ def edit_role(role_id:str, response: Response, request: Request,  manager: Manag
 
 
 @api_router.get("/company/role/view/{role_id}", status_code=200)
-def view_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def view_role(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Preview the onboarding
     """
@@ -1051,7 +1050,7 @@ def view_role(role_id:str, response: Response, request: Request,  manager: Manag
 
 @api_router.post("/company/account", status_code=200)
 @api_router.get("/company/account", status_code=200)
-def view_account(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def view_account(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     View and edit the company account
     """
@@ -1111,7 +1110,7 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
 
 # initiate test 
 @api_router.get("/company/test_module/start/{module_id}/{role_id}/{tool_id}", status_code=200)
-def startSimulator(response: Response, request: Request, role_id:str, module_id: str, tool_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
+async def startSimulator(response: Response, request: Request, role_id:str, module_id: str, tool_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s and tool_id = %s""", (module_id, tool_id))
@@ -1142,7 +1141,7 @@ def startSimulator(response: Response, request: Request, role_id:str, module_id:
 
 # SOFTWARE TRAINING ROUTES
 @api_router.get("/company/add_module/software", status_code=200)
-def add_software_module(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def add_software_module(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
     Add new module
     """
@@ -1169,7 +1168,7 @@ def add_software_module(response: Response, request: Request,  manager: Manager 
 
 
 @api_router.get("/company/processSoftware/load/{parse_id}", status_code=200)
-def processSoftware(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def processSoftware(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     if not manager:
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
@@ -1196,7 +1195,7 @@ def processSoftware(parse_id:str, response: Response, request: Request,  manager
 
 
 @api_router.post("/company/add_module/software", status_code=200)
-def addSoftwarePost(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), url: str = Form(...), website_name: str = Form(...), website_description: str = Form(...)) -> dict:
+async def addSoftwarePost(response: Response, request: Request,  manager: Manager = Depends(get_current_manager), url: str = Form(...), website_name: str = Form(...), website_description: str = Form(...)) -> dict:
     if not manager:
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
@@ -1206,7 +1205,7 @@ def addSoftwarePost(response: Response, request: Request,  manager: Manager = De
 
 
 @api_router.get("/company/processSoftware/element/{parse_id}", status_code=200)
-def processSoftwareElement(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def processSoftwareElement(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     '''Comment'''
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -1274,7 +1273,7 @@ def processSoftwareElement(parse_id:str, response: Response, request: Request,  
 
 
 @api_router.post("/company/processSoftware/element/{parse_id}", status_code=200)
-def processSoftwareElementSubmit(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def processSoftwareElementSubmit(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("""SELECT status FROM parse
@@ -1297,7 +1296,7 @@ def processSoftwareElementSubmit(parse_id:str, response: Response, request: Requ
 
 
 @api_router.post("/company/processSoftware/deleteElements/{form_id}/{parse_id}", status_code=200)
-def processSoftwareDeleteElements(form_id:str, parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def processSoftwareDeleteElements(form_id:str, parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("""SELECT status FROM parse
@@ -1317,7 +1316,7 @@ def processSoftwareDeleteElements(form_id:str, parse_id:str, response: Response,
 
 
 @api_router.get("/company/processSoftware/complete/{parse_id}", status_code=200)
-def processSoftwareComplete(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def processSoftwareComplete(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("""SELECT status FROM parse
@@ -1351,7 +1350,7 @@ def processSoftwareComplete(parse_id:str, response: Response, request: Request, 
 
 
 @api_router.post("/company/processSoftware/deletePage/{parse_id}", status_code=200)
-def processSoftwareDeletePage(parse_id:str, page_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def processSoftwareDeletePage(parse_id:str, page_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     page_id = page_id or request.form['deletingPage']
 
     # if a child of this page only has one parent, delete it
@@ -1388,7 +1387,7 @@ def processSoftwareDeletePage(parse_id:str, page_id:str, response: Response, req
 
 
 @api_router.post("/company/processSoftware/completeProcess/{parse_id}", status_code=200)
-def completeProcess(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def completeProcess(parse_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("""SELECT status FROM parse
@@ -1409,7 +1408,7 @@ def completeProcess(parse_id:str, response: Response, request: Request,  manager
 
 
 @api_router.get("/company/processSoftware/testProcess/{module_id}", status_code=200)
-def testProcess(module_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def testProcess(module_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
 
     offsetX = 0
     offsetY = 0
@@ -1494,7 +1493,7 @@ def testProcess(module_id:str, response: Response, request: Request,  manager: M
 
 
 @api_router.post("/company/training/reset/{training_id}", status_code=200)
-def resetProgress(training_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def resetProgress(training_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     '''Update training set status to pending '''
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -1508,7 +1507,7 @@ def resetProgress(training_id:str, response: Response, request: Request,  manage
 # COMPLIANCE TRAINING
 
 @api_router.get("/company/add_module/compliance/{role_id}", status_code=200)
-def addCompliance(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def addCompliance(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addCompliance.html",
         {
@@ -1523,7 +1522,7 @@ def addCompliance(response: Response, role_id:str, request: Request,  manager: M
 
 
 @api_router.post("/company/add_module/compliance/{role_id}", status_code=200)
-def addComplianceSubmit(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager), textInput: str = Form(...), moduleName: str = Form(...)) -> dict:
+async def addComplianceSubmit(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager), textInput: str = Form(...), moduleName: str = Form(...)) -> dict:
     # textInput = request.form['textInput']
     # moduleName = request.form['moduleName']
     data = {'textInput': textInput, 'moduleName': moduleName}
@@ -1544,7 +1543,7 @@ def addComplianceSubmit(response: Response, role_id:str, request: Request,  mana
 
 
 @api_router.get("/company/test_module/compliance/{module_id}/{role_id}", status_code=200)
-def testCompliance(response: Response, role_id:str, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def testCompliance(response: Response, role_id:str, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
     team_id = manager.company_id
     chat = get_training_compliance(module_id, team_id)
     with get_db_connection() as conn:
@@ -1585,7 +1584,7 @@ def testCompliance(response: Response, role_id:str, request: Request, module_id:
 
 
 @api_router.post("/company/submit_compliance/{module_id}/{role_id}", status_code=200)
-def submitCompliance(response: Response, role_id:str, request: Request, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+async def submitCompliance(response: Response, role_id:str, request: Request, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
     # training_id = request.form['training_id']
     # chat = request.form['chat']
     company_id = manager.company_id
@@ -1606,7 +1605,7 @@ def submitCompliance(response: Response, role_id:str, request: Request, module_i
 
 
 @api_router.post("/company/test_module/reset/compliance/{training_id}/{role_id}", status_code=200)
-def resetCompliance(response: Response, role_id:str, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+async def resetCompliance(response: Response, role_id:str, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     '''Update training set status to pending '''
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -1641,7 +1640,7 @@ async def saveCompliance(response: Response, role_id:str, request: Request,  man
 # SIMULATOR TRAINING
 
 @api_router.post("/company/add_module/simulator/{role_id}/{tool_id}", status_code=200)
-def addSimulatorSubmit(response: Response, request: Request, role_id:str, tool_id:str, manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...)) -> dict:
+async def addSimulatorSubmit(response: Response, request: Request, role_id:str, tool_id:str, manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...)) -> dict:
     company_id = manager.company_id
     if tool_id not in ['1', '2']:
         # error
@@ -1664,7 +1663,7 @@ def addSimulatorSubmit(response: Response, request: Request, role_id:str, tool_i
 
 
 @api_router.get("/company/add_module/simulator/{role_id}/{tool_id}", status_code=200)
-def addSimulator(response: Response, request: Request, role_id:str, tool_id:str,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def addSimulator(response: Response, request: Request, role_id:str, tool_id:str,  manager: Manager = Depends(get_current_manager)) -> dict:
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addSimulator.html",
         {
@@ -1680,7 +1679,7 @@ def addSimulator(response: Response, request: Request, role_id:str, tool_id:str,
 
 
 @api_router.get("/company/test_module/simulator/{module_id}/{role_id}", status_code=200)
-def testSimulator(response: Response, request: Request, role_id:str, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+async def testSimulator(response: Response, request: Request, role_id:str, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
     # check that manager has permission to view the module (either access is public or manager is the creator)
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1735,7 +1734,7 @@ def testSimulator(response: Response, request: Request, role_id:str, module_id: 
 
 
 @api_router.post("/company/submit_simulator/{module_id}/{role_id}", status_code=200)
-def submitSimulator(response: Response, request: Request, role_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+async def submitSimulator(response: Response, request: Request, role_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
     # training_id = request.form['training_id']
     # chat = request.form['chat']
     company_id = manager.company_id
@@ -1746,7 +1745,7 @@ def submitSimulator(response: Response, request: Request, role_id:str, module_id
 
 
 @api_router.post("/company/test_module/reset/simulator/{training_id}/{role_id}", status_code=200)
-def resetSimulator(response: Response, request: Request, role_id:str, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+async def resetSimulator(response: Response, request: Request, role_id:str, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     '''Update training set status to pending '''
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -1765,7 +1764,7 @@ def resetSimulator(response: Response, request: Request, role_id:str, training_i
 
 # navigate to next training in the list
 @api_router.get("/member/next_training/{team_id}/{tool_id}", status_code=200)
-def nextTraining(response: Response, request: Request, team_id:str, tool_id: str, user: User = Depends(get_current_employee)) -> dict:
+async def nextTraining(response: Response, request: Request, team_id:str, tool_id: str, user: User = Depends(get_current_employee)) -> dict:
     ''' Get next incomplete training module with the same tool_id '''
     if user == None or not user:
         return RedirectResponse(url="/logout", status_code=302)
@@ -1791,7 +1790,7 @@ def nextTraining(response: Response, request: Request, team_id:str, tool_id: str
 
 # SIMULATOR
 @api_router.get("/member/training/simulator/{module_id}/{team_id}", status_code=200)
-def trainingSimulator(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
+async def trainingSimulator(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
     ''' Get the training module for the employee ''' 
     if user == None or not user:
         return RedirectResponse(url="/logout", status_code=302)
@@ -1844,15 +1843,25 @@ def trainingSimulator(response: Response, request: Request, module_id:str, team_
     return response
 
 @api_router.post("/member/submit_simulator/{module_id}/{team_id}", status_code=200)
-def trainSimulator(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+async def trainSimulator(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
     update_training_status(training_id, chat, 'completed')
+    
+    progress = get_training_progress(team_id)
+    print(progress)
+    if progress == 100:
+        # email comp and emp
+        email = get_employee_email(team_id)
+        await training_completion_emp(email)
+        email = get_comp_email(team_id)
+        await training_completion_comp(email)
+    
     response = RedirectResponse(url=f"/member/training/simulator/{module_id}/{team_id}", status_code=302)
     return response
 
 
 # COMPLIANCE
 @api_router.get("/member/training/compliance/{module_id}/{team_id}", status_code=200)
-def trainingCompliance(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
+async def trainingCompliance(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
     chat = get_training_compliance(module_id, team_id)
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -1891,7 +1900,7 @@ def trainingCompliance(response: Response, request: Request, module_id:str, team
     return response
 
 @api_router.post("/member/submit_compliance/{module_id}/{team_id}", status_code=200)
-def trainCompliance(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+async def trainCompliance(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1907,11 +1916,12 @@ def trainCompliance(response: Response, request: Request, team_id:str, module_id
     
     
     progress = get_training_progress(team_id)
-    if progress == 1:
+    if progress == 100:
         # email comp and emp
         email = get_employee_email(team_id)
-        training_completion_comp(email)
-        training_completion_emp(email)
+        await training_completion_emp(email)
+        email = get_comp_email(team_id)
+        await training_completion_comp(email)
     
 
     response = RedirectResponse(url=f"/member/training/compliance/{module_id}/{team_id}", status_code=303)
@@ -1957,7 +1967,7 @@ async def visualize_email(request: Request):
     return response
 
 
-def get_email_info(email):
+async def get_email_info(email):
     '''Get user info from employee_user or manager_user'''
     uid = None
     first_name = None
@@ -1977,11 +1987,13 @@ def get_email_info(email):
                 uid = info['user_id']
                 first_name = info['first_name']
             
-    return uid, first_name
+    return [uid, first_name]
 
 ''' create account welcome email for new employees'''
-def create_account_emp(email):
-    user_id, first_name = get_email_info(email)
+async def create_account_emp(email):
+    info = await get_email_info(email)
+    user_id = info[0]
+    first_name = info[1]
     template_data = {
         "title": "Welcome to Owlo, " + first_name + ",",
         "main_message": "Thanks for joining Owlo",
@@ -1994,12 +2006,14 @@ def create_account_emp(email):
     }
     subject = "Welcome to Owlo"
     if user_id and first_name:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject)
 
 
 ''' create account welcome email for company accounts'''
-def create_account_comp(email):
-    user_id, first_name = get_email_info(email)
+async def create_account_comp(email):
+    info = await get_email_info(email)
+    user_id = info[0]
+    first_name = info[1]
     template_data = {
         "title": "Welcome to Owlo",
         "main_message": "Thanks for joining Owlo",
@@ -2012,12 +2026,14 @@ def create_account_comp(email):
     }
     subject = "Welcome to Owlo"
     if user_id and first_name:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject)
 
 
 '''training invite email'''
-def training_invite_email(email):
-    user_id, first_name = get_email_info(email)
+async def training_invite_email(email):
+    info = await get_email_info(email)
+    user_id = info[0]
+    first_name = info[1]
     template_data = {
         "title": "Onboarding Invite",
         "main_message": "Hi " + first_name + "! ",
@@ -2030,12 +2046,14 @@ def training_invite_email(email):
     }
     subject = "Let's get started"
     if user_id and first_name:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject)
 
 
 '''training reminder email'''
-def training_reminder_email(email):
-    user_id, first_name = get_email_info(email)
+async def training_reminder_email(email):
+    info = await get_email_info(email)
+    user_id = info[0]
+    first_name = info[1]
     template_data = {
         "title": "Onboarding Reminder",
         "main_message": "Hi " + first_name + "! ",
@@ -2048,12 +2066,14 @@ def training_reminder_email(email):
     }
     subject = "Your onboarding is waiting!"
     if user_id and first_name:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject)
 
 
 '''training completion email for employee'''
-def training_completion_emp(email):
-    user_id, first_name = get_email_info(email)
+async def training_completion_emp(email):
+    info = await get_email_info(email)
+    user_id = info[0]
+    first_name = info[1]
     template_data = {
         "title": "Onboarding Complete",
         "main_message": "Hi " + first_name + "! ",
@@ -2066,15 +2086,17 @@ def training_completion_emp(email):
     }
     subject = "Your onboarding is complete!"
     if user_id and first_name:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject)
 
 
 '''training completion email for employer'''
-def training_completion_comp(email):
-    user_id, first_name = get_email_info(email)
+async def training_completion_comp(email):
+    info = await get_email_info(email)
+    user_id = info[0]
+    first_name = info[1]
     template_data = {
         "title": "Onboarding Complete",
-        "main_message": "Hi " + user_name + "! ",
+        "main_message": "Hi " + first_name + "! ",
         "sub_message": "A team member has completed onboarding. ",
         "link_desc": "You can log in to your account to view their onboarding history and analysis.",
         "link": f"https://www.owlo.co/company",
@@ -2084,11 +2106,11 @@ def training_completion_comp(email):
     }
     subject = " A member has completed onboarding!"
     if user_id and first_name:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject)
 
 
 '''Unsubscribe email'''
-def send_unsubscribe_email(email):
+async def send_unsubscribe_email(email):
     template_data = {
         "title": "Unsubscribe",
         "main_message": "Sorry to see you go!",
@@ -2100,12 +2122,12 @@ def send_unsubscribe_email(email):
     }
     subject = "Unsubscribed from Owlo"
     if email:
-        send_email(email, template_data, subject)
+        await send_email(email, template_data, subject, override=True)
 
 
 '''Unsubscribe email'''
 @app.get("/unsubscribe/{user_id}/{email}", status_code=200)
-def unsubscribe_email(user_id:str, email:str):
+async def unsubscribe_email(user_id:str, email:str):
     ''' Add user_id to unsubscribe table'''
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -2114,12 +2136,12 @@ def unsubscribe_email(user_id:str, email:str):
         )
         conn.commit()
     # redirect to index
-    send_unsubscribe_email(email)
-    return RedirectResponse(url='https://www.owlo.co?alert="Unsubscribed!"', status_code=302)
+    await send_unsubscribe_email(email)
+    return RedirectResponse(url='https://www.owlo.co?alert=Unsubscribed!', status_code=302)
 
 
 ''' Check if email is unsubscribed'''
-def check_unsubscribe(email):
+async def check_unsubscribe(email):
     with get_db_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -2133,8 +2155,9 @@ def check_unsubscribe(email):
 
 
 '''SEND EMAIL'''
-async def send_email(email:str, template_data: dict, subject: str):
-    if not check_unsubscribe(email):
+async def send_email(email:str, template_data: dict, subject: str, override: bool = False):
+    subscribed = await check_unsubscribe(email)
+    if not subscribed or override:
         message = MessageSchema(
             subject=subject,
             recipients=[email],

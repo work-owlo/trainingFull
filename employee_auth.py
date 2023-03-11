@@ -127,6 +127,7 @@ def employee_change_self_email(uid, email, cur_email):
         with get_db_connection() as conn:
             cur = conn.cursor()
             cur.execute("UPDATE employee_user SET email = %s WHERE user_id = %s", (email, uid))
+            cur.execute("UPDATE team SET email = %s WHERE employee_id = %s", (email, uid))
             conn.commit()
         # sign out user client side
         return return_success()
