@@ -233,6 +233,7 @@ def start_training(request: Request, response: Response, team_id:str, user: User
 
     role_name = get_training_permission(user.uid, team_id)
     modules = get_training_tools(team_id)
+    progress = get_training_progress(team_id)
     if not role_name:
         return RedirectResponse(url="/member?alert=" + str("You are not permitted to view this role"), status_code=302)
 
@@ -241,6 +242,8 @@ def start_training(request: Request, response: Response, team_id:str, user: User
         {
             "request": request,
             "modules": modules,
+            "progress": progress,
+            "team_id": team_id,
             "name": user.first_name,
             "role_name": role_name
         }
@@ -284,179 +287,6 @@ async def view_module(request: Request, response: Response, rt_id:str, user: Use
             httponly=True
         )
     return response
-
-
-# EMPLOYEE TRAINING ROUTES
-@api_router.get("/member/train/{training_id}/software/{module_id}", status_code=200)
-def testProcess(module_id:str, training_id:str, response: Response, request: Request,  user: User = Depends(get_current_employee)) -> dict:
-
-    offsetX = 0
-    offsetY = 0
-    team_id = manager.company_id
-    pending = has_pending_training(team_id, module_id)
-    if not pending:
-        # return render_template('testSoftware.html', training_id=None, display_next=False, offsetX = offsetX, offsetY = offsetY, size = {'width': 800, 'height': 300}, form = {}, images = [])
-        print('ERROR IS HERE')
-        response = EMPLOYER_TEMPLATES.TemplateResponse(
-            "testSoftware.html",
-            {
-                "request": request,
-                "name": user.first_name,
-                "training_id": None,
-                "display_next": False,
-                "offsetX": offsetX,
-                'element_dict': [{}],
-                'screenshot_dict': [{}],
-                "offsetY": offsetY,
-                "size": {'width': 800, 'height': 300},
-                "form": {},
-                "images": []
-            }
-        )
-        return response
-    original_size = {'width': 1000, 'height': 700}
-    adjusted_size = {'width': 800, 'height': 300}
-    adjustment_factor =  adjusted_size['width']/original_size['width']
-    
-    training_id, elements, screenshots = get_next_page(team_id, module_id, adjustment_factor)
-    element_size_dict = {}
-    for element in (elements['input'] + elements['button']):
-        element_size_dict[element['id']] = {'width': element['width'], 'height': element['height'], 'x': element['x'], 'y': element['y']}
-    screenshot_size_dict = {}
-    for screenshot in screenshots:
-        screenshot_size_dict[screenshot['screenshot_name']] = {'y': screenshot['y']}
-    
-    # get vertical menu
-    with get_db_connection() as conn:
-        cur = conn.cursor()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT training_status, query_element.element_id
-                        FROM training, query_element 
-                        WHERE training.module_id = %s AND training.query_id = query_element.query_id
-                        ORDER BY training.id ASC
-                        """, (module_id,))
-        training_status = cur.fetchall()
-        training = [dict(status) for status in training_status]
-        # get context for each training
-        for i in range(len(training)):
-            cur.execute("""SELECT context, element_value
-                            FROM element
-                            WHERE id = %s""", (training[i]['element_id'],))
-            context = cur.fetchone()
-            training[i]['context'] = context['context']
-    
-    status_ratio = sum([1 if training[i]['training_status'] == 'completed' else 0 for i in range(len(training))])//len(training)
-    display_next = False
-    if len(elements['button'] + elements['input']) == 0:
-        display_next = True
-    
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "testSoftware.html",
-        {
-            "request": request,
-            "name": user.first_name,
-            "status_ratio": status_ratio,
-            "training": training,
-            "screenshot_size_dict": screenshot_size_dict,
-            "element_size_dict": element_size_dict,
-            "training_id": training_id,
-            "display_next": display_next,
-            "offsetX": offsetX,
-            "offsetY": offsetY,
-            "original_size": original_size,
-            "size": adjusted_size,
-            "form": elements,
-            "images": screenshots
-        }
-    )
-    return response
-
-
-@api_router.get("/member/train/{training_id}/compliance/{module_id}", status_code=200)
-def testCompliance(response: Response, request: Request, module_id: str, user: User = Depends(get_current_employee)) -> dict:
-    team_id = user.company_id
-    chat = get_training_compliance(module_id, team_id)
-    with get_db_connection() as conn:
-        cur = conn.cursor()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT module_title, module_text FROM module WHERE module_id = %s""", (module_id,))
-        info = cur.fetchone()
-        name = info['module_title']
-        text = info['module_text']
-        # get training id
-        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
-        completed = cur.fetchone()['count']
-        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
-        total = cur.fetchone()['count']
-        if completed < total:
-            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
-            training_id = cur.fetchone()['training_id']
-        else:
-            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
-            training_id = cur.fetchone()['training_id']
-
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "testCompliance.html",
-        {
-            "request": request,
-            "name": user.first_name,
-            "chat": chat,
-            "text": text,
-            "title": name,
-            "completed": completed,
-            "total": total,
-            "module_id": module_id,
-            "training_id": training_id,
-        }
-    )
-    return response
-
-
-@api_router.get("/member/train/{training_id}/simulator/{module_id}", status_code=200)
-def trainSimulator(response: Response, request: Request, module_id: str, user: User = Depends(get_current_employee)) -> dict:
-    team_id = manager.company_id
-    with get_db_connection() as conn:
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT module_title, customer, situation, problem, respond FROM module WHERE module_id = %s""", (module_id,))
-        module_info = cur.fetchone()
-        name = module_info['module_title']
-        text = 'Customer: ' + module_info['customer'] + 'Situation: ' + module_info['situation'] + 'Problem: ' + module_info['problem'] + 'Respond: ' + module_info['respond']
-        chat = get_training_simulator(module_id, team_id)
-
-        # get training id
-        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
-        completed = cur.fetchone()['count']
-        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
-        total = cur.fetchone()['count']
-        print('values', completed, total)
-        if completed < total:
-            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
-            training_id = cur.fetchone()['training_id']
-        else:
-            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
-            training_id = cur.fetchone()['training_id']
-    # return render_template('testSimulator.html', chat=chat, title=name, completed=completed, total=total, module_id=module_id, training_id=training_id, customer=module_info['customer'], situation=module_info['situation'], problem=module_info['problem'], respond=module_info['respond'])
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "testSimulator.html",
-        {
-            "request": request,
-            "name": user.first_name,
-            "chat": chat,
-            "text": text,
-            "title": name,
-            "completed": completed,
-            "total": total,
-            "module_id": module_id,
-            "training_id": training_id,
-            "customer": module_info['customer'],
-            "situation": module_info['situation'],
-            "problem": module_info['problem'],
-            "respond": module_info['respond'],
-        }
-    )
-    return response
-
-# END EMPLOYEE TRAINING ROUTES
 
 
 @api_router.get("/member/finish/{val}", status_code=200)
@@ -1231,6 +1061,37 @@ def view_account(response: Response, request: Request,  manager: Manager = Depen
 
 # COMPANY TRAINING ROUTES
 
+# initiate test 
+@api_router.get("/company/test_module/start/{module_id}/{role_id}/{tool_id}", status_code=200)
+def startSimulator(response: Response, request: Request, role_id:str, module_id: str, tool_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s and tool_id = %s""", (module_id, tool_id))
+        module = cur.fetchone()
+        if module is None:
+            return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+        else:
+            access = module['access']
+            company_id = module['company_id']
+            if access == 'private' and company_id != manager.company_id:
+                return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+    
+    if tool_id != 4:
+        add_training_sample(module_id, manager.company_id, tool_id)
+    else:
+        add_training_graph(module_id, manager.company_id)
+
+    # redirect to testSimulator
+    if tool_id == '1' or tool_id == '2':
+        return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
+    elif tool_id == '3':
+        return RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=302)
+    elif tool_id == '4':
+        return RedirectResponse(url=f"/company/test_module/software/{module_id}", status_code=302)
+    else:
+        return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+
+
 # SOFTWARE TRAINING ROUTES
 @api_router.get("/company/add_module/software", status_code=200)
 def add_software_module(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
@@ -1680,7 +1541,6 @@ def submitCompliance(response: Response, role_id:str, request: Request, module_i
     # training_id = request.form['training_id']
     # chat = request.form['chat']
     company_id = manager.company_id
-    time.sleep(1)
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1771,37 +1631,6 @@ def addSimulator(response: Response, request: Request, role_id:str, tool_id:str,
     return response
 
 
-# initiate test 
-@api_router.get("/company/test_module/start/{module_id}/{role_id}/{tool_id}", status_code=200)
-def startSimulator(response: Response, request: Request, role_id:str, module_id: str, tool_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
-    with get_db_connection() as conn:
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s and tool_id = %s""", (module_id, tool_id))
-        module = cur.fetchone()
-        if module is None:
-            return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
-        else:
-            access = module['access']
-            company_id = module['company_id']
-            if access == 'private' and company_id != manager.company_id:
-                return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
-    
-    if tool_id != 4:
-        add_training_sample(module_id, manager.company_id, tool_id)
-    else:
-        add_training_graph(module_id, manager.company_id)
-
-    # redirect to testSimulator
-    if tool_id == '1' or tool_id == '2':
-        return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
-    elif tool_id == '3':
-        return RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=302)
-    elif tool_id == '4':
-        return RedirectResponse(url=f"/company/test_module/software/{module_id}", status_code=302)
-    else:
-        return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
-
-
 @api_router.get("/company/test_module/simulator/{module_id}/{role_id}", status_code=200)
 def testSimulator(response: Response, request: Request, role_id:str, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
     # check that manager has permission to view the module (either access is public or manager is the creator)
@@ -1883,5 +1712,158 @@ def resetSimulator(response: Response, request: Request, role_id:str, training_i
     response = RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
     return response
 
+
+# EMPLOYEE TRAINING
+
+# navigate to next training in the list
+@api_router.get("/member/next_training/{team_id}/{tool_id}", status_code=200)
+def nextTraining(response: Response, request: Request, team_id:str, tool_id: str, user: User = Depends(get_current_employee)) -> dict:
+    ''' Get next incomplete training module with the same tool_id '''
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
+    
+    with get_db_connection() as conn:
+        # get role_id
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # cur.execute("""SELECT role_id FROM team WHERE team_id = %s""", (team_id,))
+        # role_id = cur.fetchone()['role_id']
+        cur.execute("""SELECT training.module_id FROM training, module 
+                    WHERE training.module_id = module.module_id AND training_status = 'pending' AND module.tool_id = %s AND training.team_id = %s
+                    ORDER BY training.id ASC LIMIT 1""", (tool_id, team_id))
+        module_id = cur.fetchone()
+        if module_id is None:
+            return RedirectResponse(url=f"/member/onboard/{team_id}", status_code=302)
+        else:
+            module_id = module_id['module_id']
+    if tool_id == '1' or tool_id == '2':
+        response = RedirectResponse(url=f"/member/training/simulator/{module_id}/{team_id}", status_code=302)
+    else:
+        response = RedirectResponse(url=f"/member/training/compliance/{module_id}/{team_id}", status_code=302)
+    return response
+
+# SIMULATOR
+@api_router.get("/member/training/simulator/{module_id}/{team_id}", status_code=200)
+def trainingSimulator(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
+    ''' Get the training module for the employee ''' 
+    if user == None or not user:
+        return RedirectResponse(url="/logout", status_code=302)
+
+    # role_name = get_training_permission(user.uid, team_id)
+    # with get_db_connection() as conn:
+    #     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    #     # check that training_id is valid and tool_id for this module is either '1' or '2'
+   
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_title, customer, situation, problem, respond FROM module WHERE module_id = %s""", (module_id,))
+        module_info = cur.fetchone()
+        name = module_info['module_title']
+        text = 'Customer: ' + module_info['customer'] + 'Situation: ' + module_info['situation'] + 'Problem: ' + module_info['problem'] + 'Respond: ' + module_info['respond']
+        chat = get_training_simulator(module_id, team_id)
+
+        # get training id
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
+        completed = cur.fetchone()['count']
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
+        total = cur.fetchone()['count']
+        print('values', completed, total)
+        if completed < total:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+        else:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+    # return render_template('testSimulator.html', chat=chat, title=name, completed=completed, total=total, module_id=module_id, training_id=training_id, customer=module_info['customer'], situation=module_info['situation'], problem=module_info['problem'], respond=module_info['respond'])
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
+        "trainSimulator.html",
+        {
+            "request": request,
+            "name": user.first_name,
+            "chat": chat,
+            "text": text,
+            "title": name,
+            "completed": completed,
+            "total": total,
+            "team_id": team_id,
+            "module_id": module_id,
+            "training_id": training_id,
+            "customer": module_info['customer'],
+            "situation": module_info['situation'],
+            "problem": module_info['problem'],
+            "respond": module_info['respond'],
+        }
+    )
+    return response
+
+@api_router.post("/member/submit_simulator/{module_id}/{team_id}", status_code=200)
+def trainSimulator(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+    update_training_status(training_id, chat, 'completed')
+    response = RedirectResponse(url=f"/member/training/simulator/{module_id}/{team_id}", status_code=302)
+    return response
+
+
+# COMPLIANCE
+@api_router.get("/member/training/compliance/{module_id}/{team_id}", status_code=200)
+def trainingCompliance(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
+    chat = get_training_compliance(module_id, team_id)
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_title, module_text FROM module WHERE module_id = %s""", (module_id,))
+        info = cur.fetchone()
+        name = info['module_title']
+        text = info['module_text']
+        # get training id
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
+        completed = cur.fetchone()['count']
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
+        total = cur.fetchone()['count']
+        if completed < total:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+        else:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
+        "trainCompliance.html",
+        {
+            "request": request,
+            "name": user.first_name,
+            "chat": chat,
+            "text": text,
+            "title": name,
+            "team_id": team_id,
+            "completed": completed,
+            "total": total,
+            "module_id": module_id,
+            "training_id": training_id,
+        }
+    )
+    return response
+
+@api_router.post("/member/submit_compliance/{module_id}/{team_id}", status_code=200)
+def trainCompliance(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+        context = cur.fetchone()['module_text']
+        cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
+        question = cur.fetchone()['query_id']
+    score = check_response(context, question, chat)
+    if 'Yes' in score:
+        update_training_status(training_id, chat, 'completed', score)
+    else:
+        update_training_status(training_id, chat, 'pending', score)
+    response = RedirectResponse(url=f"/member/training/compliance/{module_id}/{team_id}", status_code=303)
+    return response
+
+
+
+
+# SOFTWARE
+
+# MUTUAL
 
 app.include_router(api_router)

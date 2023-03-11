@@ -89,19 +89,20 @@ def generate_simulator(num_chats, customer, situation, problem, respond):
 
 def generate_simulation_response(init, question_history):
     # add init to question_history as first element
-    question_history.insert(0, init)
-    # get the latest question
-    # question_history[-1]['content'] = question_history[-1]['content'] + "generate reply to this question with you as the customer"
-    print(question_history) 
-    completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=question_history
+    
+    # question_history.insert(0, init)
+    # # get the latest question
+    # # question_history[-1]['content'] = question_history[-1]['content'] + "generate reply to this question with you as the customer"
+    # print(question_history) 
+    # completion = openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=question_history
 
-        )
-    response = completion.choices[0].message['content']
-    # return part after semicolon if it exists
-    if ":" in response:
-        response = response.split(":")[1]
-    return response
-    # # time.sleep(2)
+    #     )
+    # response = completion.choices[0].message['content']
+    # # return part after semicolon if it exists
+    # if ":" in response:
+    #     response = response.split(":")[1]
+    # return response
+    # # # time.sleep(2)
     return "Yes, that is correct"

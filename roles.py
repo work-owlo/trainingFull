@@ -65,13 +65,13 @@ def add_training_tasks(team_id, role_id):
                 for query in queries:
                     training_id = generate_uid()
                     cur.execute(
-                        "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module, query[0], 'pending'))
+                        "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[0], 'pending'))
                     conn.commit()
             else:
                 for query in queries:
                     training_id = generate_uid()
                     print(query)
-                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module, query[1], 'pending'))
+                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[1], 'pending'))
                     conn.commit()
 
 

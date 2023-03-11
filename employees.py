@@ -41,21 +41,64 @@ def get_training_permission(employee_id, team_id):
     return False
 
 
+# def get_training_tools(team_id):
+#     # get tools for a role
+#     with get_db_connection() as conn:
+#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+#         cur.execute('''
+#             SELECT role_tools.rt_id as id, tools.tool_name, tools.tool_icon, tools.status, tools.tool_id as tool_id
+#             FROM tools, team, role_tools
+#             WHERE team.role_id = role_tools.role_id AND tools.tool_id = role_tools.tool_id AND team.team_id = %s AND tools.status = 'active'
+#         ''', (team_id,))
+#         tools = cur.fetchall()
+#         tool_lst = []
+#         print(get_training_tools_status(team_id))
+#         if tools:
+#             for tool in tools:
+#                 tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status=tool['status'], tool_id=tool['tool_id']))
+#     return tool_lst
+
 def get_training_tools(team_id):
-    # get tools for a role
+    ''' Get the status of all tools for a role '''
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute('''
-            SELECT role_tools.rt_id as id, tools.tool_name, tools.tool_icon, tools.status
-            FROM tools, team, role_tools
-            WHERE team.role_id = role_tools.role_id AND tools.tool_id = role_tools.tool_id AND team.team_id = %s AND tools.status = 'active'
-        ''', (team_id,))
-        tools = cur.fetchall()
+        cur.execute('''SELECT tools.tool_id as tool_id, tools.tool_name, tools.tool_icon, tools.status, tools.id
+                       FROM tools, module, training
+                       WHERE tools.tool_id = module.tool_id AND module.module_id = training.module_id AND training.team_id = %s
+                       AND tools.status = 'active'
+                       AND training.training_status = 'completed'
+                       GROUP BY tools.tool_id,tools.tool_name, tools.tool_icon, tools.status, tools.id''', (team_id,))
+        completed = cur.fetchall()
+        cur.execute('''SELECT tools.tool_id as tool_id, tools.tool_name, tools.tool_icon, tools.status, tools.id
+                       FROM tools, module, training
+                       WHERE tools.tool_id = module.tool_id AND module.module_id = training.module_id AND training.team_id = %s
+                       AND tools.status = 'active'
+                       AND training.training_status != 'completed'
+                       GROUP BY tools.tool_id, tools.tool_name, tools.tool_icon, tools.status, tools.id''', (team_id,))
+        incomplete = cur.fetchall()
         tool_lst = []
-        if tools:
-            for tool in tools:
-                tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status=tool['status']))
+        for tool in completed:
+            tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status='completed', tool_id=tool['tool_id']))
+        for tool in incomplete:
+            tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status='incomplete', tool_id=tool['tool_id']))
     return tool_lst
+
+
+def get_training_progress(team_id):
+    ''' Get the progress of a role '''
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute('''SELECT COUNT(training_id) as total
+                       FROM training
+                       WHERE team_id = %s''', (team_id,))
+        total = cur.fetchone()
+        cur.execute('''SELECT COUNT(training_id) as completed
+                       FROM training
+                       WHERE team_id = %s AND training_status = 'completed' ''', (team_id,))
+        completed = cur.fetchone()
+        if total and completed:
+            return round((completed['completed']/total['total'])*100)
+
 
 def get_module_permissions(employee_id, rt_id):
     ''' Check if employee is assigned to the role '''

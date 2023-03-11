@@ -29,8 +29,9 @@
         });
     });
 </script>
+<div class="container-main">
 <div class="row" id="my-canvas">
-    <div class="col-1">
+    <div class="col-1 progress-num">
         {% for i in range(1, completed+1) %}
         <div class="compliance-progress-complete">{{i}}</div>
         {% endfor %}
@@ -61,10 +62,10 @@
                 objDiv.scrollTop = objDiv.scrollHeight;
             </script>
             <div class="text-input">
-                <form action="{{url_for('submitSimulator', module_id=module_id)}}" method="POST" id="form">
+                <form action="{{url_for('trainSimulator', module_id=module_id, team_id=team_id)}}" method="POST" id="form">
                     <!-- disabled trianing id field -->
                     <input type="hidden" name="training_id" value="{{training_id}}">
-                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
+                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message" autofocus>
                  </form>
             </div>
         </div>
@@ -78,7 +79,12 @@
             <strong>Problem:</strong> {{problem}}<br>
             <strong>Goal:</strong> {{respond}}<br> 
         </div>
+        {% if total - completed == 0 %}
+            <a type="button" class="btn btn-success" href="/member/onboard/{{team_id}}" style="margin-top:1rem">
+                Go to Next
+            </a>
+        {% endif %}
+        </div>
     </div>
 </div>
-
 {% endblock %}

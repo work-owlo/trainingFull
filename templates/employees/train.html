@@ -1,27 +1,70 @@
 {% extends "base.html" %}
 
 {% block content %}
-    
-<div class="container-train">
+<script>
+     $(document).ready(function(){
+        status = {{progress|int}}
+            if (status == 100) {
+                const jsConfetti = new JSConfetti()
+                jsConfetti.addConfetti({
+                confettiColors: [
+                    '#70ABAF', '#ebeef7'
+                ],
+            })
+        }
+     });
+</script>
+
+<div class="container-train" id="my_canvas">
+    {% if progress|int < 100 %}
     <div class="row train-row">
         <div class="col-md-12">
             <h6 class="label">{{role_name|title}}</h6>
             <h1>Welcome, {{name}}</h1>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{progress}}%" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+                {{progress}}%
+                </div>
+              </div>
             <h6 class="train-text">Select a module to continue</h6>
             <div class="card-group">
                 {% for module in modules %}
-                <a class="txt-dec" href="/member/onboard/module/{{module['id']}}">
-                    <div class="card-train" style="max-width: 18rem;">
-                        <div class="card-body">
-                        <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
-                        <h5 class="card-train-title">{{module['name']}}</h5>
-                        </div>
-                    </div>
-                </a>
+                    {% if module['status'] == 'incomplete' %}
+                        <a class="txt-dec" href="/member/next_training/{{team_id}}/{{module['tool_id']}}">
+                            <div class="card-train" style="max-width: 18rem;">
+                                <div class="card-body">
+                                <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
+                                <h5 class="card-train-title">{{module['name']}}</h5>
+                                </div>
+                            </div>
+                        </a>
+                    {% else %}
+                        <a class="txt-dec" disabled>
+                            <div class="card-train-complete" style="max-width: 18rem;">
+                                <div class="card-body">
+                                <ion-icon class="train-icon" name="{{module['icon']}}"></ion-icon>
+                                <h5 class="card-train-title">{{module['name']}}</h5>
+                                <p>Completed</p>
+                                </div>
+                            </div>
+                        </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="row train-row">
+        <div class="col-md-12">
+            <h6 class="label">{{role_name|title}}</h6>
+            <h1>Congrats, {{name}}</h1>
+            <hr>
+            <h2 class="train-text">You have completed all the modules required for the role of {{role_name|title}}.</h2>
+            <h4 class="train-text">We have notified your hiring manager. They will reach out to you with the next steps. </h4>
+
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %} 
