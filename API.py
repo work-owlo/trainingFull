@@ -24,6 +24,20 @@ from roles import *
 from training import *
 
 app = FastAPI()
+
+origins = [
+    "https://owlo.co",
+    "https://www.owlo.co",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter()
 BASE_PATH = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -36,16 +50,6 @@ favicon_path = 'favicon.ico'
 async def favicon():
     return FileResponse(favicon_path)
 
-# # Add the allowed origins here
-# origins = ["http://localhost:3000"]
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
 
