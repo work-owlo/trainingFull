@@ -128,6 +128,16 @@ async def company_forgot_password(response:Response, request: Request, email: st
 
 
 """ EMPLOYEE ROUTES """
+@api_router.get("/demo", status_code=200)
+async def employee_landing(response:Response, request: Request, alert=None) -> dict:
+    '''Demo Page for investors'''
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "demo.html",
+        {
+            "request": request,
+            "alert":alert
+        }
+    )
 
 
 @api_router.get("/", status_code=200)
@@ -738,14 +748,8 @@ async def remind_employee(response: Response, request: Request, team_id: str, ma
     if email == None:
         return RedirectResponse(url="/company/team", status_code=302)
     await training_reminder_email(email)
-    response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "employee.html",
-        {
-            "request": request,
-            "employee": 'Hi',
-            "name": manager.first_name
-        }
-    )
+    print('Reminder sent')
+    return RedirectResponse(url="/company/team", status_code=302)
 
     if manager.token != None:
         response.set_cookie(
@@ -2034,19 +2038,29 @@ async def training_invite_email(email):
     info = await get_email_info(email)
     user_id = info[0]
     first_name = info[1]
-    template_data = {
-        "title": "Onboarding Invite",
-        "main_message": "Hi " + first_name + "! ",
-        "sub_message": "A company has invited you to onboard for a new role.",
-        "link_desc": "Log in or Create an Account below to start onboarding",
-        "link": f"https://www.owlo.co/",
-        "link_cta": "Begin",
-        "user_id": user_id,
-        "email": email
-    }
-    subject = "Let's get started"
     if user_id and first_name:
-        await send_email(email, template_data, subject)
+        template_data = {
+            "title": "Onboarding Invite",
+            "main_message": "Hi! ",
+            "sub_message": "A company has invited you to onboard for a new role.",
+            "link_desc": "Log in or Create an Account below to start onboarding",
+            "link": f"https://www.owlo.co/",
+            "link_cta": "Begin",
+            "user_id": user_id,
+            "email": email
+        }
+    else:
+        template_data = {
+            "title": "Onboarding Invite",
+            "main_message": "Hi! ",
+            "sub_message": "A company has invited you to onboard for a new role.",
+            "link_desc": "Log in or Create an Account below to start onboarding",
+            "link": f"https://www.owlo.co/",
+            "link_cta": "Begin",
+            "email": email
+        }
+    subject = "Let's get started"
+    await send_email(email, template_data, subject)
 
 
 '''training reminder email'''
@@ -2156,17 +2170,19 @@ async def check_unsubscribe(email):
 
 '''SEND EMAIL'''
 async def send_email(email:str, template_data: dict, subject: str, override: bool = False):
-    subscribed = await check_unsubscribe(email)
-    if not subscribed or override:
-        message = MessageSchema(
-            subject=subject,
-            recipients=[email],
-            template_body=template_data,
-            subtype=MessageType.html
-        )
-        fm = FastMail(conf)
-        await fm.send_message(message, template_name="email.html") 
-        return JSONResponse(status_code=200, content={"message": "email has been sent"})
+    send_email = False
+    if send_email:
+        subscribed = await check_unsubscribe(email)
+        if not subscribed or override:
+            message = MessageSchema(
+                subject=subject,
+                recipients=[email],
+                template_body=template_data,
+                subtype=MessageType.html
+            )
+            fm = FastMail(conf)
+            await fm.send_message(message, template_name="email.html") 
+            return JSONResponse(status_code=200, content={"message": "email has been sent"})
 
 
 app.include_router(api_router)

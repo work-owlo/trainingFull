@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    
+
 <div class="container-employer" >
     <div class="row search-row">
         <div class="col-md-12">
@@ -100,9 +100,9 @@
                             </button>
                             <ul class="dropdown-menu">
                               <!-- Dropdown menu links -->
-                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View</a></li>
+                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View Training</a></li>
                                 <li>
-                                    <form action="/company/employee/remind/" method="post">
+                                    <form action="/company/employee/remind/{{member['id']}}" method="post" class="remind">
                                         <input type="hidden" name="team_id" value="{{member['id']}}">
                                         <button class="dropdown-item">Remind</button>
                                     </form>
@@ -112,7 +112,6 @@
                                         <input type="hidden" name="team_id" value="{{member['id']}}">
                                         <button class="dropdown-item">Unassign</button>
                                     </form>
-                                    <!-- <a class="dropdown-item" href="/company/employee/unassign/{{member['id']}}">Unassign</a> -->
                                 </li>
                             </ul>
                         </div>

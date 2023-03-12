@@ -77,10 +77,11 @@ def get_training_tools(team_id):
                        GROUP BY tools.tool_id, tools.tool_name, tools.tool_icon, tools.status, tools.id''', (team_id,))
         incomplete = cur.fetchall()
         tool_lst = []
-        for tool in completed:
-            tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status='completed', tool_id=tool['tool_id']))
         for tool in incomplete:
             tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status='incomplete', tool_id=tool['tool_id']))
+        for tool in completed:
+            if not tool['tool_id'] in [t['tool_id'] for t in incomplete]:
+                tool_lst.append(Tool(id=tool['id'], name=tool['tool_name'], icon=tool['tool_icon'], status='completed', tool_id=tool['tool_id']))
     return tool_lst
 
 

@@ -38,11 +38,10 @@
             <table class="table table-striped">
                 <thead>
                   <tr>
-                    <th scope="col" class="th-role">Role</th>
+                    <th scope="col" class="th-role" >Role</th>
                     <th scope="col">Sent to</th>
                     <th scope="col">Completed</th>
                     <th scope="col">Status</th>
-                    <th scope="col" class="invisible">View</th>
                     <th scope="col" class="invisible">Edit</th>
                     <th scope="col" class="invisible"><ion-icon name="trash-outline"></ion-icon></th>
                   </tr>
@@ -55,12 +54,12 @@
                   {% endif %}
                   {% for role in roles %}
                     <tr>
-                        <td scope="row">{{role['role_name']}}</td>
+                        <td scope="row" >{{role['role_name']}}</td>
                         <td> {{role['count']}} </td>
                         <td> {{role['completed']}} </td>
                         <td><span class="status-{{role['status']|lower}}"> {{role['status']|title}} </span></td>
                         {% if role['status'] == 'active' %}
-                        <td class="role-analytics"><a href="/company/role/view/{{role['role_id']}}" class="txt-dec-white no-hover">View</a></td>
+                        <!-- <td class="role-analytics"><a href="/company/role/view/{{role['role_id']}}" class="txt-dec-white no-hover">View</a></td> -->
                         <td class="role-edit"><a href="/company/role/edit/{{role['role_id']}}" class="txt-dec-white no-hover">Edit</a></td>
                         {% else %}
                         <td colspan="2" class="role-edit"><a href="/company/add_modules/{{role['role_id']}}" class="txt-dec-white no-hover">Finish</a></td>
