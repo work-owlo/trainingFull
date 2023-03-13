@@ -476,7 +476,7 @@ td {
 
 .role-delete {
     background-color: #e57346 !important;
-    color:white;
+    color:rgb(0, 0, 0);
     border: 1px solid #e57346;
     text-align: center;
     padding:.3rem

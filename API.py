@@ -1947,7 +1947,7 @@ async def trainCompliance(response: Response, request: Request, team_id:str, mod
 # MAIL CONFIG
 conf = ConnectionConfig(
     MAIL_USERNAME = "info@owlo.co",
-    MAIL_PASSWORD = rds_config.mail_password,
+    MAIL_PASSWORD = configs.mail_password,
     MAIL_FROM = "info@owlo.co",
     MAIL_PORT = 587,
     MAIL_SERVER="smtp.gmail.com",

@@ -132,3 +132,4 @@ templates/.DS_Store
 /rds_config.py
 utils.py
 configs.py
+env.py

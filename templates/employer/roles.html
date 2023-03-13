@@ -62,7 +62,7 @@
                         <!-- <td class="role-analytics"><a href="/company/role/view/{{role['role_id']}}" class="txt-dec-white no-hover">View</a></td> -->
                         <td class="role-edit"><a href="/company/role/edit/{{role['role_id']}}" class="txt-dec-white no-hover">Edit</a></td>
                         {% else %}
-                        <td colspan="2" class="role-edit"><a href="/company/add_modules/{{role['role_id']}}" class="txt-dec-white no-hover">Finish</a></td>
+                        <td class="role-edit"><a href="/company/add_modules/{{role['role_id']}}" class="txt-dec-white no-hover">Finish</a></td>
                         {% endif %}
                         <td class="role-delete"><button onclick="setVal('{{role['role_id']}}')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="no-btn no-hover "><ion-icon name="trash-outline"></ion-icon></button></td>
                     </tr>
