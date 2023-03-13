@@ -9,6 +9,7 @@ db_host  =  "localhost"
 db_username = "postgres"
 db_password = "Plane2017"
 db_name = "postgres"
+mail_password = "Owlo0020!"
 
 # db_info = os.environ.get('DATABASE_URL')
 
