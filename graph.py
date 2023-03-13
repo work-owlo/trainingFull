@@ -137,10 +137,18 @@ def add_training_graph(module_id, company_id):
     training_type = 'software'
     # get data from query
     with get_db_connection() as conn:
+        # check if training already exists
         cur = conn.cursor()
-        cur.execute("SELECT query_id FROM query WHERE module_id = %s", (module_id,))
-        query_ids = cur.fetchall()
-        for query_id in query_ids:
-            training_id = generate_id()
-            cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status, training_type) VALUES (%s, %s, %s, %s, %s, %s)", (training_id, team_id, module_id, query_id[0], training_status, training_type))
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s", (module_id, company_id))
+        training = cur.fetchall()
+        if training:
+            cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                        WHERE team_id=%s AND module_id = %s""", ('pending', company_id, module_id))
             conn.commit()
+        else:
+            cur.execute("SELECT query_id FROM query WHERE module_id = %s", (module_id,))
+            query_ids = cur.fetchall()
+            for query_id in query_ids:
+                training_id = generate_id()
+                cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status, training_type) VALUES (%s, %s, %s, %s, %s, %s)", (training_id, team_id, module_id, query_id[0], training_status, training_type))
+                conn.commit()

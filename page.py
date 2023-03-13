@@ -381,4 +381,4 @@ class Page:
 
     def add_elements(self, driver, parse_id):
         self.elements = Element.get_elements(driver, self.page_id, self.url, parse_id=parse_id)
-        # self.forms = Webform.get_forms(driver, self.page_id, self.url, parse_id=parse_id)
+        self.forms = Webform.get_forms(driver, self.page_id, self.url, parse_id=parse_id)

@@ -18,11 +18,11 @@ def get_db_connection():
     '''Return a connection to the database.'''
     db_info = os.environ.get('DATABASE_URL')
     if db_info:
-        print('Connecting to Heroku Postgres')
+        # print('Connecting to Heroku Postgres')
         conn = psycopg2.connect(db_info)
         return conn
     else:
-        print('Connecting to local Postgres')
+        # print('Connecting to local Postgres')
         rds_host  = configs.db_host
         rds_username = configs.db_username
         rds_user_pwd = configs.db_password

@@ -2,7 +2,7 @@ import sqlite3
 
 from utils import *
 from classes import *
-
+from graph import *
 
 def add_role(company_id, role_id, role_name, role_description):
     ''' Add role to company '''
@@ -59,21 +59,19 @@ def add_training_tasks(team_id, role_id):
             "SELECT module.module_id, module.tool_id FROM module, role_module WHERE module.module_id = role_module.module_id AND role_id = %s AND status = 'active'", (role_id,))
         modules = cur.fetchall()
         for module in modules:
-            cur.execute("SELECT query_id, query FROM query WHERE module_id = %s", (module[0],))
-            queries = cur.fetchall()
             if module[1] == '4':
-                for query in queries:
-                    training_id = generate_uid()
-                    cur.execute(
-                        "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[0], 'pending'))
-                    conn.commit()
+                add_training_graph(module[0],team_id)
+                # for query in queries:
+                #     training_id = generate_uid()
+                #     cur.execute(
+                #         "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[0], 'pending'))
             else:
+                cur.execute("SELECT query_id, query FROM query WHERE module_id = %s", (module[0],))
+                queries = cur.fetchall()
                 for query in queries:
                     training_id = generate_uid()
                     print(query)
                     cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[1], 'pending'))
-                    conn.commit()
-
 
 def get_employee_id(email):
     ''' Get employee_id from email '''

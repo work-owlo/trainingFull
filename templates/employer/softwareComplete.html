@@ -43,7 +43,7 @@
           {% endfor %}
         </div>
 
-      <form class="float-right" style="width:50%" action="{{url_for('completeProcess', parse_id=parse_id)}}" method="POST">
+      <form class="float-right" style="width:50%" action="{{url_for('completeProcess', parse_id=parse_id, role_id=role_id)}}" method="POST">
           <br>
           <input type="text" value="{{parse_id}}" name="parse_id" hidden>
           <button type="submit" class="btn btn-success">I'm Done</button>
@@ -62,7 +62,7 @@
           Are you sure you want to delete this page? All pages that only come after this page will be deleted as well.
         </div>
         <div class="modal-footer">
-            <form class="not-important" action="{{url_for('processSoftwareDeletePage', parse_id=parse_id)}}" method="POST">
+            <form class="not-important" action="{{url_for('processSoftwareDeletePage', parse_id=parse_id, role_id=role_id)}}" method="POST">
                 <input type="text" value="" name="deletingPage" id="deletingPage" hidden>
                 <button type="submit" class="btn btn-danger">Delete</button>
             </form>

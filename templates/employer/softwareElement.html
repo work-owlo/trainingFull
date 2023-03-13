@@ -74,7 +74,7 @@
             id="{{image['screenshot_name']}}">
             {% endfor %}
         
-            <form action="/company/processSoftware/element/{{parse_id}}" method="post" autocomplete="off">
+            <form action="/company/processSoftware/element/{{parse_id}}/{{role_id}}" method="post" autocomplete="off">
                     {% for input in form['input'] %}
                         <input
                         type = "{{input['subtype']}}"
@@ -172,7 +172,7 @@
 
         </div>
         <div class="modal-footer">
-            <form class="not-important" action="{{url_for('processSoftwareDeleteElements', form_id=form_id, parse_id=parse_id)}}" method="POST">
+            <form class="not-important" action="{{url_for('processSoftwareDeleteElements', form_id=form_id, parse_id=parse_id, role_id=role_id)}}" method="POST">
                 <button type="submit" class="btn btn-danger">Delete</button>
             </form>
         </div>

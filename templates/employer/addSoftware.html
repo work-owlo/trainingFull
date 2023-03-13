@@ -17,7 +17,7 @@
                 </div>
             </div>
             <br>
-            <form action="/company/add_module/software" method="post">
+            <form action="{{ url_for('addSoftwarePost', role_id=role_id) }}" method="post" enctype="multipart/form-data">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" name="website_name" id="website-name" placeholder="Owlo" required>
                     <label for="website-name">Website Name </label>

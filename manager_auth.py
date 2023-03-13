@@ -39,7 +39,10 @@ def manager_login(email, password):
 
 def manager_create_admin_account(first_name, last_name, email, password, uid=None, add_to_firebase=True):
     ''' Use Firebase to create a manager account '''
-    try:
+    try:        
+        verify_password = check_password(password)
+        if not verify_password:
+            return return_error("Password must be at least 6 characters, contain at least one number, and contain at least one special character")
         uid = generate_uid() if uid is None else uid
         # create user in firebase
         user = auth.create_user(uid=uid, email=email, password=password) if add_to_firebase else None
