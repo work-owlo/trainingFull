@@ -14,6 +14,8 @@ pyrebase_auth = firebase.auth()
 
 def manager_login(email, password):
     ''' Use Firebase to login a user '''
+    email = email.lower()
+    email = email.strip()
     try:
         user = pyrebase_auth.sign_in_with_email_and_password(email, password)
         # check if manager_user status is active in db
@@ -71,13 +73,15 @@ def manager_email_exists(email):
 
 def manager_create_account(uid, manager_uid, first_name, last_name, email, password, company_id):
     ''' Use Firebase to create a manager account in the case that the company already exists'''
+    email = email.lower()
+    email = email.strip()
     try:
         # create user in firebase
         if manager_email_exists(email):
             return return_error("Email already exists")
         verify_password = check_password(password)
-        if verify_password['status'] == 'error':
-            return verify_password
+        if not verify_password:
+            return return_error("Password must be at least 6 characters, contain at least one number, and contain at least one special character")
         user = auth.create_user(uid=manager_uid, email=email, password=password)
         # create user in db
         with get_db_connection() as conn:
@@ -139,6 +143,8 @@ def manager_forgot_password(email):
 
 def manager_change_self_email(uid, curr_email, email):
     ''' Change user email in Firebase and DB '''
+    email = email.lower()
+    email = email.strip()
     try:
     # see if credentials are valid
         if email == curr_email:

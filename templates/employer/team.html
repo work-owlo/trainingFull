@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    
+
 <div class="container-employer" >
     <div class="row search-row">
         <div class="col-md-12">
@@ -25,7 +25,6 @@
                         <select class="form-select search-inputs" name="filter" id="filter" aria-label="Filter" onchange="this.form.submit()">
                             <option value=""{{"selected" if filter == ''}}>Filter</option>
                             <option value="completed" {{"selected" if filter == 'completed'}}>Completed</option>
-                            <option value="incomplete" {{"selected" if filter == 'incomplete'}}>Incomplete</option>
                             <option value="pending" {{"selected" if filter == 'pending'}}>Pending</option>
                         </select>
                     </div>
@@ -93,7 +92,7 @@
                         <td >{{member['email']}}</td>
                         <td >{{member['role']|title}}</td>
                         <td><span class="type-{{member['employment_type']|lower}}"> {{member['employment_type']|title}} </span></td>
-                        <td><span class="status-{{member['status']|lower}}"> {{member['status']|title}} </span></td>
+                        <td><span class="status-{{'pending' if member['status']|int < 100 else 'completed'}}"> {{member['status']|title}}% </span></td>
                         <td>
                         <div class="btn-group dropend">
                             <button type="button" class="btn-clear" data-bs-toggle="dropdown" aria-expanded="false">
@@ -101,9 +100,9 @@
                             </button>
                             <ul class="dropdown-menu">
                               <!-- Dropdown menu links -->
-                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View</a></li>
+                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View Training</a></li>
                                 <li>
-                                    <form action="/company/employee/remind/" method="post">
+                                    <form action="/company/employee/remind/{{member['id']}}" method="post" class="remind">
                                         <input type="hidden" name="team_id" value="{{member['id']}}">
                                         <button class="dropdown-item">Remind</button>
                                     </form>
@@ -113,7 +112,6 @@
                                         <input type="hidden" name="team_id" value="{{member['id']}}">
                                         <button class="dropdown-item">Unassign</button>
                                     </form>
-                                    <!-- <a class="dropdown-item" href="/company/employee/unassign/{{member['id']}}">Unassign</a> -->
                                 </li>
                             </ul>
                         </div>

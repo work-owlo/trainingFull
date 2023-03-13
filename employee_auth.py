@@ -13,6 +13,8 @@ pyrebase_auth = firebase.auth()
 
 def employee_login(email, password):
     ''' Use Firebase to login a user '''
+    email = email.lower()
+    email = email.strip()
     try:
         user = pyrebase_auth.sign_in_with_email_and_password(email, password)
         # check if employee_user status is active in db
@@ -66,6 +68,9 @@ def check_password(password):
 
 def employee_create_account(first_name, last_name, email, password):
     ''' Use Firebase to create a manager account '''
+    email = email.lower()
+    email = email.strip()
+
     try:
         uid = generate_uid()
         verify_password = check_password(password)
@@ -108,6 +113,8 @@ def employee_forgot_password(email):
 
 def employee_change_self_email(uid, email, cur_email):
     ''' Change user email in Firebase and DB '''
+    email = email.lower()
+    email = email.strip()
     try:
         if cur_email == email:
             return return_error('Cannot use same email')
@@ -120,6 +127,7 @@ def employee_change_self_email(uid, email, cur_email):
         with get_db_connection() as conn:
             cur = conn.cursor()
             cur.execute("UPDATE employee_user SET email = %s WHERE user_id = %s", (email, uid))
+            cur.execute("UPDATE team SET email = %s WHERE employee_id = %s", (email, uid))
             conn.commit()
         # sign out user client side
         return return_success()
@@ -181,8 +189,8 @@ def employee_change_password(uid, email, curr_password, password):
         if not employee_login(email, curr_password)['status'] == 'success':
             return {'error': 'Invalid Credentials'}
         verify_password = check_password(password)
-        if verify_password['status'] == 'error':
-            return verify_password
+        if not verify_password:
+            return return_error('Password Must Contain At Least One Number, One Uppercase Letter, One Lowercase Letter, and Be Between 6 and 20 Characters')
         auth.update_user(uid, password=password)
         # sign out user
         return return_success()

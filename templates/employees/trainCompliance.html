@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+        status = {{total - completed}}
+            if (status == 0) {
+                const jsConfetti = new JSConfetti()
+                jsConfetti.addConfetti({
+                confettiColors: [
+                    '#70ABAF', '#ebeef7'
+                ],
+            })
+        }
+        $("#form").on("submit", function(){
+            // delay for one second
+            var delayInMilliseconds = 1000; //1 second
+            // add user input as a chat-user
+            $(".texts").append('<div class="chat-user">' + $("#chat").val() + '</div>');
+            // scroll to the latest text
+            var objDiv = document.getElementsByClassName("texts")[0];
+            objDiv.scrollTop = objDiv.scrollHeight;
+            setTimeout(function() {
+                // display a chat-bot with a spinner inside
+                $(".texts").append('<div class="chat-bot"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+                // scroll to the latest text
+                var objDiv = document.getElementsByClassName("texts")[0];
+                objDiv.scrollTop = objDiv.scrollHeight;
+            }, delayInMilliseconds);
+        });
+    });
+</script>
+<div class="container-main">
+    <div class="row" id="my-canvas">
+        <div class="col-1 progress-num">
+            {% for i in range(1, completed+1) %}
+            <div class="compliance-progress-complete">{{i}}</div>
+            {% endfor %}
+            {% for i in range(completed+1, total+1) %}
+            <div class="compliance-progress-pending">{{i}}</div>
+            {% endfor %}
+        </div>
+        <div class="col-6">
+            {% if chat|length > 0 %}
+            <h4 class="label"></h4>
+            <div class="test-chat">
+                <div class="texts">
+                {% for c in chat %} 
+                    {% if c['from'] == 'bot' %}
+                    <div class="chat-bot">
+                        {{ c['text'] }}
+                    </div>
+                    {% else %}
+                    <div class="chat-user">
+                        {{ c['text'] }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+                <!-- automatically scroll to the last text -->
+                <script>
+                    var objDiv = document.getElementsByClassName("texts")[0];
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                </script>
+                <div class="text-input">
+                    <form action="{{url_for('trainCompliance', module_id=module_id, team_id=team_id)}}" method="POST" id="form">
+                        <!-- disabled trianing id field -->
+                        <input type="hidden" name="training_id" value="{{training_id}}">
+                        <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message" autofocus>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <div class="compliance-text">
+                <h4>{{title}}</h4>
+                {{text}}
+            </div>
+            {% if total - completed == 0 %}
+                <a type="button" class="btn btn-success" href="/member/onboard/{{team_id}}" style="margin-top:1rem">
+                    Go to Next
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

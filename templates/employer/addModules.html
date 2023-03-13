@@ -30,11 +30,11 @@
                     <h5>{{tool['tool_name']}}</h5>
                 </div>
                 <div class="col">
-                    <p style="text-align: right;">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                            Add Modules
-                          </button>
-                    </p>
+                    <form action="{{url_for('add_module_redirect', tool_id=tool['tool_id'], role_id=role_id)}}" method="POST">
+                      <button type="submit" class="btn btn-success">
+                        Add Module
+                      </button>
+                    </form>
                 </div>
             </div>
             <div class="row g-2 inputs">
@@ -60,9 +60,13 @@
                 <div class="checkCard">
                   <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
                   <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
-                  {{module['name']}} - {{module['description']}}
+                  {{module['name']}} <br> {{module['description']}}
                   </label>
-                </div>
+                  <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
+                  href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
+                    >Test Module</a>
+                  </div>
+                
                 {% endfor %}
               </div>
               <label>Explore Library</label>
@@ -76,8 +80,11 @@
                 <div class="checkCard">
                   <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
                   <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
-                  {{module['name']}} - {{module['description']}}
+                  {{module['name']}} <br> {{module['description']}}
                   </label>
+                    <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
+                    href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
+                    >Test Module</a>
                 </div>
                 {% endfor %}
               </div>

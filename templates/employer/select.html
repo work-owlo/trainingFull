@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- display 3 options -->
+<!-- -- compliance rules 
+-- customer simulation
+-- coworker simulation -->
+
+<form method="post" action="/select">
+    <input type="radio" id="compliance" name="compliance" value="compliance">
+    <label for="compliance">Compliance Rules</label><br>
+    <input type="radio" id="customer" name="customer" value="customer">
+    <label for="customer">Customer Simulation</label><br>
+    <input type="radio" id="coworker" name="coworker" value="coworker">
+    <label for="coworker">Coworker Simulation</label><br>
+    <input type="submit" class="btn btn-success" value="Submit">
+</form>
+
+{% endblock %}

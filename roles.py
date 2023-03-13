@@ -37,7 +37,7 @@ def assign_employee_role(company_id, id_input, first_name, last_name, email, rol
         with get_db_connection() as conn:
             cur = conn.cursor()
             cur.execute(
-                "SELECT * FROM team WHERE role_id = %s AND email = %s AND status != 'deleted'", (role_id, email))
+                "SELECT * FROM team WHERE role_id = %s AND email = %s AND (status = 'pending' or status='completed')", (role_id, email))
             employee = cur.fetchone()
             if employee != None:
                 return return_error("Employee already exists for this role")
@@ -56,12 +56,23 @@ def add_training_tasks(team_id, role_id):
         cur = conn.cursor()
         training_id = generate_uid()
         cur.execute(
-            "SELECT module.module_id FROM module, role_module WHERE module.module_id = role_module.module_id AND role_id = %s AND status = 'active'", (role_id,))
+            "SELECT module.module_id, module.tool_id FROM module, role_module WHERE module.module_id = role_module.module_id AND role_id = %s AND status = 'active'", (role_id,))
         modules = cur.fetchall()
         for module in modules:
-            cur.execute(
-                "INSERT INTO training (training_id, team_id, module_id, status) VALUES (%s, %s, %s, %s)", (training_id, team_id, module, "pending"))
-            conn.commit()
+            cur.execute("SELECT query_id, query FROM query WHERE module_id = %s", (module[0],))
+            queries = cur.fetchall()
+            if module[1] == '4':
+                for query in queries:
+                    training_id = generate_uid()
+                    cur.execute(
+                        "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[0], 'pending'))
+                    conn.commit()
+            else:
+                for query in queries:
+                    training_id = generate_uid()
+                    print(query)
+                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[1], 'pending'))
+                    conn.commit()
 
 
 def get_employee_id(email):
@@ -83,7 +94,6 @@ def get_team(company_id, keyword=None, status=None):
     if keyword != None:
         keyword_ubiq = "%" + keyword.lower() + "%"
         keyword = keyword.lower()
-    status='%%' if (status == None or status == '') else status.lower()
 
     with get_db_connection() as conn:
         cur = conn.cursor()
@@ -92,13 +102,43 @@ def get_team(company_id, keyword=None, status=None):
                 FROM team as a, job_roles as j 
                 WHERE a.role_id = j.role_id AND
                 a.company_id = %s AND
-                (LOWER(a.first_name) = %s OR LOWER(a.last_name) = %s OR LOWER(id_input) LIKE %s OR LOWER(a.email) LIKE %s OR LOWER(j.role_name) LIKE %s) AND LOWER(a.status) LIKE %s AND a.status != 'unassigned' AND j.status = 'active' """, (company_id, keyword, keyword, keyword_ubiq, keyword_ubiq, keyword_ubiq, status))
+                (LOWER(a.first_name) = %s OR LOWER(a.last_name) = %s OR LOWER(id_input) LIKE %s OR LOWER(a.email) LIKE %s OR LOWER(j.role_name) LIKE %s) AND a.status != 'unassigned' AND j.status = 'active' """, (company_id, keyword, keyword, keyword_ubiq, keyword_ubiq, keyword_ubiq))
         employees = cur.fetchall()
         team_list = []
         if employees != None:
             for employee in employees:
-                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=employee[9]))
+                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=int(get_training_status(employee[0]))))
+        print(status)
+        if status == 'completed':
+            team_list = [t for t in team_list if t.status == '100']
+        elif status == 'pending':
+            team_list = [t for t in team_list if t.status != '100']
+        
+    
     return team_list
+
+
+def get_training_status(team_id):
+    # get training status (in percentage) for a role
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute('''
+            SELECT COUNT(*) as count
+            FROM training
+            WHERE training.team_id = %s
+              AND training.training_status = 'completed'
+        ''', (team_id,))
+        completed = cur.fetchone()['count']
+        cur.execute('''
+            SELECT COUNT(*) as count
+            FROM training
+            WHERE training.team_id = %s
+        ''', (team_id,))
+        total = cur.fetchone()['count']
+        print('value', completed, total)
+        if total and completed:
+            return round(completed/total*100)
+    return 0
 
 
 def get_roles(company_id):
@@ -151,6 +191,30 @@ def check_emp_in_team(company_id, team_id):
     return True
 
 
+def get_employee_email(team_id):
+    '''Get employee email'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT email FROM team WHERE team_id = %s AND status != 'unassigned'" , (team_id,))
+        employee = cur.fetchone()
+        if employee == None:
+            return False
+    return employee[0]
+
+
+def get_comp_email(team_id):
+    '''Get company email'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT email FROM manager_user WHERE company_id = (SELECT company_id FROM team WHERE team_id = %s AND status != 'unassigned')" , (team_id,))
+        employee = cur.fetchone()
+        if employee == None:
+            return False
+    return employee[0]
+
+
 def check_role_in_company(company_id, role_id):
     '''Check if role is in company'''
     with get_db_connection() as conn:
@@ -171,7 +235,6 @@ def get_role_tools_remaining(role_id):
             "SELECT r.tool_id, tool_name, tool_icon FROM tools as t, role_tools as r WHERE t.tool_id = r.tool_id AND role_id = %s AND r.status = 'pending' ORDER BY tool_name LIMIT 1", (role_id,))
         tool = cur.fetchone()
         return None if tool == None else Tool_info(tool_id=tool[0], tool_name=tool[1], tool_icon=tool[2])
-
 
 
 def unasign_employee_role(company_id, team_id):
@@ -238,6 +301,7 @@ def verify_pending_rool_tool_relationship(role_id, tool_id):
         if tool == None:
             return False
     return True
+
 
 def update_role_tool_status(role_id, tool_id, status):
     '''Update role tool status'''

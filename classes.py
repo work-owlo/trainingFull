@@ -63,6 +63,7 @@ class Tool(BaseModel):
     name: str
     icon: str
     status: str
+    tool_id: str
 
 
 class Tool_info(BaseModel):

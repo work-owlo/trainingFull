@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+        status = {{total - completed}}
+            if (status == 0) {
+                const jsConfetti = new JSConfetti()
+                jsConfetti.addConfetti({
+                confettiColors: [
+                    '#70ABAF', '#ebeef7'
+                ],
+            })
+        }
+        $("#form").on("submit", function(){
+            // delay for one second
+            var delayInMilliseconds = 1000; //1 second
+            // add user input as a chat-user
+            $(".texts").append('<div class="chat-user">' + $("#chat").val() + '</div>');
+            // scroll to the latest text
+            var objDiv = document.getElementsByClassName("texts")[0];
+            objDiv.scrollTop = objDiv.scrollHeight;
+            setTimeout(function() {
+                // display a chat-bot with a spinner inside
+                $(".texts").append('<div class="chat-bot"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+                var objDiv = document.getElementsByClassName("texts")[0];
+                objDiv.scrollTop = objDiv.scrollHeight;
+            }, delayInMilliseconds);
+        });
+    });
+</script>
+<div class="row" id="my-canvas">
+    <div class="col-1 progress-num">
+        {% for i in range(1, completed+1) %}
+        <div class="compliance-progress-complete">{{i}}</div>
+        {% endfor %}
+        {% for i in range(completed+1, total+1) %}
+        <div class="compliance-progress-pending">{{i}}</div>
+        {% endfor %}
+    </div>
+    <div class="col-6">
+        {% if chat|length > 0 %}
+        <h4 class="label"> Simulator Created - Try it out!</h4>
+        <div class="test-chat">
+            <div class="texts">
+            {% for c in chat %} 
+                {% if c['role'] == 'assistant' %}
+                <div class="chat-bot">
+                    {{ c['content'] }}
+                </div>
+                {% else %}
+                <div class="chat-user">
+                    {{ c['content'] }}
+                </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+            <!-- automatically scroll to the last text -->
+            <script>
+                var objDiv = document.getElementsByClassName("texts")[0];
+                objDiv.scrollTop = objDiv.scrollHeight;
+            </script>
+            <div class="text-input">
+                <form action="{{url_for('submitSimulator', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
+                    <!-- disabled trianing id field -->
+                    <input type="hidden" name="training_id" value="{{training_id}}">
+                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
+                 </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="compliance-text">
+            <h4>{{title}}</h4>
+            <strong>Simulate:</strong> {{customer | title}}<br>
+            <strong>Situation:</strong> {{situation}}<br>
+            <strong>Problem:</strong> {{problem}}<br>
+            <strong>Goal:</strong> {{respond}}<br> 
+        </div>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteElement" style="margin-top:1rem">
+            Reset Progress
+        </button>
+        <a type="button" class="btn btn-light" href="/company/add_modules/{{role_id}}" style="margin-top:1rem">
+            Done Testing
+        </a>
+
+    </div>
+</div>
+<div class="modal fade" id="deleteElement" tabindex="-1" aria-labelledby="deleteElementLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deleteElementLabel">Reset Progress</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to reset your progress? This action cannot be undone. 
+        </div>
+        <div class="modal-footer">
+            <form class="not-important" action="{{url_for('resetSimulator', training_id=training_id, role_id=role_id)}}" method="POST">
+                <input type="text" value="" name="deletingPage" id="deletingPage" hidden>
+                <button type="submit" class="btn btn-danger">Reset</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>
+{% endblock %}
