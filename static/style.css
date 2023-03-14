@@ -153,6 +153,24 @@ background-color: rgb(245, 245, 245);
     text-align: center;
 }
 
+.card-train-low-hover {
+    border:1px solid #70ABAF;
+    border-radius:3px;
+    color:#686868;
+    width: 20rem;
+    fill:#686868;
+    margin:1rem;
+    display: flex;
+    justify-content: center;
+    padding:1rem;
+    padding-top:1.5rem;
+    text-align: center;
+}
+
+.card-train-low-hover:hover {
+    color:#70ABAF;
+}
+
 .card-train-complete {
     border:1px solid #ffffff;
     border-radius:3px;

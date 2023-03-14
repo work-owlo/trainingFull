@@ -1,5 +1,6 @@
 import openai
 import time
+import re
 
 openai.api_key = "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"
 
@@ -14,6 +15,10 @@ def clean_output(text):
     # remove quotes
     text = text.replace('"', '')
     text = text.replace("'", "")
+    # remove any parenthesis and the text inside ex. "hello (one)" is "hello" using regex
+    text = re.sub(r'\([^)]*\)', '', text)
+
+    
     return text
 
 def generate_compliance_questions(text):
@@ -102,17 +107,18 @@ def generate_simulator(num_chats, customer, situation, problem, respond):
 def generate_simulation_response(init, question_history, tool_name):
     # add init to question_history as first element
     character = "customer" if "customer" in tool_name else "co-worker"
-    
+    question_history = question_history[0:]
     question_history.insert(0, init)
     # get the latest question
-    question_history[-1]['content'] = question_history[-1]['content'] + ". Generate reply to this question with you as a " + character
-    print(question_history) 
+    question_history[-1]['content'] = question_history[-1]['content'] + ". Generate reply to this question with you as the customer only.  I will answer as the customer service representative"
+    # print(question_history) 
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=question_history
 
         )
     response = completion.choices[0].message['content']
+    print(response)
     return clean_output(response)
     # # # time.sleep(2)
     # return "Yes, that is correct"

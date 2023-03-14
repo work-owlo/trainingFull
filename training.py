@@ -157,13 +157,16 @@ def get_training_simulator(module_id, team_id):
         if pending:
             if pending['query_id'] is None:
                 # generate text and update
-                question = generate_simulation_response(generate_prompt(module_id), training_data[:], tool_name)
+                question = generate_simulation_response(generate_prompt(module_id), training_data[0:], tool_name)
                 cur.execute("UPDATE training SET query_id = %s WHERE training_id = %s", (question, pending['training_id']))
                 conn.commit()
                 training_data.append({'role': 'assistant', 'content': question})
             else:
                 training_data.append({'role': 'assistant', 'content': pending['query_id']})
-            
+        for i in training_data:
+            # remove any occurrences of the phrase "Generate reply to this question with you as the customer only.  I will answer as the customer service representative"
+            i['content'] = i['content'].replace("Generate reply to this question with you as the customer only.  I will answer as the customer service representative", "")
+            i['content'] = i['content'].replace("Generate reply to this question with you as the customer only. I will answer as the customer service representative", "")
         return training_data
     
 

@@ -62,6 +62,7 @@ def get_training_tools(team_id):
     ''' Get the status of all tools for a role '''
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # write query that coun
         cur.execute('''SELECT tools.tool_id as tool_id, tools.tool_name, tools.tool_icon, tools.status, tools.id
                        FROM tools, module, training
                        WHERE tools.tool_id = module.tool_id AND module.module_id = training.module_id AND training.team_id = %s
@@ -102,6 +103,8 @@ def get_training_progress(team_id):
         completed = cur.fetchone()
 
         # get 
+        if total['total'] == 0:
+            return 0
         if total and completed:
             return round((completed['completed']/total['total'])*100)
 

@@ -252,18 +252,38 @@ class Page:
         actions.perform()
         screenshot2 = driver.get_screenshot_as_png()
         driver.execute_script("window.scrollTo(0, 0);")
+        Log.add_log('\tScrolling to top')
+        time.sleep(.5)
         # unfocus any focused elements
         driver.execute_script("document.activeElement.blur();")
-        if len(screenshot) != len(screenshot2):
-            return True
+        # if len(screenshot) != len(screenshot2):
+        #     return True
         Log.add_log('\tChecking if scrollable: ' + str(screenshot != screenshot2))
-        return screenshot != screenshot2
+        # get MSE between the two screenshots
+        # mse = np.mean((screenshot - screenshot2) ** 2)
+
+        img1 = cv2.imdecode(np.frombuffer(screenshot, np.uint8), 1)
+        img2 = cv2.imdecode(np.frombuffer(screenshot2, np.uint8), 1)
+
+        h, w = img1.shape[:2]
+        diff = cv2.subtract(img1, img2)
+        err = np.sum(diff**2)
+        mse1 = err/(float(h*w))
+
+        # swap images and try again
+        diff = cv2.subtract(img2, img1)
+        err = np.sum(diff**2)
+        mse2 = err/(float(h*w))
+        Log.add_log('\tMSE1: ' + str(mse1))
+        Log.add_log('\tMSE2: ' + str(mse2))
+        return max(mse1, mse2) > 0.001 
             
 
     def get_screenshots(self, driver):
         '''Takes screenshots of the page and saves them in the wasabi bucket'''
                 # print focused elements
         driver.execute_script("window.scrollTo(0, 0);")
+        Log.add_log('\tScrolling to 0')
         height = driver.execute_script("return document.documentElement.scrollHeight")
         window_height = driver.execute_script("return Math.max(window.innerHeight, document.documentElement.clientHeight);")
         screenshot_y = 0
@@ -277,6 +297,7 @@ class Page:
             Log.add_log('\tPage is scrollable')
             for h in range(max(height // window_height,1)):
                 driver.execute_script("window.scrollTo(0, " + str(screenshot_y) + ");")
+                Log.add_log('\t\tScrolling to ' + str(screenshot_y))
                 # print any focused elements
                 focused_elements = driver.find_elements(By.XPATH, "//*[@focused='true']")
                 for element in focused_elements:
@@ -297,6 +318,7 @@ class Page:
             remaining_height = height%window_height
             if remaining_height > 0:
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight+1000);")
+                Log.add_log('\tScrolling to remaining_height')
                 time.sleep(.5)
                 append_screenshot = driver.get_screenshot_as_png()
                 append = np.array(Image.open(io.BytesIO(append_screenshot)))
@@ -312,6 +334,7 @@ class Page:
         screenshot = cv2.imencode('.png', screenshot)[1].tostring()
         self.screenshot = screenshot
         driver.execute_script("window.scrollTo(0, 0);")
+        Log.add_log('\tScrolling to top')
 
     def is_page_scrolled(self, driver, screenshot_y):
         '''Checks whether the page has finished scrolling to the specified position'''

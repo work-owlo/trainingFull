@@ -12,7 +12,7 @@
     var cards = document.getElementsByClassName('checkCard');
     for (var i = 0; i < cards.length; i++) {
       // get text in label
-      var title = cards[i].getElementsByClassName('card-train')[0].innerText;
+      var title = cards[i].getElementsByClassName('card-train-low-hover')[0].innerText;
       if (title.toLowerCase().indexOf(searchInput.value.toLowerCase()) < 0) {
         cards[i].style.display = 'none';
       } else {
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <p class="label">Select From Existing Scenarios</p>
+            <p class="label">Select From Module Library (Select All That Apply)</p>
             <label>Private Modules</label>
             {% if private_modules|length == 0 %}
               <br>
@@ -59,7 +59,7 @@
                 {% for module in private_modules %}
                 <div class="checkCard">
                   <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
-                  <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
+                  <label class="btn btn-outline-success card-train-low-hover" for="btn-{{module['id']}}">
                   {{module['name']}} <br> {{module['description']}}
                   </label>
                   <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
@@ -79,7 +79,7 @@
                 {% for module in public_modules %}
                 <div class="checkCard">
                   <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
-                  <label class="btn btn-outline-success card-train" for="btn-{{module['id']}}">
+                  <label class="btn btn-outline-success card-train-low-hover" for="btn-{{module['id']}}">
                   {{module['name']}} <br> {{module['description']}}
                   </label>
                     <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"

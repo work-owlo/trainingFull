@@ -723,8 +723,10 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
     if not check_emp_in_team(manager.company_id, team_id):
         return RedirectResponse(url="/company/team", status_code=302)
     
+    print(team_id)
     employee = get_employee_info(team_id)
     role_id, role_name = get_team_role(team_id)
+    print(role_id, role_name)
     modules = get_role_modules(role_id)
     # print(modules)
     with get_db_connection() as conn:
@@ -736,14 +738,15 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
             completed_training = 0
             total_training = 0
             for mod in tool['modules']:
+                print(mod)
                 # print(mod)
                 cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s ORDER BY id ASC", (mod['module_id'], team_id))
                 mod_data = cur.fetchall()
                 mod_data = [dict(row) for row in mod_data]
+                print(mod_data)
                 mod['responses'] = mod_data
                 print(mod['responses'])
                 total = [response['sentiment'] for response in mod['responses'] if response['sentiment'] != None]
-                print(total)
                 if len(total) == 0:
                     print('no sentiment')
                     mod['avg_sentiment'] = 0

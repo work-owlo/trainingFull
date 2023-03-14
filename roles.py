@@ -373,9 +373,9 @@ def get_role_modules(role_id):
         with get_db_connection() as conn:
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             cur.execute(
-                """ SELECT module_id, module_title, module_description  
-                FROM module
-                WHERE tool_id = %s""", (tool['tool_id'],))
+                """ SELECT role_module.module_id, module_title, module_description  
+                FROM module, role_module
+                WHERE tool_id = %s AND role_module.module_id = module.module_id AND role_id = %s""", (tool['tool_id'], role_id))
             mod = cur.fetchall()
             modules['modules'] = [dict(modules) for modules in mod]
             module_list.append(modules)
