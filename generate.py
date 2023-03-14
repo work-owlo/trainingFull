@@ -5,6 +5,17 @@ openai.api_key = "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"
 
 model_engine = "gpt-3.5-turbo"
 
+def clean_output(text):
+    '''Clean generated output'''
+    # get text after first semicolon
+    if ":" in text:
+        text = text.split(":")[1]
+
+    # remove quotes
+    text = text.replace('"', '')
+    text = text.replace("'", "")
+    return text
+
 def generate_compliance_questions(text):
     # prompt = "Generate a comma seperated list of 10 questions to ask an employee about the following policy"
     # prompt += text
@@ -32,7 +43,7 @@ def generate_description(text):
             {"role": "user", "content": prompt},
         ]
         )
-    return completion.choices[0].message['content']
+    return clean_output(completion.choices[0].message['content'])
     # time.sleep(2)
     return "Expectations for employee compensation, flexible scheduling, and communication regarding scheduling and time off requests"
 
@@ -54,17 +65,18 @@ def format_questions(questions):
 
 
 def check_response(context, question, answer):
-    # prompt = "Check if the following response is correct. Start respnse with 'Yes' or 'No'.\n"
-    # prompt += f"Question: {question}"
-    # prompt += f"Answer: {answer}"
-    # prompt += f"Context: {context}"
-    # completion = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {"role": "user", "content": prompt},
-    #     ]
-    #     )
-    # return completion.choices[0].message['content']
+    prompt = "Check if the following response is correct. Start respnse with 'Yes' or 'No'. If correct, give an affermative phrase. If incorrect, say 'No, the correct answer is' and provide correct answer\n"
+    prompt += f"Question: {question}"
+    prompt += f"Answer: {answer}"
+    prompt += f"Context: {context}"
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": prompt},
+        ]
+        )
+    answer = clean_output(completion.choices[0].message['content'])
+    return answer
     # # time.sleep(2)
     return "Yes, that is correct"
 
@@ -82,17 +94,18 @@ def generate_simulator(num_chats, customer, situation, problem, respond):
         messages=[
             {"role": "user", "content": prompt}
         ])
-    return completion.choices[0].message['content']
+    return clean_output(completion.choices[0].message['content'])
     # time.sleep(2)
     return "Yes, that is correct"
 
 
-def generate_simulation_response(init, question_history):
+def generate_simulation_response(init, question_history, tool_name):
     # add init to question_history as first element
+    character = "customer" if "customer" in tool_name else "co-worker"
     
     question_history.insert(0, init)
     # get the latest question
-    # question_history[-1]['content'] = question_history[-1]['content'] + "generate reply to this question with you as the customer"
+    question_history[-1]['content'] = question_history[-1]['content'] + ". Generate reply to this question with you as a " + character
     print(question_history) 
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -100,9 +113,6 @@ def generate_simulation_response(init, question_history):
 
         )
     response = completion.choices[0].message['content']
-    # return part after semicolon if it exists
-    if ":" in response:
-        response = response.split(":")[1]
-    return response
+    return clean_output(response)
     # # # time.sleep(2)
-    return "Yes, that is correct"
+    # return "Yes, that is correct"

@@ -1,5 +1,156 @@
 {% extends "base.html" %}
 
-Hi 
+{% block content %}
+<!-- Label for role name -->
+<div class="container-main" style="margin-left:0px">
+    <div class="row">
+        <div class="col">
+            <h2 class="label">{{role_name}} | Onboarding Report </h2>
+            <!-- Employee Name and status -->
+            <h3 >{{employee['first_name']}} {{employee['last_name']}}</h3>
+        </div>
+    </div>
+
+    <!-- Comprehensive statistics bar -->
+    <div class="row row-cols-1 row-cols-md-4 g-4 ">  
+        {% for key, value in comprehensive.items() %}
+            <div class="col">
+                <div class="card border-primary stats-card" style="">
+                    <div class="card-body">
+                    {% if value[1] == 0 %}
+                    <h5 class="card-title" style="color: #70ABAF;">-</h5>
+                    {% elif key == 'avg_sentiment' and value[1] >= 50 %} 
+                    <h5 class="card-title" style="color: #70ABAF;">{{value[1]}} (Positive) </h5>
+                    {% elif key == 'avg_sentiment' and value[1] < 50 %}
+                    <h5 class="card-title" style="color: #e25454;">{{value[1]}} (Negative) </h5>
+                    {% else %}
+                    <h5 class="card-title">{{value[1]}}</h5>
+                    {% endif %}
+                    <h6 class="card-subtitle mb-2 text-muted">{{value[0]}}</h6>
+                    </div>
+                </div>
+            </div> 
+        {% endfor %}
+    </div>
+
+    <!-- Go to section -->
+    <div class="report-section">
+        <h6 class="label">Jump To</h6>
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <a class="btn btn-outline-success" href="#key_points">Key Analytics</a>
+            {% for tool in modules %}
+                <a class="btn btn-outline-success" href="#tool{{tool['tool_id']}}">{{tool['tool_name']}}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Main Points -->
+    <div id="key_points" class="report-section">
+        <h5 class="label">Key Analytics</h5>
+        <div class="accordion" id="accordionExample">
+            {% for tool in modules %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="accordian{{tool['tool_id']}}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{tool['tool_id']}}" aria-expanded="false" aria-controls="accordian{{tool['tool_id']}}">
+                    {{tool['tool_name']}}
+                </button>
+                </h2>
+                <div id="collapse{{tool['tool_id']}}" class="accordion-collapse collapse" aria-labelledby="accordian{{tool['tool_id']}}" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <p class="label"> Analytics will appear when we have more onboarding statistics from members of your organization </p>
+                </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        {% for tool in modules %}
+        <!-- Tool -->
+        <div class="report-section" id="tool{{tool['tool_id']}}">
+            <h3 class="">{{tool['tool_name']}}</h3>
+            <h6 class="label">Overall Statistics</h6>    
+            <div class="row row-cols-1 row-cols-md-4 g-4 ">  
+            {% for key, value in tool['comprehensive'].items() %}
+                <div class="col">
+                    <div class="card border-secondary mb-3 stats-card">
+                        <div class="card-body">
+                        {% if value[1] == 0 %}
+                        <h5 class="card-title">-</h5>
+                        {% elif key == 'avg_sentiment' and value[1] >= 50 %} 
+                        <h5 class="card-title" style="color: #70ABAF;">{{value[1]}} (Positive) </h5>
+                        {% elif key == 'avg_sentiment' and value[1] < 50 %}
+                        <h5 class="card-title" style="color: #e25454;">{{value[1]}} (Negative) </h5>
+                        {% else %}
+                        <h5 class="card-title">{{value[1]}}</h5>
+                        {% endif %}
+                        <h6 class="card-subtitle mb-2 text-muted">{{value[0]}}</h6>
+                        </div>
+                    </div>
+                </div> 
+            {% endfor %}
+               
+            </div>
+            {% for module in tool['modules'] %}
+                <div class="module">
+                    <h6 class="label">{{module['module_title']}}</h6>
+                    <div class="module_stats">
+                        <div class="row row-cols-1 row-cols-md-4 g-4 ">  
+                            {% for key, value in module['comprehensive'].items() %}
+                            <div class="col">
+                                <div class="card border-secondary mb-3 stats-card">
+                                    <div class="card-body">
+                                    {% if value[1] == 0 %}
+                                    <h5 class="card-title">-</h5>
+                                    {% elif key == 'avg_sentiment' and value[1] >= 50 %} 
+                                    <h5 class="card-title" style="color: #70ABAF;">{{value[1]}} (Positive) </h5>
+                                    {% elif key == 'avg_sentiment' and value[1] < 50 %}
+                                    <h5 class="card-title" style="color: #e25454;">{{value[1]}} (Negative) </h5>
+                                    {% else %}
+                                    <h5 class="card-title">{{value[1]}}</h5>
+                                    {% endif %}
+                                    <h6 class="card-subtitle mb-2 text-muted">{{value[0]}}</h6>
+                                    </div>
+                                </div>
+                            </div> 
+                        {% endfor %}
+                        </div>
+                    </div>
+                    {% if tool['tool_id'] != '4' %}
+                    <div class="report-chat">
+                        <div class="report-chat">
+                            <div class="texts">
+                            {% for response in module['responses'] %} 
+                                {% if response['query_id'] %}
+                                <div class="chat-bot">
+                                    {{ response['query_id'] }}
+                                </div>
+                                {% endif %}
+                                {% if response['response'] %}
+                                <div class="chat-user">
+                                    {{ response['response'] }}
+                                </div>
+                                {% endif %}
+                                {% if response['responsetoresponse'] %}
+                                <div class="chat-bot">
+                                    {{ response['responsetoresponse'] }}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+{% endblock %}
 
 

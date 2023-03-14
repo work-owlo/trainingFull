@@ -1,6 +1,8 @@
 from classes import *
 from utils import *
 from generate import *
+from nlp import *
+import datetime
 
 def get_tools():
     '''Get all tools from the database.'''
@@ -144,6 +146,10 @@ def get_training_simulator(module_id, team_id):
             training_data.append({'role': 'assistant', 'content': t['query_id']})
             if t['response']:
                 training_data.append({'role': 'user', 'content': t['response']})
+        
+        # get tool_name
+        cur.execute("SELECT tool_name FROM tools WHERE tool_id = (SELECT tool_id FROM module WHERE module_id = %s)", (module_id,))
+        tool_name = cur.fetchone()
 
         # get pending training data
         cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='pending' ORDER BY id asc LIMIT 1 ", (module_id, team_id))
@@ -151,7 +157,7 @@ def get_training_simulator(module_id, team_id):
         if pending:
             if pending['query_id'] is None:
                 # generate text and update
-                question = generate_simulation_response(generate_prompt(module_id), training_data[:])
+                question = generate_simulation_response(generate_prompt(module_id), training_data[:], tool_name)
                 cur.execute("UPDATE training SET query_id = %s WHERE training_id = %s", (question, pending['training_id']))
                 conn.commit()
                 training_data.append({'role': 'assistant', 'content': question})
@@ -180,8 +186,35 @@ def generate_prompt(module_id):
 def update_training_status(training_id, response, status, score=None):
     print(training_id, response, status)
     '''Update training status'''
+    sentiment = get_sentiment_score(response)
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("UPDATE training SET training_status = %s, response = %s, responsetoresponse = %s WHERE training_id = %s", (status, response, score, training_id))
+        cur.execute("UPDATE training SET training_status = %s, response = %s, responsetoresponse = %s, sentiment = %s WHERE training_id = %s", (status, response, score, sentiment, training_id))
+        conn.commit()
+
+
+def time_tracker(training_id):
+    '''Track time for training'''
+    tracker_id = generate_id()
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("INSERT INTO training_time_tracker (time_tracker_token, training_id, started) VALUES (%s, %s, NOW())", (tracker_id, training_id))
+        conn.commit()
+        return tracker_id
+    
+
+def end_time_tracker(tracker_id, training_id):
+    '''End time tracker'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        # get time and up
+        # cur.execute("UPDATE training_time_tracker SET ended = NOW() WHERE time_tracker_token = %s", (tracker_id,))
+        cur.execute("""
+        UPDATE training 
+        SET seconds_spent = 
+            (SELECT EXTRACT(EPOCH FROM (NOW() - started))::int FROM training_time_tracker WHERE time_tracker_token = %s) 
+        WHERE training_id = %s
+        """, (tracker_id, training_id))
+        cur.execute("DELETE FROM training_time_tracker WHERE time_tracker_token = %s", (tracker_id,))
         conn.commit()
 

@@ -2,7 +2,7 @@ import boto3
 import openai 
 import botocore
 import os
-# from env import *
+from env import *
 from botocore.exceptions import ClientError
 
 # OPEN AI

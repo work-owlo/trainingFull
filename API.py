@@ -713,7 +713,7 @@ async def assign_employee(response: Response, request: Request,  id_input: str =
 @api_router.get("/company/employee/view/{team_id}", status_code=200)
 async def view_employee(response: Response, request: Request, team_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
-    Get all the roles of this company
+    View employee training info
     """
     if not manager:
         return RedirectResponse(url="/company/logout", status_code=302)
@@ -722,11 +722,87 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
     # employee = get_employee(manager.company_id, employee_id)
     if not check_emp_in_team(manager.company_id, team_id):
         return RedirectResponse(url="/company/team", status_code=302)
+    
+    employee = get_employee_info(team_id)
+    role_id, role_name = get_team_role(team_id)
+    modules = get_role_modules(role_id)
+    # print(modules)
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        for tool in modules:
+            tool_time = 0
+            tool_sentiment = 0
+            tool_length = 0
+            completed_training = 0
+            total_training = 0
+            for mod in tool['modules']:
+                # print(mod)
+                cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s ORDER BY id ASC", (mod['module_id'], team_id))
+                mod_data = cur.fetchall()
+                mod_data = [dict(row) for row in mod_data]
+                mod['responses'] = mod_data
+                print(mod['responses'])
+                total = [response['sentiment'] for response in mod['responses'] if response['sentiment'] != None]
+                print(total)
+                if len(total) == 0:
+                    print('no sentiment')
+                    mod['avg_sentiment'] = 0
+                else:
+                    mod['avg_sentiment'] = sum(total)/len(total)
+                    print('avg_sentiment', mod['avg_sentiment'])
+                tool_sentiment += mod['avg_sentiment']
+                time_spent = [response['seconds_spent'] for response in mod['responses'] if response['seconds_spent'] != None]
+                mod['total_time'] = sum(time_spent)
+                tool_time += mod['total_time']
+                if len(time_spent) == 0:
+                    mod['avg_time'] = 0
+                else:
+                    mod['avg_time'] = mod['total_time']/len(time_spent)
+                mod['completed'] = len([response['training_status'] for response in mod['responses'] if response['training_status'] == 'completed'])
+                mod['progress'] = int(mod['completed'] / len(mod['responses']) * 100)
+                mod['comprehensive'] = {}
+                mod['comprehensive']['total_time'] = ["Total Time (minutes)", round(mod['total_time'] / 60,2)]
+                mod['comprehensive']['avg_time'] = ["Avg. Minutes / Module", round(mod['avg_time'] / 60,2)]
+                mod['comprehensive']['avg_sentiment'] = ["Avg. Sentiment Score", round(mod['avg_sentiment'],1)]
+                mod['comprehensive']['progress'] = ["Progress", str(round(mod['progress'],2)) + "%"]
+                completed_training += mod['completed']
+                total_training += len(mod['responses'])
+                tool_length += 1
+            tool_comp = {}
+            tool_comp['avg_time'] = ["Avg. Minutes / Module", round(tool_time/tool_length,2)]
+            tool_comp['avg_sentiment'] = ["Avg. Sentiment Score", round(tool_sentiment/tool_length,2)]
+            tool_comp['total_time'] = ["Total Time (minutes)", tool_time]
+            tool_comp['completed'] = ["Number Completed", completed_training]
+            tool_comp['total_training'] = ["Total Modules", total_training]
+            tool_comp['progress'] = ["Progress", int(completed_training/total_training * 100)]
+            tool_comp['total'] = ["Total Modules", tool_length]
+            tool['comprehensive'] = tool_comp
+
+
+    comprehensive = {}
+    comprehensive['total_time'] = ["Total Time (minutes)", round(sum([tool['comprehensive']['total_time'][1] for tool in modules]) / 60, 2)]
+    comprehensive['avg_time'] = ["Avg. minutes / Module ", round(sum([tool['comprehensive']['avg_time'][1] for tool in modules])/len(modules) / 60, 2)]
+    comprehensive['avg_sentiment'] = ["Avg. Sentiment Score", round(sum([tool['comprehensive']['avg_sentiment'][1] for tool in modules])/len(modules),2)]
+    comprehensive['progress'] = ["Progress", str(int(sum([tool['comprehensive']['completed'][1]  for tool in modules])/sum([tool['comprehensive']['total_training'][1] for tool in modules]) * 100)) + '%']
+    
+    for tool in modules:
+        tool['comprehensive'] = {
+            "total_time": ["Total Time (minutes)", round(tool['comprehensive']['total_time'][1] / 60, 2)],
+            "avg_time": ["Avg. Minutes / Module", round(tool['comprehensive']['avg_time'][1] / 60, 2)],
+            "avg_sentiment": ["Avg. Sentiment Score", round(tool['comprehensive']['avg_sentiment'][1],1)],
+            "progress": ["Progress", str(tool['comprehensive']['progress'][1]) + '%'],
+        }
+    
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "employee.html",
         {
             "request": request,
             "employee": 'Hi',
+            "employee": employee,
+            "role_name": role_name,
+            "name": manager.first_name,
+            "comprehensive": comprehensive,
+            "modules": modules,
             "name": manager.first_name
         }
     )
@@ -1652,7 +1728,7 @@ async def submitCompliance(response: Response, role_id:str, request: Request, mo
     if 'Yes' in score:
         update_training_status(training_id, chat, 'completed', score)
     else:
-        update_training_status(training_id, chat, 'pending', score)
+        update_training_status(training_id, chat, 'completed', score)
     response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=303)
     return response
 
@@ -1878,12 +1954,14 @@ async def trainingSimulator(response: Response, request: Request, module_id:str,
             cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
             training_id = cur.fetchone()['training_id']
     # return render_template('testSimulator.html', chat=chat, title=name, completed=completed, total=total, module_id=module_id, training_id=training_id, customer=module_info['customer'], situation=module_info['situation'], problem=module_info['problem'], respond=module_info['respond'])
+    time_token = time_tracker(training_id)
     response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "trainSimulator.html",
         {
             "request": request,
             "name": user.first_name,
             "chat": chat,
+            "time_token": time_token,
             "text": text,
             "title": name,
             "completed": completed,
@@ -1899,12 +1977,12 @@ async def trainingSimulator(response: Response, request: Request, module_id:str,
     )
     return response
 
-@api_router.post("/member/submit_simulator/{module_id}/{team_id}", status_code=200)
-async def trainSimulator(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+@api_router.post("/member/submit_simulator/{module_id}/{team_id}/{time_token}", status_code=200)
+async def trainSimulator(response: Response, request: Request, team_id:str, module_id: str, time_token:str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+    ''' Submit the training module for the employee'''
     update_training_status(training_id, chat, 'completed')
-    
     progress = get_training_progress(team_id)
-    print(progress)
+    end_time_tracker(time_token, training_id)
     if progress == 100:
         # email comp and emp
         email = get_employee_email(team_id)
@@ -1939,12 +2017,15 @@ async def trainingCompliance(response: Response, request: Request, module_id:str
             cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
             training_id = cur.fetchone()['training_id']
 
+    time_token = time_tracker(training_id)
+
     response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "trainCompliance.html",
         {
             "request": request,
             "name": user.first_name,
             "chat": chat,
+            "time_token": time_token,
             "text": text,
             "title": name,
             "team_id": team_id,
@@ -1956,8 +2037,8 @@ async def trainingCompliance(response: Response, request: Request, module_id:str
     )
     return response
 
-@api_router.post("/member/submit_compliance/{module_id}/{team_id}", status_code=200)
-async def trainCompliance(response: Response, request: Request, team_id:str, module_id: str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+@api_router.post("/member/submit_compliance/{module_id}/{team_id}/{time_token}", status_code=200)
+async def trainCompliance(response: Response, request: Request, team_id:str, module_id: str, time_token:str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1969,7 +2050,8 @@ async def trainCompliance(response: Response, request: Request, team_id:str, mod
     if 'Yes' in score:
         update_training_status(training_id, chat, 'completed', score)
     else:
-        update_training_status(training_id, chat, 'pending', score)
+        update_training_status(training_id, chat, 'completed', score)
+    end_time_tracker(time_token, training_id)
     
     
     progress = get_training_progress(team_id)
@@ -1994,7 +2076,6 @@ async def trainSoftware(module_id:str, response: Response, request: Request, tea
     pending = has_pending_training(team_id, module_id)
     if not pending:
         # return render_template('testSoftware.html', training_id=None, display_next=False, offsetX = offsetX, offsetY = offsetY, size = {'width': 800, 'height': 300}, form = {}, images = [])
-        print('ERROR IS HERE')
         response = EMPLOYER_TEMPLATES.TemplateResponse(
             "testSoftware.html",
             {
@@ -2047,13 +2128,14 @@ async def trainSoftware(module_id:str, response: Response, request: Request, tea
     display_next = False
     if len(elements['button'] + elements['input']) == 0:
         display_next = True
-    print(element_size_dict)
+    time_token = time_tracker(training_id)
     response = EMPLOYEE_TEMPLATES.TemplateResponse(
         "trainSoftware.html",
         {
             "request": request,
             "name": user.first_name,
             "status_ratio": status_ratio,
+            "time_token": time_token,
             "training": training,
             "screenshot_size_dict": screenshot_size_dict,
             "element_size_dict": element_size_dict,
@@ -2071,8 +2153,8 @@ async def trainSoftware(module_id:str, response: Response, request: Request, tea
     return response
 
 
-@api_router.post('/member/training/software/{training_id}/{team_id}', status_code=200)
-async def testSoftwareSubmit(training_id: str, team_id:str, request: Request, user: User = Depends(get_current_employee)) -> RedirectResponse:
+@api_router.post('/member/training/software/{training_id}/{team_id}/{time_token}', status_code=200)
+async def testSoftwareSubmit(training_id: str, team_id:str, request: Request, time_token:str, user: User = Depends(get_current_employee)) -> RedirectResponse:
     # check form_id
     if check_training_status(team_id, training_id):
         # check inputs are valid
@@ -2084,6 +2166,7 @@ async def testSoftwareSubmit(training_id: str, team_id:str, request: Request, us
             valid = verify_input(value, key, training_id) and valid
         if valid:
             # set the current page status as done
+            end_time_tracker(time_token, training_id)
             with get_db_connection() as conn:
                 cur = conn.cursor()
                 cur.execute("""UPDATE training SET training_status = 'completed'

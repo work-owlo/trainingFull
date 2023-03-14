@@ -73,6 +73,7 @@ def add_training_tasks(team_id, role_id):
                     print(query)
                     cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[1], 'pending'))
 
+
 def get_employee_id(email):
     ''' Get employee_id from email '''
     with get_db_connection() as conn:
@@ -98,7 +99,7 @@ def get_team(company_id, keyword=None, status=None):
         cur.execute(
                 """SELECT a.team_id as unique_id, a.employee_id as employee_id, a.role_id as role_id, id_input as id, a.first_name as first, a.last_name as last, a.email as email, j.role_name as role, a.employment_type as type, a.status 
                 FROM team as a, job_roles as j 
-                WHERE a.role_id = j.role_id AND
+                WHERE a.role_id = j.role_id 
                 a.company_id = %s AND
                 (LOWER(a.first_name) = %s OR LOWER(a.last_name) = %s OR LOWER(id_input) LIKE %s OR LOWER(a.email) LIKE %s OR LOWER(j.role_name) LIKE %s) AND a.status != 'unassigned' AND j.status = 'active' """, (company_id, keyword, keyword, keyword_ubiq, keyword_ubiq, keyword_ubiq))
         employees = cur.fetchall()
@@ -336,6 +337,18 @@ def get_role_info(role_id):
         return Role(role_id=role[0], role_name=role[1], role_description=role[2], status=role[3])
 
 
+def get_team_role(team_id):
+    '''Given a team_id, get the role_id'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            """SELECT team.role_id, role_name FROM team, job_roles WHERE team.role_id = job_roles.role_id AND team_id = %s""", (team_id,))
+        role = cur.fetchone()
+        if role == None:
+            return None
+        return role[0], role[1]
+
+
 def get_role_modules(role_id):
     '''Get all the modules for a role'''
     # get all tools
@@ -362,7 +375,21 @@ def get_role_modules(role_id):
                 """ SELECT module_id, module_title, module_description  
                 FROM module
                 WHERE tool_id = %s""", (tool['tool_id'],))
-            modules['modules'] = cur.fetchall()
+            mod = cur.fetchall()
+            modules['modules'] = [dict(modules) for modules in mod]
             module_list.append(modules)
 
     return module_list
+
+
+def get_employee_info(team_id):
+    '''Get employee info'''
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            """SELECT user_id, first_name, last_name, email, status FROM employee_user WHERE user_id = 
+            (SELECT employee_id FROM team WHERE team_id = %s)""", (team_id,))
+        employee = cur.fetchone()
+        if employee == None:
+            return None
+        return dict(employee)
