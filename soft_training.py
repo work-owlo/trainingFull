@@ -108,7 +108,7 @@ def verify_input(input, element_id, training_id):
             return False
 
         cur.execute('''SELECT generated_value FROM element WHERE id = %s''', (element_id,))
-        input_value = cur.fetchone()[0]
+        input_value = cur.fetchone()['generated_value']
         return input_value == input
 
 

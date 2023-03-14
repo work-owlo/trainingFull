@@ -89,14 +89,19 @@ def get_training_progress(team_id):
     ''' Get the progress of a role '''
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute('''SELECT COUNT(training_id) as total
+        cur.execute('''SELECT COUNT(training_id) - (SELECT COUNT(DISTINCT module.module_id) FROM module, training WHERE module.module_id = training.module_id AND training.team_id = %s AND module.tool_id = %s)
+                       as total
                        FROM training
-                       WHERE team_id = %s''', (team_id,))
+                       WHERE team_id = %s''', (team_id,"4",team_id))
         total = cur.fetchone()
         cur.execute('''SELECT COUNT(training_id) as completed
                        FROM training
-                       WHERE team_id = %s AND training_status = 'completed' ''', (team_id,))
+                       WHERE team_id = %s AND 
+                       training_status = 'completed'
+                       ''', (team_id,))
         completed = cur.fetchone()
+
+        # get 
         if total and completed:
             return round((completed['completed']/total['total'])*100)
 

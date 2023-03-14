@@ -844,7 +844,6 @@ async def remind_employee(response: Response, request: Request, team_id: str, ma
     return response
 
 
-
 @api_router.get("/company/add_role", status_code=200)
 async def add_company_role(response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """

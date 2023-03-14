@@ -2,6 +2,7 @@ import sqlite3
 
 from utils import *
 from classes import *
+from employees import get_training_progress
 from graph import *
 
 def add_role(company_id, role_id, role_name, role_description):
@@ -99,14 +100,14 @@ def get_team(company_id, keyword=None, status=None):
         cur.execute(
                 """SELECT a.team_id as unique_id, a.employee_id as employee_id, a.role_id as role_id, id_input as id, a.first_name as first, a.last_name as last, a.email as email, j.role_name as role, a.employment_type as type, a.status 
                 FROM team as a, job_roles as j 
-                WHERE a.role_id = j.role_id 
+                WHERE a.role_id = j.role_id AND
                 a.company_id = %s AND
                 (LOWER(a.first_name) = %s OR LOWER(a.last_name) = %s OR LOWER(id_input) LIKE %s OR LOWER(a.email) LIKE %s OR LOWER(j.role_name) LIKE %s) AND a.status != 'unassigned' AND j.status = 'active' """, (company_id, keyword, keyword, keyword_ubiq, keyword_ubiq, keyword_ubiq))
         employees = cur.fetchall()
         team_list = []
         if employees != None:
             for employee in employees:
-                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=int(get_training_status(employee[0]))))
+                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=int(get_training_progress(employee[0]))))
         print(status)
         if status == 'completed':
             team_list = [t for t in team_list if t.status == '100']
