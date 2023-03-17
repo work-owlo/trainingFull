@@ -40,28 +40,31 @@
             <div class="row g-2 inputs">
                 <div class="col-md">
                     <div class="mb-3">
-                        <input type="text" onkeyup="searchModules()"  name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search" value="{{keyword}}">
+                      <form action="/company/add_modules" method="POST">
+                        <input type="text" name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search" value="{{keyword}}">
+                      </form>
                     </div>
                 </div>
             </div>
-            <p class="label">Select From Module Library (Select All That Apply)</p>
-            <label>Private Modules</label>
-            {% if private_modules|length == 0 %}
-              <br>
-              <div class="alert alert-warning" role="alert">
-                  No modules found. Please add one above
+          <form action="/company/add_modules" method="post">
+            <div class="row">
+              <div class="col-md-10">
+                <p class="label">Select From Module Library (Select All That Apply)</p>
               </div>
-            {% endif %}
-            <form action="/company/add_modules" method="post">
-              <input type="hidden" name="role_id" value="{{role_id}}">
-              <input type="hidden" name="tool_id" value="{{tool['tool_id']}}">
+              <div class="col-md-2">
+                <p style="text-align: right;">
+                  <button href="/company/roles" class="btn btn-success">Continue</button>
+                </p>
+              </div>
+
+              {% if added_modules|length != 0 %}
+              <label>Added Modules</label>
               <div class="card-group">
-                {% for module in private_modules %}
+              {% for module in added_modules %}
                 <div class="checkCard">
-                  <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
-                  <label class="btn btn-outline-success card-train-low-hover" for="btn-{{module['id']}}">
-                  {{module['name']}} <br> {{module['description']}}
-                  </label>
+                  <button class="card-train-low-hover-added" for="btn-{{module['id']}}" style="">
+                    {{module['name']}} <br> {{module['description']}}
+                    </button>
                   <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
                   href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
                     >Test Module</a>
@@ -69,7 +72,34 @@
                 
                 {% endfor %}
               </div>
-              <label>Explore Library</label>
+              {% endif %}
+
+            <label>Your Modules</label>
+
+            {% if private_modules|length == 0 %}
+              <br>
+              <div class="alert alert-warning" role="alert">
+                  No modules found. Please add one above
+              </div>
+            {% endif %}
+            
+              <input type="hidden" name="role_id" value="{{role_id}}">
+              <input type="hidden" name="tool_id" value="{{tool['tool_id']}}">
+              <div class="card-group">
+                {% for module in private_modules %}
+                <div class="checkCard">
+                  <button class="card-train-low-hover" for="btn-{{module['id']}}" style="">
+                    {{module['name']}} <br> {{module['description']}}
+                  </button>
+                  <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
+                  href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
+                    >Test Module</a>
+                  </div>
+                
+                {% endfor %}
+              </div>
+
+              <label>Recommended</label>
               {% if public_modules|length == 0 %}
                 <div class="alert alert-warning" role="alert">
                     No modules found 
@@ -78,49 +108,19 @@
               <div class="card-group">
                 {% for module in public_modules %}
                 <div class="checkCard">
-                  <input name="{{module['id']}}" type="checkbox" class="btn-check" id="btn-{{module['id']}}" autocomplete="off">
-                  <label class="btn btn-outline-success card-train-low-hover" for="btn-{{module['id']}}">
+                  <button class="card-train-low-hover" for="btn-{{module['id']}}" style="">
                   {{module['name']}} <br> {{module['description']}}
-                  </label>
+                  </button>
                     <a type="submit" class="btn btn-outline-success" style="margin-left:1rem;margin-bottom:1rem"
                     href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}"
                     >Test Module</a>
                 </div>
                 {% endfor %}
               </div>
-              <p style="text-align: right;">
-                <button href="/company/roles" class="btn btn-success">Continue</button>
-              </p>
+
             </form>
         </div>
     </div>
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Module</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form>
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="roleName" placeholder="Dispatch">
-                    <label for="roleName">Module Name</label>
-                  </div>
-                  <p class="label">In a few sentences, describe the scenario</p>
-                  <div class="form-floating">
-                    <textarea type="text" class="form-control" id="roleDesc" placeholder="Description"> </textarea>
-                  </div>
-                
-            </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success">Add</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
             

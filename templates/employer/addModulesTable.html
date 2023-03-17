@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-employer-85" >
+    <div class="row search-row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col">
+                    <h5>{{tool['tool_name']}}</h5>
+                </div>
+                <div class="col">
+                    <form action="/company/save_module" method="post" style="float: right;">
+                      <input type="hidden" name="role_id" value="{{role_id}}">
+                      <input type="hidden" name="tool_id" value="{{tool['tool_id']}}">
+                      <button type="submit" class="btn btn-success">Continue</button>
+                    </form>
+                </div>
+            </div>
+            <!-- SEARCH -->
+            <div class="row g-2 inputs">
+                <div class="col-md">
+                    <div class="mb-3">
+                      <form action="/company/add_modules/{{role_id}}" method="GET">
+                        <input type="text" name="keyword" class="form-control search-inputs" id="search-module" placeholder="Search" value="{{keyword}}" minlength="5">
+                      </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10">
+                <p class="label">Select Modules (Select All That Apply)</p>
+              </div>
+              <div class="col-md-2">
+                <form action="{{url_for('add_module_redirect', tool_id=tool['tool_id'], role_id=role_id)}}" method="POST">
+                  <button type="submit" class="btn btn-success" style="float:right">
+                    Add Module
+                  </button>
+                </form>
+              </div>
+
+              <!-- SEARCH RESULTS -->
+              {% if search %}
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col-2"></th>
+                    <th scope="col-3"></th>
+                    <th scope="col-2"></th>
+                    <th scope="col-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">Search</td>
+                  </tr>
+                  {% if search_modules|length == 0 %}
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">No modules found</td>
+                  </tr>
+                  {% endif %}
+                  {% for module in search_modules %}
+                  <tr>
+                    <td>{{module['name']}}</td>
+                    <td >{{module['description']}}</td>
+                    {% if module['status'] == 'added' %}
+                    <td class="role-delete">
+                      <form action="/company/add_module/delete" method="POST">
+                        <input type="hidden" name="module_id" value="{{module['id']}}">
+                        <input type="hidden" name="role_id" value="{{role_id}}">
+                        <input type="hidden" name="keyword" value="{{keyword}}">
+                        <button type="submit" class="btn " style="color:white;border:0px">Remove</button>
+                      </form>
+                    </td>
+                    {% else %}
+                    <td class="role-edit">
+                      <form action="/company/add_module/add" method="POST">
+                        <input type="hidden" name="module_id" value="{{module['id']}}">
+                        <input type="hidden" name="role_id" value="{{role_id}}">
+                        <input type="hidden" name="keyword" value="{{keyword}}">
+                        <button type="submit" class="btn " style="color:white;border:0px">Add</button>
+                      </form>
+                    </td>
+                    {% endif %}
+                    <td class="role-test">
+                      <a type="submit" class="btn btn-primary"
+                      href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}">Test</a>
+                    </td>
+                    
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% endif %}
+
+
+              <!-- ADDED -->
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col-2"></th>
+                    <th scope="col-3"></th>
+                    <th scope="col-2"></th>
+                    <th scope="col-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">Added</td>
+                  </tr>
+                  {% if added_modules|length == 0 %}
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">No modules added</td>
+                  </tr>
+                  {% endif %}
+                  {% for module in added_modules %}
+                  <tr>
+                    <td>{{module['name']}}</td>
+                    <td >{{module['description']}}</td>
+                    <td class="role-delete">
+                      <form action="/company/add_module/delete" method="POST">
+                        <input type="hidden" name="module_id" value="{{module['id']}}">
+                        <input type="hidden" name="keyword" value="{{keyword}}">
+                        <input type="hidden" name="role_id" value="{{role_id}}">
+                        <button type="submit" class="btn " style="color:white;border:0px">Remove</button>
+                      </form>
+                    </td>
+                    <td class="role-test">
+                      <a type="submit" class="btn btn-primary"
+                      href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}">Test</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              
+              
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col-3"></th>
+                    <th scope="col-3"></th>
+                    <th scope="col-2"></th>
+                    <th scope="col-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">Yours</td>
+                  </tr>
+                  {% if private_modules|length == 0 %}
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">You have no modules (or all already added)</td>
+                  </tr>
+                  {% endif %}
+                  {% for module in private_modules %}
+                  <tr>
+                    <td>{{module['name']}}</td>
+                    <td>{{module['description']}}</td>
+                    <td class="role-edit">
+                      <form action="/company/add_module/add" method="POST">
+                        <input type="hidden" name="module_id" value="{{module['id']}}">
+                        <input type="hidden" name="role_id" value="{{role_id}}">
+                        <input type="hidden" name="keyword" value="{{keyword}}">
+                        <button type="submit" class="btn btn-outline-success" style="color:white;border:0px">Add</button>
+                      </form>
+                    </td>
+                    <td class="role-test">
+                      <a type="submit" class="btn btn-primary"
+                      href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}">Test</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              
+
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col-3"></th>
+                    <th scope="col-3"></th>
+                    <th scope="col-2"></th>
+                    <th scope="col-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">Recommended</td>
+                  </tr>
+                  {% if public_modules|length == 0 %}
+                  <tr>
+                    <td colspan="5"  style="text-align: center;background-color: white;">No Recommended Modules</td>
+                  </tr>
+                  {% endif %}
+                  {% for module in public_modules %}
+                  <tr>
+                    <td>{{module['name']}}</td>
+                    <td>{{module['description']}}</td>
+                    <td class="role-edit">
+                      <form action="/company/add_module/add" method="POST">
+                        <input type="hidden" name="module_id" value="{{module['id']}}">
+                        <input type="hidden" name="role_id" value="{{role_id}}">
+                        <input type="hidden" name="keyword" value="{{keyword}}">
+                        <button type="submit" class="btn btn-outline-success" style="color:white;border:0px">Add</button>
+                      </form>
+                    </td>
+                    <td class="role-test">
+                      <a type="submit" class="btn btn-primary"
+                      href="/company/test_module/start/{{module['id']}}/{{role_id}}/{{tool['tool_id']}}">Test</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+
+            
+{% endblock %} 

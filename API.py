@@ -523,8 +523,19 @@ async def company_login(response: Response, username: str = Form(), password: st
     return rr
 
 
+@api_router.post("/company/waitlist", status_code=200)
+async def employer_waitlist(response: Response,request: Request, email: str = Form(), name:str = Form(), company_name:str = Form()):
+    '''Add employee to waitlist'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("INSERT into waitlist (name, email, company_name) VALUES (%s, %s, %s)", (name, email, company_name))
+
+    # redirect to company landing
+    return RedirectResponse(url="/company/?alert=You are on the Waitlist!", status_code=302)
+
+
 @api_router.post("/company/signup", status_code=200)
-async def employee_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form(), legalCheckbox:bool = Form(False)) -> dict:
+async def employer_signup(response: Response,request: Request, email: str = Form(), password:str = Form(), fName:str = Form(), lName:str = Form(), legalCheckbox:bool = Form(False)) -> dict:
     """
     Create a new company account
     """
@@ -857,12 +868,15 @@ async def add_company_role(response: Response, request: Request,  manager: Manag
     elif manager.company_id == None:
         return RedirectResponse(url="/company/add_company")
 
+
+    roles = get_roles(manager.company_id)
     modules = get_tools()
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addRole.html",
         {
             "request": request,
             "modules": modules,
+            "roles": roles,
             "name": manager.first_name,
             "alert": request.query_params.get('alert') if request.query_params.get('alert') != None else ''
         }
@@ -878,7 +892,7 @@ async def add_company_role(response: Response, request: Request,  manager: Manag
 
 
 @api_router.post("/company/add_role", status_code=200)
-async def add_company_role(response: Response, request: Request,  role_name: str = Form(), role_description: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+async def add_company_role(response: Response, request: Request,  role_name: str = Form(), role_description: str = Form(), manager: Manager = Depends(get_current_manager), existing_id:str = Form(None)) -> dict:
     """
     Add new role to this company
     """
@@ -895,14 +909,37 @@ async def add_company_role(response: Response, request: Request,  role_name: str
     if sum([1 for tool in available_tools if tool.id in form_data]) == 0:
         return RedirectResponse(url='/company/add_role?alert=Please select at least one tool', status_code=302)
 
-    add = add_role(manager.company_id, role_id, role_name, role_description)
-    if add['status'] == 'error':
-        return RedirectResponse(url='/company/add_role?alert='+str(add['body']), status_code=302)
+    if existing_id == None:
+        print('adding new role')
+        add = add_role(manager.company_id, role_id, role_name, role_description)
+        if add['status'] == 'error':
+            return RedirectResponse(url='/company/add_role?alert='+str(add['body']), status_code=302)
 
-    for tool in available_tools:
-        if tool.id in form_data:
-            add_role_tool_relationship(role_id, tool.id)
-    return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+        for tool in available_tools:
+            if tool.id in form_data:
+                add_role_tool_relationship(role_id, tool.id)
+        return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+    
+    else:
+        # check that the role exists (and permissinos)
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT count(*) FROM job_roles WHERE role_id = %s AND (company_id = %s or company_id = %s) ", (existing_id, manager.company_id, '1'))
+            if cur.fetchone()[0] == 0:
+                return RedirectResponse(url='/company/add_role?alert=Role does not exist', status_code=302)
+        
+        add = add_role(manager.company_id, role_id, role_name, role_description)
+        if add['status'] == 'error':
+            return RedirectResponse(url='/company/add_role?alert='+str(add['body']), status_code=302)
+
+
+        for tool in available_tools:
+            if tool.id in form_data:
+                add_role_tool_relationship(role_id, tool.id)
+                copy_role_tool_models(existing_id, role_id, tool.id)
+
+        return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+            
 
 
 @api_router.post("/company/role/delete", status_code=200)
@@ -944,6 +981,7 @@ async def add_modules(role_id:str, response: Response, request: Request,  manage
     """
     Add new module
     """
+    # print keyword query args
     if not manager:
         return RedirectResponse(url="/company/logout")
     elif manager.company_id == None:
@@ -962,15 +1000,46 @@ async def add_modules(role_id:str, response: Response, request: Request,  manage
         else:
             return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
 
-    public_modules = get_public_modules(tool.tool_id,manager.company_id)
+    public_modules = get_recommended_modules(role_id, tool.tool_id)
     private_modules = get_private_modules(tool.tool_id, manager.company_id)
+    added_modules = get_role_modules(role_id, tool.tool_id)
+
+    query = request.query_params
+    search_modules = []
+    search = False
+    if 'keyword' in query and len(query['keyword']) > 4:
+        search = True
+        search_modules = search_modules_by_keyword(query['keyword'], tool.tool_id, manager.company_id)
+
+    # remove from public or private if already added
+    for p in public_modules:
+        for a in added_modules:
+            if p.id == a.id:
+                public_modules.remove(p)
+
+
+    for p in private_modules:
+        for a in added_modules:
+            if p.id == a.id:
+                private_modules.remove(p)
+
+    for p in search_modules:
+        for a in added_modules:
+            if p.id == a.id:
+                p.status = 'added'
+
+
     # modules = []
     response = EMPLOYER_TEMPLATES.TemplateResponse(
-        "addModules.html",
+        "addModulesTable.html",
         {
             "request": request,
             "public_modules": public_modules,
+            "added_modules": added_modules,
             "private_modules": private_modules,
+            "search_modules": search_modules,
+            "search": search,
+            "keyword": query['keyword'] if 'keyword' in query else '',
             "name": manager.first_name, 
             "tool": tool,
             "role_id": role_id
@@ -985,6 +1054,65 @@ async def add_modules(role_id:str, response: Response, request: Request,  manage
         )
     return response
 
+
+@api_router.post("/company/add_module/add/", status_code=200)
+async def add_module(response: Response, request: Request, role_id: str = Form(), module_id: str = Form(), keyword: str = Form(None), manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Add module to role_modules'''
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+    # check role belongs to company
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles", status_code=302)
+    
+    # check that role is in process of being edited
+    tool = get_role_tools_remaining(role_id)
+    if not tool:
+        complete = complete_role(manager.company_id, role_id)
+        if complete['status'] == 'error':
+            return RedirectResponse(url="/company/roles?alert="+str(complete['body']), status_code=302)
+        else:
+            return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
+        
+    added = add_role_module_relationship(role_id, module_id, manager.company_id)
+    keyword = '' if keyword == None else keyword
+    if added['status'] == 'success':
+        return RedirectResponse(url='/company/add_modules/'+str(role_id)+'?keyword='+str(keyword), status_code=302)
+    else:
+        return RedirectResponse(url='/company/add_modules/'+str(role_id)+'?alert='+str(added['body'])+'&keyword='+str(keyword), status_code=302)
+
+
+@api_router.post("/company/add_module/delete/", status_code=200)
+async def delete_module(response: Response, request: Request, role_id: str = Form(), module_id: str = Form(), keyword: str = Form(None), manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Add module to role_modules'''
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+    # check role belongs to company
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles", status_code=302)
+    
+    # check that role is in process of being edited
+    tool = get_role_tools_remaining(role_id)
+    if not tool:
+        complete = complete_role(manager.company_id, role_id)
+        if complete['status'] == 'error':
+            return RedirectResponse(url="/company/roles?alert="+str(complete['body']), status_code=302)
+        else:
+            return RedirectResponse(url="/company/roles", status_code=302)
+        
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM role_module WHERE role_id = %s AND module_id = %s", (role_id, module_id))
+        conn.commit()
+    
+    keyword = '' if keyword == None else keyword
+    return RedirectResponse(url='/company/add_modules/'+str(role_id)+'?keyword='+str(keyword), status_code=302)
+    
 
 @api_router.post("/company/add_module_redirect/{tool_id}/{role_id}", status_code=200)
 async def add_module_redirect(tool_id:str, role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
@@ -1051,13 +1179,39 @@ async def add_modules_api(response: Response, request: Request, tool_id:str = Fo
         if permission:
             valid_modules_list.append(module)
     if len(valid_modules_list) == 0:    
-        return RedirectResponse(url='/company/add_modules/'+str(role_id) + "?alert=" + str('Please add atleast one module'), status_code=302)
+        return RedirectResponse(url='/company/add_modules/'+str(role_id) + "?alert=" + str('Please add at least one module'), status_code=302)
     
     # add modules to role
     for module in valid_modules_list:
         add_module_to_role(role_id, module)
 
     # change rool_tool status to active
+    update_role_tool_status(role_id, tool_id, 'active')
+
+    return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
+
+
+@api_router.post("/company/save_module/", status_code=200)
+async def save_module(response: Response, request: Request, role_id: str = Form(), tool_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    # verify permisison to add modules to the role
+    permission = check_role_in_company(manager.company_id, role_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles?alert=Error", status_code=302)
+
+    # check tool_id in roll tools and 
+    permission = verify_pending_rool_tool_relationship(role_id, tool_id)
+    if not permission:
+        return RedirectResponse(url="/company/roles?alert=Error", status_code=302)
+    
+    added = get_role_modules(role_id, tool_id)
+    if len(added) == 0:    
+        return RedirectResponse(url='/company/add_modules/'+str(role_id) + "?alert=" + str('Please add at least one module'), status_code=302)
+
     update_role_tool_status(role_id, tool_id, 'active')
 
     return RedirectResponse(url='/company/add_modules/'+str(role_id), status_code=302)
@@ -1215,6 +1369,7 @@ async def startSimulator(response: Response, request: Request, role_id:str, modu
     
     if tool_id != '4':
         add_training_sample(module_id, manager.company_id, tool_id)
+        print('added')
     else:
         print('here')
         add_training_graph(module_id, manager.company_id)

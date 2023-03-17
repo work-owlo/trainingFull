@@ -4,11 +4,15 @@ from utils import *
 from classes import *
 from employees import get_training_progress
 from graph import *
+import spacy
+import numpy as np
+from scipy.spatial.distance import cosine
 
 def add_role(company_id, role_id, role_name, role_description):
     ''' Add role to company '''
     # Check if role already exists
-
+    nlp = spacy.load("en_core_web_sm")
+    vec = nlp(role_name).vector.tolist()
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute(
@@ -17,7 +21,7 @@ def add_role(company_id, role_id, role_name, role_description):
         if role != None:
             return return_error("Role already exists")
         cur.execute(
-            "INSERT INTO job_roles (role_id, company_id, role_name, role_description, status) VALUES (%s, %s, %s, %s, %s)", (role_id, company_id, role_name, role_description, "pending"))
+            "INSERT INTO job_roles (role_id, company_id, role_name, role_description, status, wordvec) VALUES (%s, %s, %s, %s, %s, %s)", (role_id, company_id, role_name, role_description, "pending", vec))
         conn.commit()
     return return_success()
 
@@ -30,6 +34,21 @@ def add_role_tool_relationship(role_id, tool_id):
         cur.execute(
             "INSERT INTO role_tools (rt_id, role_id, tool_id, status) VALUES (%s, %s, %s, %s)", (rt_id, role_id, tool_id, 'pending'))
         conn.commit()
+
+
+def copy_role_tool_models(existing_id, role_id, tool_id):
+    ''' Copy models from existing role to new role '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT module.module_id FROM module, role_module WHERE module.module_id = role_module.module_id AND role_id = %s AND status = 'active' AND tool_id = %s", (existing_id, tool_id))
+        modules = cur.fetchall()
+        for module in modules:
+            # print(module[0])
+            print('adding module: ', module[0])
+            cur.execute(
+                "INSERT INTO role_module (role_id, module_id, status) VALUES (%s, %s, %s)", (role_id, module[0], 'active'))
+            conn.commit()
 
 
 def assign_employee_role(company_id, id_input, first_name, last_name, email, role_id, employment_type):
@@ -232,7 +251,7 @@ def get_role_tools_remaining(role_id):
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute(
-            "SELECT r.tool_id, tool_name, tool_icon FROM tools as t, role_tools as r WHERE t.tool_id = r.tool_id AND role_id = %s AND r.status = 'pending' ORDER BY tool_name LIMIT 1", (role_id,))
+            "SELECT r.tool_id, tool_name, tool_icon FROM tools as t, role_tools as r WHERE t.tool_id = r.tool_id AND role_id = %s AND r.status = 'pending' ORDER BY tool_id LIMIT 1", (role_id,))
         tool = cur.fetchone()
         return None if tool == None else Tool_info(tool_id=tool[0], tool_name=tool[1], tool_icon=tool[2])
 
@@ -325,6 +344,28 @@ def complete_role(company_id, role_id):
         conn.commit()
     return return_success()
 
+
+def add_role_module_relationship(role_id, module_id, company_id):
+    '''Add role module relationship'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        # check that the company has access to the module
+        cur.execute(
+            """SELECT module_id FROM module WHERE module_id = %s AND company_id = %s or company_id = %s""", (module_id, company_id, '1'))
+        module = cur.fetchone()
+        if module == None:
+            return return_error("Permission Denied")
+        # check module role relationship does not exist
+        cur.execute(
+            "SELECT module_id FROM role_module WHERE role_id = %s AND module_id = %s", (role_id, module_id))
+        module = cur.fetchone()
+        if module != None:
+            return return_error("Module already in role")
+        # add module role relationship
+        cur.execute(
+            "INSERT INTO role_module (role_id, module_id, status) VALUES (%s, %s, %s)", (role_id, module_id, 'active'))
+        conn.commit()
+    return return_success()
 
 def get_role_info(role_id):
     '''Get role info'''

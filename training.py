@@ -3,6 +3,35 @@ from utils import *
 from generate import *
 from nlp import *
 import datetime
+import spacy
+import numpy as np
+from scipy.spatial.distance import cosine
+
+def get_roles(company_id):
+    '''Get all roles that from company_id from the database.'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT role_id, role_name FROM job_roles WHERE company_id = %s and status != 'deleted' ORDER BY role_name asc", (company_id,))
+        roles = cur.fetchall()
+        roles_list = []
+        if roles != None:
+            for role in roles:
+                roles_list.append(Role(role_id=role[0], role_name=role[1]))
+    return roles_list + get_public_roles()
+
+
+def get_public_roles():
+    '''Get all roles that from company_id from the database.'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT role_id, role_name FROM job_roles WHERE company_id = %s ORDER BY role_name asc", ('1',))
+        roles = cur.fetchall()
+        roles_list = []
+        if roles != None:
+            for role in roles:
+                roles_list.append(Role(role_id=role[0], role_name=role[1]))
+    return roles_list
+
 
 def get_tools():
     '''Get all tools from the database.'''
@@ -17,17 +46,58 @@ def get_tools():
     return tools_list
 
 
-def get_public_modules(tool_id, company_id):
-    '''Get all public modules for a tool.'''
+# def get_public_modules(tool_id, company_id):
+#     '''Get all public modules for a tool.'''
+#     with get_db_connection() as conn:
+#         cur = conn.cursor()
+#         tool_id = str(tool_id)
+#         cur.execute("SELECT module_id, module_title, module_description FROM module WHERE tool_id = %s AND access = 'public' AND not module.company_id = %s  ORDER BY module_title asc", (tool_id,company_id))
+#         modules = cur.fetchall()
+#         modules_list = []
+#         if modules != None:
+#             for module in modules:
+#                 modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
+#     return modules_list
+
+def get_similar(wordvec, n=3):
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("SELECT module_id, module_title, module_description FROM module WHERE tool_id = %s AND access = 'public' AND not module.company_id = %s  ORDER BY module_title asc", (tool_id,company_id))
-        modules = cur.fetchall()
-        modules_list = []
-        if modules != None:
-            for module in modules:
-                modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
-    return modules_list
+        vec1 = [float(i) for i in wordvec]
+        cur.execute("SELECT role_id, wordvec FROM job_roles WHERE company_id='1'")
+        roles = cur.fetchall()
+        similarity_list = []
+        for role in roles:
+            r_id = role[0]
+            vec2 = role[1]
+            similarity = cosine(vec1, vec2)
+            similarity_list.append((r_id, similarity))
+
+        similarity_list.sort(key=lambda x: x[1])
+        return similarity_list[:n]
+    
+
+def get_recommended_modules(role_id, tool_id):
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        # get role_name from role_id
+        cur.execute("SELECT wordvec FROM job_roles WHERE role_id=%s", (role_id,))
+        wordvec = cur.fetchone()[0]
+        # get similar roles
+        similar_roles = get_similar(wordvec)
+        # get modules for similar roles
+        modules = []
+        mod_names = []
+        for role in similar_roles:
+            # print(role)
+            cur.execute("SELECT module.module_id, module.module_title, module.module_description  FROM role_module, module WHERE role_module.module_id=module.module_id AND role_id=%s AND tool_id=%s", (role[0], tool_id))
+            mods=cur.fetchall()
+            if mods != None:
+                for mod in mods:
+                    if mod[1] not in mod_names and len(modules) < 20:
+                        mod_names.append(mod[1])
+                        modules.append(Module(id=mod[0], name=mod[1], description=mod[2]))
+
+        return modules[:20]
 
 
 def get_private_modules(tool_id, company_id):
@@ -42,6 +112,36 @@ def get_private_modules(tool_id, company_id):
                 modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
     return modules_list
 
+
+def search_modules_by_keyword(keyword, tool, company_id):
+    '''Search modules to see if keyword is a substring of title, description, text, problem, situation, respond'''
+    with get_db_connection() as conn:
+        keyword = keyword.lower()
+        cur = conn.cursor()
+        cur.execute("""SELECT module_id, module_title, module_description 
+        FROM module WHERE tool_id = %s AND (company_id = %s or access = 'public') 
+            AND (LOWER(module_title) LIKE %s OR LOWER(module_description) LIKE %s OR LOWER(module_text) LIKE %s OR LOWER(problem) LIKE %s OR LOWER(situation) LIKE %s OR LOWER(respond) LIKE %s) 
+            LIMIT 20
+            """, (tool, company_id, '%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%'))
+        modules = cur.fetchall()
+        modules_list = []
+        if modules != None:
+            for module in modules:
+                modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
+    return modules_list
+
+
+def get_role_modules(role_id, tool_id):
+    '''Get all modules for a role.'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT module.module_id, module.module_title, module.module_description FROM role_module, module WHERE role_module.module_id=module.module_id AND role_id=%s AND tool_id=%s", (role_id, tool_id))
+        modules = cur.fetchall()
+        modules_list = []
+        if modules != None:
+            for module in modules:
+                modules_list.append(Module(id=module[0], name=module[1], description=module[2]))
+    return modules_list
 
 # add module to db
 def add_module(company_id, title, desc, tool_id, text, access='private'):

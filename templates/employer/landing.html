@@ -19,11 +19,11 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-SWN1PX74ZK');
+
     </script>
   </head>
-  <body>
+  <body  id="my-canvas">
     <!-- Navbar that is fixed to the top, has a white background, and an icon on the left -->
     <div class="" style="height: 5rem;width:100%">
       <a class="navbar-brand" href="/company" style="float:left">
@@ -74,6 +74,38 @@
           <button type="button" class="btn btn-forgot-password" style="color:rgb(0, 166, 255);padding:0px" data-bs-toggle="modal" data-bs-target="#forgotPassword">
             Forgot password?
           </button>
+        </div>
+       
+      </div>
+    </div>
+  </div>
+
+  <!-- Add to Waitlist -->
+  <div class="modal fade" id="waitlistModal" tabindex="-1" aria-labelledby="waitlistModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="loginModalTitle">Waitlist</h1>
+          
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <form action="/company/waitlist" method="post">
+            <div class="mb-3">
+              <label for="waitlist_name" class="form-label">Name</label>
+              <input name="name" type="text" class="form-control" id="waitlist_name" aria-describedby="nameHelp" required>
+            </div>
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+              </div>
+              <div class="mb-3">
+                <label for="companyName" class="form-label">Company Name</label>
+                <input name="company_name" type="text" class="form-control" id="companyName" required>
+              </div>
+              <button type="submit" class="btn btn-success">Join Waitlist!</button>
+          </form>
         </div>
        
       </div>
@@ -142,14 +174,14 @@
         {{alert}}
       </div>
     {% endif %}
-
+ 
     <!-- Hero -->
     <div class="px-4 pt-5 my-5 text-center">
       <h1 class="display-4 fw-bold">Simplified Onboarding</h1>
       <div class="col-lg-6 mx-auto">
         <p class="lead mb-4">Save time and money while onboarding. Owlo is a learning platform that simulates a team member's new job for faster and more interactive onboarding</p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-          <!-- <button type="button" class="btn btn-success btn-lg px-4 me-sm-3" data-bs-toggle="modal" data-bs-target="#signupModal">Get Started</button> -->
+          <button type="button" class="btn btn-success btn-lg px-4 me-sm-3" data-bs-toggle="modal" data-bs-target="#waitlistModal">Join Waitlist</button>
           <a type="button" class="btn btn-outline-secondary btn-lg px-4" href="https://calendly.com/anshulpaul" target="_blank">Schedule Demo</a>
         </div>
       </div>

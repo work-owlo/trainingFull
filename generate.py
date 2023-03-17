@@ -2,7 +2,7 @@ import openai
 import time
 import re
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 model_engine = "gpt-3.5-turbo"
 

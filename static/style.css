@@ -158,19 +158,45 @@ background-color: rgb(245, 245, 245);
     border-radius:3px;
     color:#686868;
     width: 20rem;
-    fill:#686868;
+    fill:#ffffff;
     margin:1rem;
     display: flex;
     justify-content: center;
     padding:1rem;
     padding-top:1.5rem;
     text-align: center;
+    background-color: white;
+    min-height: 15rem;
+    align-items: center; 
 }
 
 .card-train-low-hover:hover {
-    color:#70ABAF;
+    color:#ffffff;
+    background-color: #70ABAF !important;
 }
 
+.card-train-low-hover-added {
+    border:1px solid #70ABAF;
+    border-radius:3px;
+    color:#ffffff;
+    width: 20rem;
+    fill:#ffffff;
+    margin:1rem;
+    display: flex;
+    justify-content: center;
+    padding:1rem;
+    padding-top:1.5rem;
+    text-align: center;
+    background-color: #70ABAF;
+    min-height: 15rem;
+    align-items: center; 
+}
+
+.card-train-low-hover-added:hover {
+    color:#686868;
+    background-color: #ffffff !important;
+
+}
 .card-train-complete {
     border:1px solid #ffffff;
     border-radius:3px;
@@ -480,6 +506,14 @@ td {
     background-color: #70ABAF !important;
     color:white;
     border: 1px solid #70ABAF;
+    text-align: center;
+    padding:.3rem
+}
+
+.role-test {
+    background-color: #0275d8 !important;
+    color:white;
+    border: 1px solid #0275d8;
     text-align: center;
     padding:.3rem
 }

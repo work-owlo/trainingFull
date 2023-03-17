@@ -77,5 +77,3 @@ class Module(BaseModel):
     name: str
     description: str
     status: str = None
-
-
