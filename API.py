@@ -501,7 +501,8 @@ async def company_landing(response:Response, request: Request, alert=None) -> di
         "landing.html",
         {
             "request": request,
-            "alert":alert
+            "alert":alert,
+            "modules": get_tools()
         }
     )
 
@@ -1116,7 +1117,6 @@ async def delete_module(response: Response, request: Request, role_id: str = For
 
 @api_router.post("/company/add_module_redirect/{tool_id}/{role_id}", status_code=200)
 async def add_module_redirect(tool_id:str, role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
-    # print(tool_id)
     # if not manager:
     #     return RedirectResponse(url="/company/logout")
     # elif manager.company_id == None:
@@ -1135,7 +1135,6 @@ async def add_module_redirect(tool_id:str, role_id:str, response: Response, requ
     #         return RedirectResponse(url="/company/roles?alert="+str(complete['body']), status_code=302)
     #     else:
     #         return RedirectResponse(url="/company/roles?alert=Role Added", status_code=302)
-    # print(tool_id)
     if tool_id == '1':
         return RedirectResponse(url="/company/add_module/simulator/"+str(role_id) + "/" + str(tool_id), status_code=302)
     elif tool_id == '2':
@@ -1144,6 +1143,8 @@ async def add_module_redirect(tool_id:str, role_id:str, response: Response, requ
         return RedirectResponse(url="/company/add_module/compliance/"+str(role_id), status_code=302)
     elif tool_id == '4':
         return RedirectResponse(url="/company/add_module/software/"+str(role_id), status_code=302)
+    elif tool_id == '6':
+        return RedirectResponse(url="/company/add_module/physical/"+str(role_id), status_code=302)
     else:
         return RedirectResponse(url="/company/roles", status_code=302)
         
@@ -1383,6 +1384,36 @@ async def startSimulator(response: Response, request: Request, role_id:str, modu
         return RedirectResponse(url=f"/company/test_module/software/{module_id}/{role_id}", status_code=302)
     else:
         return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+
+# PHYSICAL TRAINING ROUTES
+# SOFTWARE TRAINING ROUTES
+@api_router.get("/company/add_module/physical/{role_id}", status_code=200)
+async def add_physical_module(response: Response, request: Request, role_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Add new module
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "addPhysical.html",
+        {
+            "request": request,
+            "name": manager.first_name,
+            "role_id": role_id,
+            "data": []
+        }
+    )
+
+    if manager.token != None:
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {manager.token}",
+            httponly=True
+        )
+    return response
 
 
 # SOFTWARE TRAINING ROUTES
@@ -1831,7 +1862,15 @@ async def addComplianceSubmit(response: Response, role_id:str, request: Request,
 @api_router.get("/company/test_module/compliance/{module_id}/{role_id}", status_code=200)
 async def testCompliance(response: Response, role_id:str, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
     team_id = manager.company_id
-    chat = get_training_compliance(module_id, team_id)
+    slides = get_training_compliance_slides(module_id, team_id)
+    # if last slide is completed
+    display = "slides"
+    if len(slides) == 0 or slides[-1]['status'] == 'completed':
+        chat = get_training_compliance_chat(module_id, team_id)
+        display = "chat"
+    else:
+        chat = []
+    
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1857,7 +1896,9 @@ async def testCompliance(response: Response, role_id:str, request: Request, modu
             "request": request,
             "role_id": role_id,
             "name": manager.first_name,
+            "display": display,
             "chat": chat,
+            "slides": slides,
             "text": text,
             "title": name,
             "completed": completed,
@@ -1874,20 +1915,31 @@ async def submitCompliance(response: Response, role_id:str, request: Request, mo
     # training_id = request.form['training_id']
     # chat = request.form['chat']
     company_id = manager.company_id
+    # if test_bool for this training_id is true, go to next
     with get_db_connection() as conn:
-        cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
-        context = cur.fetchone()['module_text']
-        cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, company_id))
-        question = cur.fetchone()['query_id']
-    score = check_response(context, question, chat)
-    if 'Yes' in score:
-        update_training_status(training_id, chat, 'completed', score)
-    else:
-        update_training_status(training_id, chat, 'completed', score)
-    response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=303)
-    return response
+        # get the test_bool of this training
+        cur.execute("""SELECT query_id, test_bool FROM training WHERE training_id = %s AND team_id = %s""", (training_id, company_id))
+        data = cur.fetchone()
+        question = data['query_id']
+        test_bool = data['test_bool']
+        if test_bool:
+            # get the context of this module
+            print('getting next slide')
+            update_training_status_slides(training_id, 'completed')
+            response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=303)
+            return response
+        else:
+            cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+            context = cur.fetchone()['module_text']
+       
+            score = check_response(context, question, chat)
+            if 'Yes' in score:
+                update_training_status(training_id, chat, 'completed', score)
+            else:
+                update_training_status(training_id, chat, 'completed', score)
+            response = RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=303)
+            return response
 
 
 @api_router.post("/company/test_module/reset/compliance/{training_id}/{role_id}", status_code=200)
