@@ -17,6 +17,21 @@
     .footer {
         width: 100%;
     }
+
+    .card-train-landing {
+        border:1px solid #70ABAF;
+        border-radius:3px;
+        color:#686868;
+        width: 15rem;
+        fill:#686868;
+        margin:1rem;
+        display: flex;
+        justify-content: center;
+        padding:1rem;
+        padding-top:1.5rem;
+        text-align: center;
+        min-height: 15rem;
+    }
     
     .pb-2 {
         border-bottom: 1px solid rgb(216, 216, 216);
