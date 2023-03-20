@@ -6,6 +6,23 @@
         margin: 0 auto;
     }
 
+    .hero-landing {
+        margin-top:7rem;
+    }
+
+    .overview {
+        text-align:center;
+    }
+
+    .footer {
+        width: 100%;
+    }
+    
+    .pb-2 {
+        border-bottom: 1px solid rgb(216, 216, 216);
+        padding-bottom:20px;
+    }
+
     .card-train{
         width: 90%;
         margin: 0 auto;
