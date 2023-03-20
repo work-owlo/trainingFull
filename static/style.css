@@ -153,6 +153,11 @@ background-color: rgb(245, 245, 245);
     text-align: center;
 }
 
+.container-landing {
+    width: 80%;
+    margin: 0 auto;
+}
+
 .card-train-landing {
     border:1px solid #70ABAF;
     border-radius:3px;

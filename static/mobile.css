@@ -18,11 +18,16 @@
         width: 100%;
     }
 
+    .container-landing {
+        width: 95%;
+        margin: 0 auto;
+    }
+
     .card-train-landing {
         border:1px solid #70ABAF;
         border-radius:3px;
         color:#686868;
-        width: 15rem;
+        width: 16rem;
         fill:#686868;
         margin:1rem;
         display: flex;
