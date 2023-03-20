@@ -86,12 +86,12 @@ def add_training_tasks(team_id, role_id):
                 #     cur.execute(
                 #         "INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[0], 'pending'))
             else:
-                cur.execute("SELECT query_id, query FROM query WHERE module_id = %s", (module[0],))
+                cur.execute("SELECT query_id, query, test_bool FROM query WHERE module_id = %s", (module[0],))
                 queries = cur.fetchall()
                 for query in queries:
                     training_id = generate_uid()
                     print(query)
-                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[1], 'pending'))
+                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status, test_bool) VALUES (%s, %s, %s, %s, %s, %s)", (training_id, team_id, module[0], query[1], 'pending', query[2]))
 
 
 def get_employee_id(email):

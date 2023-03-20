@@ -2,7 +2,10 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 import math 
 
+# nltk.download('vader_lexicon')
+
 def get_sentiment_score(text):
+    
     sid = SentimentIntensityAnalyzer()
     scores = sid.polarity_scores(text)
     sentiment_score = scores['compound']

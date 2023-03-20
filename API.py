@@ -498,6 +498,7 @@ async def company_landing(response:Response, request: Request, alert=None) -> di
     if cookie:
         return RedirectResponse(url="/company/team") 
     return EMPLOYER_TEMPLATES.TemplateResponse(
+        # "landing_local.html",
         "landing.html",
         {
             "request": request,
@@ -910,7 +911,7 @@ async def add_company_role(response: Response, request: Request,  role_name: str
     if sum([1 for tool in available_tools if tool.id in form_data]) == 0:
         return RedirectResponse(url='/company/add_role?alert=Please select at least one tool', status_code=302)
 
-    if existing_id == None:
+    if existing_id == '0':
         print('adding new role')
         add = add_role(manager.company_id, role_id, role_name, role_description)
         if add['status'] == 'error':
@@ -1057,7 +1058,7 @@ async def add_modules(role_id:str, response: Response, request: Request,  manage
 
 
 @api_router.post("/company/add_module/add/", status_code=200)
-async def add_module(response: Response, request: Request, role_id: str = Form(), module_id: str = Form(), keyword: str = Form(None), manager: Manager = Depends(get_current_manager)) -> dict:
+async def add_module_save(response: Response, request: Request, role_id: str = Form(), module_id: str = Form(), keyword: str = Form(None), manager: Manager = Depends(get_current_manager)) -> dict:
     '''Add module to role_modules'''
     if not manager:
         return RedirectResponse(url="/company/logout")
@@ -1382,11 +1383,13 @@ async def startSimulator(response: Response, request: Request, role_id:str, modu
         return RedirectResponse(url=f"/company/test_module/compliance/{module_id}/{role_id}", status_code=302)
     elif tool_id == '4':
         return RedirectResponse(url=f"/company/test_module/software/{module_id}/{role_id}", status_code=302)
+    elif tool_id == '6':
+        return RedirectResponse(url=f"/company/test_module/physical/{module_id}/{role_id}", status_code=302)
     else:
         return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
 
 # PHYSICAL TRAINING ROUTES
-# SOFTWARE TRAINING ROUTES
+
 @api_router.get("/company/add_module/physical/{role_id}", status_code=200)
 async def add_physical_module(response: Response, request: Request, role_id:str, manager: Manager = Depends(get_current_manager)) -> dict:
     """
@@ -1414,6 +1417,140 @@ async def add_physical_module(response: Response, request: Request, role_id:str,
             httponly=True
         )
     return response
+
+
+@api_router.post("/company/add_module/physical/{role_id}", status_code=200)
+async def addPhysicalSubmit(response: Response, role_id:str, request: Request,  manager: Manager = Depends(get_current_manager), moduleTask:str=Form(...), moduleFocus: str = Form(...), moduleName: str = Form(...), textInput:str = Form(None)) -> dict:
+
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT role_name FROM job_roles WHERE role_id = %s""", (role_id,))
+        role_name = cur.fetchone()['role_name']
+
+    fetch = generate_steps(moduleTask, moduleFocus, role_name, textInput)
+    questions = fetch['questions']
+    steps = fetch['steps']
+
+    # create module
+    company_id = manager.company_id
+    desc = generate_description(moduleTask + moduleFocus + role_name).strip()
+    module_id = add_module(company_id, moduleName, desc, '6', desc)
+
+    # add steps as queries
+    for i in range(len(steps)):
+        if ':' in steps[i]:
+            steps[i] = steps[i].split(':')[1]
+
+    save_queries_physical(module_id, steps, True)
+
+    for i in range(len(questions)):
+        if ':' in questions[i]:
+            questions[i] = questions[i].split(':')[1]
+
+    save_queries_physical(module_id, questions, False)
+
+    # add questions as queries
+
+    return RedirectResponse(url=f"/company/add_modules/{role_id}", status_code=302)
+
+
+@api_router.get("/company/test_module/physical/{module_id}/{role_id}", status_code=200)
+async def testphysical(response: Response, role_id:str, request: Request, module_id: str,  manager: Manager = Depends(get_current_manager)) -> dict:
+    team_id = manager.company_id
+    slides = get_training_compliance_slides(module_id, team_id)
+    # if last slide is completed
+    display = "slides"
+    if len(slides) == 0 or slides[-1]['status'] == 'completed':
+        chat = get_training_compliance_chat(module_id, team_id)
+        display = "chat"
+    else:
+        chat = []
+    
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_title, module_text FROM module WHERE module_id = %s""", (module_id,))
+        info = cur.fetchone()
+        name = info['module_title']
+        text = info['module_text']
+        # get training id
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
+        completed = cur.fetchone()['count']
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
+        total = cur.fetchone()['count']
+        if completed < total:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+        else:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+
+    response = EMPLOYER_TEMPLATES.TemplateResponse(
+        "testCompliance.html",
+        {
+            "request": request,
+            "role_id": role_id,
+            "name": manager.first_name,
+            "display": display,
+            "chat": chat,
+            "slides": slides,
+            "text": text,
+            "title": name,
+            "completed": completed,
+            "total": total,
+            "module_id": module_id,
+            "training_id": training_id,
+        }
+    )
+    return response
+
+
+@api_router.post("/company/submit_physical/{module_id}/{role_id}", status_code=200)
+async def submitphysical(response: Response, role_id:str, request: Request, module_id: str, training_id: str = Form(...), chat: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+    # training_id = request.form['training_id']
+    # chat = request.form['chat']
+    company_id = manager.company_id
+    # if test_bool for this training_id is true, go to next
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # get the test_bool of this training
+        cur.execute("""SELECT query_id, test_bool FROM training WHERE training_id = %s AND team_id = %s""", (training_id, company_id))
+        data = cur.fetchone()
+        question = data['query_id']
+        test_bool = data['test_bool']
+        if test_bool:
+            # get the context of this module
+            print('getting next slide')
+            update_training_status_slides(training_id, 'completed')
+            response = RedirectResponse(url=f"/company/test_module/physical/{module_id}/{role_id}", status_code=303)
+            return response
+        else:
+            cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+            context = cur.fetchone()['module_text']
+       
+            score = check_response(context, question, chat)
+            if 'Yes' in score:
+                update_training_status(training_id, chat, 'completed', score)
+            else:
+                update_training_status(training_id, chat, 'completed', score)
+            response = RedirectResponse(url=f"/company/test_module/physical/{module_id}/{role_id}", status_code=303)
+            return response
+
+
+@api_router.post("/company/test_module/reset/physical/{training_id}/{role_id}", status_code=200)
+async def resetphysical(response: Response, role_id:str, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Update training set status to pending '''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT team_id, module_id FROM training WHERE training_id = %s""", (training_id,))
+        team_id, module_id = cur.fetchone()
+        cur.execute("""UPDATE training SET response=NULL, training_status=%s
+                    WHERE team_id=%s AND module_id = %s""", ('pending', team_id, module_id))
+        conn.commit()
+    # return redirect(url_for('testCompliance', module_id=module_id))
+    response = RedirectResponse(url=f"/company/test_module/physical/{module_id}/{role_id}", status_code=303)
+    return response
+
 
 
 # SOFTWARE TRAINING ROUTES
@@ -1942,7 +2079,7 @@ async def submitCompliance(response: Response, role_id:str, request: Request, mo
             return response
 
 
-@api_router.post("/company/test_module/reset/compliance/{training_id}/{role_id}", status_code=200)
+@api_router.post("/company/test_module/reset/module/{training_id}/{role_id}", status_code=200)
 async def resetCompliance(response: Response, role_id:str, request: Request, training_id: str, manager: Manager = Depends(get_current_manager)) -> dict:
     '''Update training set status to pending '''
     with get_db_connection() as conn:

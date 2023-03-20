@@ -40,36 +40,99 @@
         {% endfor %}
     </div>
     <div class="col-6">
-        {% if chat|length > 0 %}
-        <h4 class="label">Questions Compiled - Try it Out!</h4>
-        <div class="test-chat">
-            <div class="texts">
-            {% for c in chat %} 
-                {% if c['from'] == 'bot' %}
-                <div class="chat-bot">
-                    {{ c['text'] }}
+        {% if display == 'slides' %}
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-interval="false">
+            <div class="carousel-inner">
+            {% for c in slides %} 
+              <div class="carousel-item active">
+                <div class="carousel-slideshow">
+                  <h1 class="carousel-title">{{title}}</h1>
+                  <div class="centered">
+                    <div class="number">{{slides[-1]['id']}}</div>
+                    <p>{{slides[-1]['text']}}</p>
+                  </div>
                 </div>
-                {% else %}
-                <div class="chat-user">
-                    {{ c['text'] }}
-                </div>
-                {% endif %}
+              </div>
             {% endfor %}
             </div>
-            <!-- automatically scroll to the last text -->
-            <script>
-                var objDiv = document.getElementsByClassName("texts")[0];
-                objDiv.scrollTop = objDiv.scrollHeight;
-            </script>
-            <div class="text-input">
-                <form action="{{url_for('submitCompliance', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
-                    <!-- disabled trianing id field -->
-                    <input type="hidden" name="training_id" value="{{training_id}}">
-                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message" autofocus>
-                 </form>
-            </div>
-        </div>
+            <form action="{{url_for('submitCompliance', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
+                <input type="hidden" name="training_id" value="{{training_id}}">
+                <input type="hidden" name="chat" value="None">
+                <button class="carousel-control-next" type="submit">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </form>
+            
+          </div> 
         {% endif %}
+        {% if chat|length > 0 %}
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active green" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Test</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link green" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Info</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            
+            <!-- <h4 class="label">Questions Compiled - Try it Out!</h4> -->
+            <div class="test-chat">
+                <div class="texts">
+                {% for c in chat %} 
+                    {% if c['from'] == 'bot' %}
+                    <div class="chat-bot">
+                        {{ c['text'] }}
+                    </div>
+                    {% else %}
+                    <div class="chat-user">
+                        {{ c['text'] }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+                <script>
+                    var objDiv = document.getElementsByClassName("texts")[0];
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                </script>
+                <div class="text-input">
+                    <form action="{{url_for('submitCompliance', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
+                        <input type="hidden" name="training_id" value="{{training_id}}">
+                        <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message" autofocus>
+                    </form>
+                </div>
+            </div>
+            </div>
+            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-interval="false" style="padding:1rem">
+                    <div class="carousel-inner">
+                    {% for c in slides %} 
+                      <div class="carousel-item {{'active' if c['id'] == 1}}">
+                        <div class="carousel-slideshow">
+                          <h1 class="carousel-title">{{title}}</h1>
+                          <div class="centered">
+                            <div class="number">{{c['id']}}</div>
+                            <p>{{c['text']}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                      </button>
+                  </div> 
+            </div>
+          </div>
+          {% endif %}
+        
     </div>
     <div class="col-md-4">
         <div class="compliance-text">

@@ -17,12 +17,12 @@
             <br>
             <form action="/company/add_role" method="post">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" name="role_name" id="roleName" placeholder="Dispatch">
+                    <input type="text" class="form-control" name="role_name" id="roleName" placeholder="Dispatch" required>
                     <label for="roleName">Role Name</label>
                   </div>
                   <p class="label">In a few sentences, describe the role and its responsibilites</p>
                   <div class="form">
-                    <textarea type="text" name="role_description" class="form-control" id="roleDesc" placeholder="Description"> </textarea>
+                    <textarea type="text" name="role_description" class="form-control" id="roleDesc" placeholder="Description" required> </textarea>
                   </div>
                     <br>
                   <p class="label">Load Modules from Existing Role (Optional) </p>

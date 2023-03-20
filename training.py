@@ -148,6 +148,7 @@ def add_module(company_id, title, desc, tool_id, text, access='private'):
     module_id = generate_id()
     with get_db_connection() as conn:
         cur = conn.cursor()
+        print(company_id, title, desc, tool_id, text)
         cur.execute("INSERT INTO module (module_id, company_id, tool_id, module_title, module_description, access, module_text) VALUES (%s, %s, %s, %s, %s, %s, %s)", (module_id, company_id, tool_id, title, desc, access, text))
     return module_id
 
@@ -167,6 +168,16 @@ def save_queries(module_id, q_list):
             q_id = generate_id()
             q = q_list[i]
             cur.execute("INSERT INTO query (query_id, module_id, query, query_type, path_id) VALUES (%s, %s, %s, %s, %s)", (q_id, module_id, q, 'compliance', i))
+            conn.commit()
+
+
+def save_queries_physical(module_id, q_list, test_bool):
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        for i in range(len(q_list)):
+            q_id = generate_id()
+            q = q_list[i]
+            cur.execute("INSERT INTO query (query_id, module_id, query, query_type, path_id, test_bool) VALUES (%s, %s, %s, %s, %s, %s)", (q_id, module_id, q, 'physical', i, test_bool))
             conn.commit()
 
 
@@ -194,12 +205,12 @@ def add_training_sample(module_id, company_id, tool_id):
             # get data from query
             with get_db_connection() as conn:
                 cur = conn.cursor()
-                cur.execute("SELECT query FROM query WHERE module_id = %s", (module_id,))
+                cur.execute("SELECT query, test_bool FROM query WHERE module_id = %s", (module_id,))
                 query_ids = cur.fetchall()
                 for query_id in query_ids:
                     print(query_id[0])
                     training_id = generate_id()
-                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status) VALUES (%s, %s, %s, %s, %s)", (training_id, team_id, module_id, query_id[0], training_status))
+                    cur.execute("INSERT INTO training (training_id, team_id, module_id, query_id, training_status, test_bool) VALUES (%s, %s, %s, %s, %s, %s)", (training_id, team_id, module_id, query_id[0], training_status, query_id[1]))
                     conn.commit()
 
 
@@ -208,7 +219,7 @@ def get_training_compliance(module_id, team_id):
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='completed' ORDER BY id asc ", (module_id, team_id))
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='completed' and test_bool='false' ORDER BY id asc ", (module_id, team_id))
         training_completed = cur.fetchall()
 
         # parse training data into chat format
@@ -223,10 +234,58 @@ def get_training_compliance(module_id, team_id):
                 training_data.append({'from': 'bot', 'text': t['responsetoresponse']})
 
         # get pending training data
-        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='pending' ORDER BY id asc LIMIT 1 ", (module_id, team_id))
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='pending' and test_bool='false' ORDER BY id asc LIMIT 1 ", (module_id, team_id))
         pending = cur.fetchone()
         if pending:
             training_data.append({'from': 'bot', 'text': pending['query_id']})
+        print('training_data: ', training_data)
+        return training_data
+    
+
+def get_training_compliance_chat(module_id, team_id):
+    '''Get training data for compliance'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='completed' and test_bool='false' ORDER BY id asc ", (module_id, team_id))
+        training_completed = cur.fetchall()
+
+        # parse training data into chat format
+        training_data = []
+        for t in training_completed:
+            print(t)
+            # add query
+            training_data.append({'from': 'bot', 'text': t['query_id'], 'status': 'completed'})
+            if t['response']:
+                training_data.append({'from': 'user', 'text': t['response'], 'status': 'completed'})
+            if t['responsetoresponse']:
+                training_data.append({'from': 'bot', 'text': t['responsetoresponse'], 'status': 'completed'})
+
+        # get pending training data
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='pending' and test_bool='false' ORDER BY id asc LIMIT 1 ", (module_id, team_id))
+        pending = cur.fetchone()
+        if pending:
+            training_data.append({'from': 'bot', 'text': pending['query_id'], 'status': 'pending'})
+        print('training_data: ', training_data)
+        return training_data
+    
+
+def get_training_compliance_slides(module_id, team_id):
+    '''Get training data for compliance'''
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='completed' and test_bool='true' ORDER BY id asc ", (module_id, team_id))
+        training_completed = cur.fetchall()
+        training_data = []
+        for i in range(len(training_completed)):
+            t = training_completed[i]
+            training_data.append({'from': 'bot', 'text': t['query_id'], 'status': 'completed', 'id': i+1})
+        # get pending training data
+        cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND training_status='pending' and test_bool='true' ORDER BY id asc LIMIT 1 ", (module_id, team_id))
+        pending = cur.fetchone()
+        if pending:
+            training_data.append({'from': 'bot', 'text': pending['query_id'], 'test_bool': 'true', 'status': 'pending', 'id': len(training_data)+1})
         print('training_data: ', training_data)
         return training_data
     
@@ -294,6 +353,13 @@ def update_training_status(training_id, response, status, score=None):
         cur = conn.cursor()
         cur.execute("UPDATE training SET training_status = %s, response = %s, responsetoresponse = %s, sentiment = %s WHERE training_id = %s", (status, response, score, sentiment, training_id))
         conn.commit()
+
+def update_training_status_slides(training_id, status):
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("UPDATE training SET training_status = %s WHERE training_id = %s", (status, training_id))
+        conn.commit()
+
 
 
 def time_tracker(training_id):
