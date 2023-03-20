@@ -35,7 +35,10 @@
         <rect width="47" height="45" fill="white"/>
         </clipPath>
         </defs>
-      </svg>  
+      </svg> 
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal" style="float:right">
+        Login
+      </button> 
     </div>
 
     <!-- ALERT -->
@@ -174,6 +177,59 @@
         </div>
       </div>
     </footer>
+
+
+    <!-- Forgot Password -->
+    <div class="modal fade" id="forgotPassword" tabindex="-1" aria-labelledby="forgotPasswordArea" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="forgotPasswordArea">Forgot Password</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="/company/forgotPassword" method="post">
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+              </div>
+              <button type="submit" class="btn btn-success">Continue</button>
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalArea" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="loginModalTitle">Welcome Back</h1>
+          
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <form action="/company/token" method="post">
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input name="username" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" id="exampleInputPassword1" required>
+              </div>
+              <button type="submit" class="btn btn-success">Login</button>
+          </form>
+          <br> 
+          <button type="button" class="btn btn-forgot-password" style="color:rgb(0, 166, 255);padding:0px" data-bs-toggle="modal" data-bs-target="#forgotPassword">
+            Forgot password?
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- WAITLIST MODAL -->
   <div class="modal fade" id="waitlistModal" tabindex="-1" aria-labelledby="waitlistModal" aria-hidden="true">

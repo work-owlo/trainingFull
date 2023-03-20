@@ -39,7 +39,7 @@ def runner_dfs(parse, driver):
                     print('returing form_id: ' + str(element.form_id))
                     return element.form_id
                 # ensure we stay within main domain
-                if (parse.url == driver.current_url or driver.current_url.startswith(parse.url)) and not 'company' in driver.current_url:
+                if (parse.url == driver.current_url or driver.current_url.startswith(parse.url)):
                     next_page = Page(driver=driver, source_element_id = element.id, id=parse.get_page_id(), parse_id=parse.id) 
                     visited = next_page.page_visited()
                     if success and visited == -1:
