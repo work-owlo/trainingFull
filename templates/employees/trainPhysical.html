@@ -56,7 +56,7 @@
                   </div>
                 {% endfor %}
                 </div>
-                <form action="{{url_for('trainCompliance', module_id=module_id, team_id=team_id, time_token=time_token)}}" method="POST" id="form">
+                <form action="{{url_for('trainPhysical', module_id=module_id, team_id=team_id, time_token=time_token)}}" method="POST" id="form">
                     <input type="hidden" name="training_id" value="{{training_id}}">
                     <input type="hidden" name="chat" value="None">
                     <button class="carousel-control-next" type="submit">
@@ -99,7 +99,7 @@
                         objDiv.scrollTop = objDiv.scrollHeight;
                     </script>
                     <div class="text-input">
-                        <form action="{{url_for('trainCompliance', module_id=module_id, team_id=team_id, time_token=time_token)}}" method="POST" id="form">
+                        <form action="{{url_for('trainPhysical', module_id=module_id, team_id=team_id, time_token=time_token)}}" method="POST" id="form">
                             <input type="hidden" name="training_id" value="{{training_id}}">
                             <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message" autofocus>
                         </form>

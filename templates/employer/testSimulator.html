@@ -29,6 +29,8 @@
         });
     });
 </script>
+
+
 <div class="row" id="my-canvas">
     <div class="col-1 progress-num">
         {% for i in range(1, completed+1) %}
@@ -39,8 +41,13 @@
         {% endfor %}
     </div>
     <div class="col-6">
+       
         {% if chat|length > 0 %}
         <h4 class="label"> Simulator Created - Try it out!</h4>
+        <!-- <video id="video" class="camera" autoplay></video> -->
+        <video id="video" class="video"  autoplay></video>
+        <button id="recordButton" class="btn btn-success" onclick="record()">Begin Response</button>
+        <button id="stopButton"  class="btn btn-success" onclick="stop()" disabled>End Response</button>
         <div class="test-chat">
             <div class="texts">
             {% for c in chat %} 
@@ -106,5 +113,49 @@
       </div>
     </div>
   </div>
+  <script>
+    var video = document.getElementById('video');
+    var recordButton = document.getElementById('recordButton');
+    var stopButton = document.getElementById('stopButton');
+    var mediaRecorder = null;
+    var chunks = [];
+
+    navigator.mediaDevices.getUserMedia({video: true})
+        .then(function(stream) {
+            video.srcObject = stream;
+            mediaRecorder = new MediaRecorder(stream, {mimeType: 'video/webm'});
+            mediaRecorder.ondataavailable = function(event) {
+                chunks.push(event.data);
+            };
+            mediaRecorder.onstop = function(event) {
+                var blob = new Blob(chunks, {type: 'video/webm'});
+                chunks = [];
+                var formData = new FormData();
+                formData.append('video', blob, 'recording.webm');
+                fetch('/submit', {method: 'POST', body: formData})
+                    .then(function(response) {
+                        console.log('Video submitted.');
+                    })
+                    .catch(function(error) {
+                        console.error('Unable to submit video.', error);
+                    });
+            };
+        })
+        .catch(function(error) {
+            console.error('Unable to access the camera.', error);
+        });
+
+    function record() {
+        mediaRecorder.start();
+        recordButton.disabled = true;
+        stopButton.disabled = false;
+    }
+
+    function stop() {
+        mediaRecorder.stop();
+        recordButton.disabled = false;
+        stopButton.disabled = true;
+    }
+</script>
 </html>
 {% endblock %}

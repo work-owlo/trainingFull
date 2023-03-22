@@ -1014,10 +1014,10 @@ async def add_modules(role_id:str, response: Response, request: Request,  manage
         search_modules = search_modules_by_keyword(query['keyword'], tool.tool_id, manager.company_id)
 
     # remove from public or private if already added
-    for p in public_modules:
-        for a in added_modules:
-            if p.id == a.id:
-                public_modules.remove(p)
+    # for p in public_modules:
+    #     for a in added_modules:
+    #         if p.id == a.id:
+    #             public_modules.remove(p)
 
 
     for p in private_modules:
@@ -2263,6 +2263,8 @@ async def nextTraining(response: Response, request: Request, team_id:str, tool_i
     elif tool_id == '4':
         print('here')
         response = RedirectResponse(url=f"/member/training/software/{module_id}/{team_id}", status_code=302)
+    elif tool_id == '6':
+        response = RedirectResponse(url=f"/member/training/physical/{module_id}/{team_id}", status_code=302)
     else:
         response = RedirectResponse(url=f"/member/onboard/{team_id}", status_code=302)
     return response
@@ -2339,11 +2341,120 @@ async def trainSimulator(response: Response, request: Request, team_id:str, modu
     response = RedirectResponse(url=f"/member/training/simulator/{module_id}/{team_id}", status_code=302)
     return response
 
+# PHYSICAL TASKS
+
+@api_router.get("/member/training/physical/{module_id}/{team_id}", status_code=200)
+async def trainingPhysical(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
+    slides = get_training_compliance_slides(module_id, team_id)
+    # if last slide is completed
+    display = "slides"
+    if len(slides) == 0 or slides[-1]['status'] == 'completed':
+        chat = get_training_compliance_chat(module_id, team_id)
+        display = "chat"
+    else:
+        chat = []
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT module_title, module_text FROM module WHERE module_id = %s""", (module_id,))
+        info = cur.fetchone()
+        name = info['module_title']
+        text = info['module_text']
+        # get training id
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
+        completed = cur.fetchone()['count']
+        cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
+        total = cur.fetchone()['count']
+        if completed < total:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+        else:
+            cur.execute("""SELECT training_id FROM training WHERE module_id = %s and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
+            training_id = cur.fetchone()['training_id']
+
+    time_token = time_tracker(training_id)
+
+    response = EMPLOYEE_TEMPLATES.TemplateResponse(
+        "trainPhysical.html",
+        {
+            "request": request,
+            "name": user.first_name,
+            "chat": chat,
+            "slides": slides,
+            "display": display,
+            "time_token": time_token,
+            "text": text,
+            "title": name,
+            "team_id": team_id,
+            "completed": completed,
+            "total": total,
+            "module_id": module_id,
+            "training_id": training_id,
+        }
+    )
+    return response
+
+@api_router.post("/member/submit_physical/{module_id}/{team_id}/{time_token}", status_code=200)
+async def trainPhysical(response: Response, request: Request, team_id:str, module_id: str, time_token:str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+    # with get_db_connection() as conn:
+    #     cur = conn.cursor()
+    #     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    #     cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+    #     context = cur.fetchone()['module_text']
+    #     cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
+    #     question = cur.fetchone()['query_id']
+    # score = check_response(context, question, chat)
+    # if 'Yes' in score:
+    #     update_training_status(training_id, chat, 'completed', score)
+    # else:
+    #     update_training_status(training_id, chat, 'completed', score)
+    # end_time_tracker(time_token, training_id)
+    
+    
+    # progress = get_training_progress(team_id)
+    # if progress == 100:
+    #     # email comp and emp
+    #     email = get_employee_email(team_id)
+    #     await training_completion_emp(email)
+    #     email = get_comp_email(team_id)
+    #     await training_completion_comp(email)
+    
+        # if test_bool for this training_id is true, go to next
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # get the test_bool of this training
+        cur.execute("""SELECT query_id, test_bool FROM training WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
+        data = cur.fetchone()
+        question = data['query_id']
+        test_bool = data['test_bool']
+        if test_bool:
+            # get the context of this module
+            print('getting next slide')
+            update_training_status_slides(training_id, 'completed')
+        else:
+            cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+            context = cur.fetchone()['module_text']
+       
+            score = check_response(context, question, chat)
+            if 'Yes' in score:
+                update_training_status(training_id, chat, 'completed', score)
+            else:
+                update_training_status(training_id, chat, 'completed', score)
+
+        response = RedirectResponse(url=f"/member/training/physical/{module_id}/{team_id}", status_code=303)
+        return response
 
 # COMPLIANCE
 @api_router.get("/member/training/compliance/{module_id}/{team_id}", status_code=200)
 async def trainingCompliance(response: Response, request: Request, module_id:str, team_id: str, user: User = Depends(get_current_employee)) -> dict:
-    chat = get_training_compliance(module_id, team_id)
+    slides = get_training_compliance_slides(module_id, team_id)
+    # if last slide is completed
+    display = "slides"
+    if len(slides) == 0 or slides[-1]['status'] == 'completed':
+        chat = get_training_compliance_chat(module_id, team_id)
+        display = "chat"
+    else:
+        chat = []
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -2371,6 +2482,8 @@ async def trainingCompliance(response: Response, request: Request, module_id:str
             "request": request,
             "name": user.first_name,
             "chat": chat,
+            "slides": slides,
+            "display": display,
             "time_token": time_token,
             "text": text,
             "title": name,
@@ -2385,32 +2498,53 @@ async def trainingCompliance(response: Response, request: Request, module_id:str
 
 @api_router.post("/member/submit_compliance/{module_id}/{team_id}/{time_token}", status_code=200)
 async def trainCompliance(response: Response, request: Request, team_id:str, module_id: str, time_token:str, training_id: str = Form(...), chat: str = Form(...), user: User = Depends(get_current_employee)) -> dict:
+    # with get_db_connection() as conn:
+    #     cur = conn.cursor()
+    #     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    #     cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+    #     context = cur.fetchone()['module_text']
+    #     cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
+    #     question = cur.fetchone()['query_id']
+    # score = check_response(context, question, chat)
+    # if 'Yes' in score:
+    #     update_training_status(training_id, chat, 'completed', score)
+    # else:
+    #     update_training_status(training_id, chat, 'completed', score)
+    # end_time_tracker(time_token, training_id)
+    
+    
+    # progress = get_training_progress(team_id)
+    # if progress == 100:
+    #     # email comp and emp
+    #     email = get_employee_email(team_id)
+    #     await training_completion_emp(email)
+    #     email = get_comp_email(team_id)
+    #     await training_completion_comp(email)
+    
+        # if test_bool for this training_id is true, go to next
     with get_db_connection() as conn:
-        cur = conn.cursor()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
-        context = cur.fetchone()['module_text']
-        cur.execute("""SELECT query_id FROM training WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
-        question = cur.fetchone()['query_id']
-    score = check_response(context, question, chat)
-    if 'Yes' in score:
-        update_training_status(training_id, chat, 'completed', score)
-    else:
-        update_training_status(training_id, chat, 'completed', score)
-    end_time_tracker(time_token, training_id)
-    
-    
-    progress = get_training_progress(team_id)
-    if progress == 100:
-        # email comp and emp
-        email = get_employee_email(team_id)
-        await training_completion_emp(email)
-        email = get_comp_email(team_id)
-        await training_completion_comp(email)
-    
+        # get the test_bool of this training
+        cur.execute("""SELECT query_id, test_bool FROM training WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
+        data = cur.fetchone()
+        question = data['query_id']
+        test_bool = data['test_bool']
+        if test_bool:
+            # get the context of this module
+            print('getting next slide')
+            update_training_status_slides(training_id, 'completed')
+        else:
+            cur.execute("""SELECT module_text FROM module WHERE module_id = %s""", (module_id,))
+            context = cur.fetchone()['module_text']
+       
+            score = check_response(context, question, chat)
+            if 'Yes' in score:
+                update_training_status(training_id, chat, 'completed', score)
+            else:
+                update_training_status(training_id, chat, 'completed', score)
 
-    response = RedirectResponse(url=f"/member/training/compliance/{module_id}/{team_id}", status_code=303)
-    return response
+        response = RedirectResponse(url=f"/member/training/compliance/{module_id}/{team_id}", status_code=303)
+        return response
 
 
 # SOFTWARE

@@ -4,37 +4,22 @@ from selenium.webdriver.chrome.options import Options
 import os
 import cv2
 from parse import *
+from page import *
+import time
 import unittest
 
-parse = setup('https://owlo-training.herokuapp.com/', 'test', '1', '123')
-parser(parse.id)
-        # assert True
+parse = setup('https://owlo-training.herokuapp.com/company', 'test', '1', '123')
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+driver = webdriver.Chrome(options=chrome_options)
+driver.get(parse.url)
+
+# find button that has value "Join Waitlist"
+button = driver.find_element(By.XPATH, "//button[contains(text(), 'Join Waitlist')]")
+print(button)
+button.click()
+time.sleep(1)
+print(Page.check_if_scrollable(driver))
 
 
 
-im = cv2.imread('images/1352.0screenshot.png')
-
-# print(type(im))
-# # <class 'numpy.ndarray'>
-
-print('width: {} pixels'.format(im.shape[1]))
-print('height: {} pixels'.format(im.shape[0]))
-# class TestScreenshots(unittest.TestCase):
-
-#     def test_no_errors(self):
-#         '''Ensure no errors are thrown'''
-       
-
-#     # parse = setup('https://owlo-training.herokuapp.com/', 'test', '1', '123')
-#     # parser(parse.id)
-
-#     def test_num_screenshots(self):
-#         '''Ensure the correct number of screenshots are being supplied'''
-#         # get the number of png files in images
-#         num_images = len([name for name in os.listdir('images') if name.endswith('.png')])
-#         self.assertEqual(num_images, 6, "Should be 6")
-
-
-
-# if __name__ == '__main__':
-#     unittest.main()

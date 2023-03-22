@@ -24,21 +24,21 @@ def clean_output(text):
 
 
 def generate_compliance_questions(text):
-    # prompt = "Generate a comma seperated list of 10 questions to ask an employee about the following policy"
-    # prompt += text
-    # completion = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {"role": "user", "content": prompt},
-    #     ]
-    #     )
+    prompt = "Generate a comma seperated list of 10 questions to ask an employee about the following policy"
+    prompt += text
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": prompt},
+        ]
+        )
 
-    # return completion.choices[0].message
-    time.sleep(2)
-    return {
-        "content": "\n\n1. Can you explain the policy for being paid for all hours worked?\n2. What should an employee do if there is a discrepancy in their pay or hours worked?\n3. How are work schedules determined? \n4. What happens if an employee needs time off after the schedules have been posted? \n5. How much notice is required for scheduling requests? \n6. Who should an employee contact for approval of time off, even in an emergency? \n7. What is the procedure for calling in sick for an opener? \n8. How much notice is required for calling in sick for all other shifts?\n9. What happens if an employee is absent without permission or advanced notice? \n10. What is the importance of an employee's availability and flexibility for their work schedule?",
-        "role": "assistant"
-        }
+    return completion.choices[0].message
+    # time.sleep(2)
+    # return {
+    #     "content": "\n\n1. Can you explain the policy for being paid for all hours worked?\n2. What should an employee do if there is a discrepancy in their pay or hours worked?\n3. How are work schedules determined? \n4. What happens if an employee needs time off after the schedules have been posted? \n5. How much notice is required for scheduling requests? \n6. Who should an employee contact for approval of time off, even in an emergency? \n7. What is the procedure for calling in sick for an opener? \n8. How much notice is required for calling in sick for all other shifts?\n9. What happens if an employee is absent without permission or advanced notice? \n10. What is the importance of an employee's availability and flexibility for their work schedule?",
+    #     "role": "assistant"
+        # }
 
 
 def generate_description(text):
@@ -52,7 +52,7 @@ def generate_description(text):
         )
     return clean_output(completion.choices[0].message['content'])
     # time.sleep(2)
-    return "Expectations for employee compensation, flexible scheduling, and communication regarding scheduling and time off requests"
+    # return "Expectations for employee compensation, flexible scheduling, and communication regarding scheduling and time off requests"
 
 
 def format_questions(questions):
@@ -135,15 +135,15 @@ def generate_steps(task, focus, role, documentation=None):
         prompt += f"Documentation: {documentation[:205]}"
     prompt += "Also generate a list of 12 comprehensive questions I can ask an employee to test their understanding of the task."
     prompt += 'Return as a list of steps in a json {"data": {"steps": [...], "questions": [...]} }, and no other text'
-    # completion = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {"role": "user", "content": prompt},
-    #     ]
-    #     )
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": prompt},
+        ]
+        )
     # print(completion)
-    # value = completion.choices[0].message['content']
-    value = "\n\n{\n  \"data\": {\n    \"steps\": [\n      \"Begin by assessing the weight and dimensions of the box(es) before attempting to lift them. Always ensure that the boxes can be lifted safely and without risk of injury.\",\n      \"Take a moment to stretch and loosen up your muscles, especially your back and legs, before lifting. Stand in front of the box with your feet shoulder-width apart.\",\n      \"Squat down, bending at the knees, and grip the box firmly with both hands. Keep your back straight and lift the box up slowly, using the force from your legs rather than your back.\",\n      \"Once the box is off the ground, hug it close to your body to maintain balance and control. Avoid twisting your body or jerking the box in any direction.\",\n      \"If necessary, take small steps to move the box to its desired location. Avoid sudden movements and be aware of your surroundings at all times.\",\n      \"If you need to lift multiple boxes, take breaks as needed to avoid overexertion and fatigue. Always prioritize safety over speed.\",\n      \"When you're finished lifting, take a few additional moments to stretch and relax your muscles. Avoid any activities that could put additional strain on your back or joints.\",\n      \"If you experience discomfort or pain while lifting, stop immediately and seek medical attention if necessary. Report any accidents or injuries to your supervisor.\",\n      \"Be aware of any safety equipment or procedures provided by your employer, such as back braces or lifting devices. Use them as directed to minimize the risk of injury.\",\n      \"Maintain proper posture throughout the lifting process. Keep your shoulders back, your chest out, and your head looking forward.\",\n      \"Take the necessary precautions to prevent slips and falls, especially if you're lifting boxes in a wet or slippery environment. Wear slip-resistant shoes and be mindful of any hazards in your surroundings.\",\n      \"Communicate with your coworkers and supervisors to ensure that everyone is on the same page regarding safety procedures and expectations.\",\n    ],\n    \"questions\": [\n      \"What should you do before attempting to lift a heavy box?\",\n      \"Which part of your body should you prioritize when stretching before lifting?\",\n      \"How should you grip a heavy box when lifting it up?\",\n      \"What should you do to maintain balance and control when lifting a heavy box?\",\n      \"How should you move a heavy box from one location to another?\",\n      \"What should you do if you need to lift multiple heavy boxes?\",\n      \"Why should you prioritize safety over speed when lifting heavy boxes?\",\n      \"What should you do if you experience discomfort or pain while lifting?\",\n      \"What safety equipment or procedures might be provided by your employer to help you lift heavy boxes safely?\",\n      \"What is the proper posture for lifting a heavy box?\",\n      \"What precautions should you take to prevent slips and falls when lifting heavy boxes?\",\n      \"Why is communication important for lifting heavy boxes safely?\",\n    ]\n  }\n}"
+    value = completion.choices[0].message['content']
+    # value = "\n\n{\n  \"data\": {\n    \"steps\": [\n      \"Begin by assessing the weight and dimensions of the box(es) before attempting to lift them. Always ensure that the boxes can be lifted safely and without risk of injury.\",\n      \"Take a moment to stretch and loosen up your muscles, especially your back and legs, before lifting. Stand in front of the box with your feet shoulder-width apart.\",\n      \"Squat down, bending at the knees, and grip the box firmly with both hands. Keep your back straight and lift the box up slowly, using the force from your legs rather than your back.\",\n      \"Once the box is off the ground, hug it close to your body to maintain balance and control. Avoid twisting your body or jerking the box in any direction.\",\n      \"If necessary, take small steps to move the box to its desired location. Avoid sudden movements and be aware of your surroundings at all times.\",\n      \"If you need to lift multiple boxes, take breaks as needed to avoid overexertion and fatigue. Always prioritize safety over speed.\",\n      \"When you're finished lifting, take a few additional moments to stretch and relax your muscles. Avoid any activities that could put additional strain on your back or joints.\",\n      \"If you experience discomfort or pain while lifting, stop immediately and seek medical attention if necessary. Report any accidents or injuries to your supervisor.\",\n      \"Be aware of any safety equipment or procedures provided by your employer, such as back braces or lifting devices. Use them as directed to minimize the risk of injury.\",\n      \"Maintain proper posture throughout the lifting process. Keep your shoulders back, your chest out, and your head looking forward.\",\n      \"Take the necessary precautions to prevent slips and falls, especially if you're lifting boxes in a wet or slippery environment. Wear slip-resistant shoes and be mindful of any hazards in your surroundings.\",\n      \"Communicate with your coworkers and supervisors to ensure that everyone is on the same page regarding safety procedures and expectations.\",\n    ],\n    \"questions\": [\n      \"What should you do before attempting to lift a heavy box?\",\n      \"Which part of your body should you prioritize when stretching before lifting?\",\n      \"How should you grip a heavy box when lifting it up?\",\n      \"What should you do to maintain balance and control when lifting a heavy box?\",\n      \"How should you move a heavy box from one location to another?\",\n      \"What should you do if you need to lift multiple heavy boxes?\",\n      \"Why should you prioritize safety over speed when lifting heavy boxes?\",\n      \"What should you do if you experience discomfort or pain while lifting?\",\n      \"What safety equipment or procedures might be provided by your employer to help you lift heavy boxes safely?\",\n      \"What is the proper posture for lifting a heavy box?\",\n      \"What precautions should you take to prevent slips and falls when lifting heavy boxes?\",\n      \"Why is communication important for lifting heavy boxes safely?\",\n    ]\n  }\n}"
     # remove all \n
     value = value.replace("\n", "")
     # remove all \t

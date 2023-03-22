@@ -189,6 +189,10 @@ background-color: rgb(245, 245, 245);
 
 }
 
+/* .hero-landing {
+    padding-top:3rem
+} */
+
 .number-bold {
     font-weight: 700;
     font-size:3rem;
@@ -197,8 +201,8 @@ background-color: rgb(245, 245, 245);
 
 .header-navbar {
     position: absolute;
-    top:2rem;
-    margin-left:5%;
+    margin-top:2rem;
+    margin-left:2%;
     width:90%;
     z-index: 100;
 }
@@ -479,8 +483,16 @@ td {
 
 .container-main {
     /* import generic bootstrap container classs */
-    width:65%;
-    margin:0 auto;
+    width:80%;
+    margin-left:10%;
+    /* margin:0 auto; */
+}
+
+.camera {
+    border-radius: 20px;
+    z-index:10;
+    border:1px solid gray;
+    width: 100%;
 }
 
 .type-contractor {

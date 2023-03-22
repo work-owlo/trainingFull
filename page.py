@@ -245,9 +245,10 @@ class Page:
 
     def check_if_scrollable(driver):
         '''Checks if the page is scrollable'''
+        time.sleep(1)
         screenshot = driver.get_screenshot_as_png()
         actions = ActionChains(driver)
-        actions.send_keys(Keys.PAGE_DOWN)
+        actions.send_keys(Keys.DOWN)
         time.sleep(.5)
         actions.perform()
         screenshot2 = driver.get_screenshot_as_png()
