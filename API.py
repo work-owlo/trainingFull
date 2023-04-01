@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException, Depends, status, Response, Request, APIRouter, Form
+from fastapi import FastAPI, Header, HTTPException, Depends, status, Response, Request, APIRouter, Form, File, UploadFile
 from pydantic import BaseModel, EmailStr
 # from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +13,10 @@ from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from typing import List
 from pathlib import Path
 import re
+import configs
+import io
+import ffmpeg
+import cv2
 
 from employee_auth import *
 from employees import *
@@ -33,6 +37,8 @@ app = FastAPI()
 origins = [
     "https://owlo.co",
     "https://www.owlo.co",
+    "http://localhost",
+    "http://localhost:8201",
 ]
 
 app.add_middleware(
@@ -140,6 +146,17 @@ async def employee_landing(response:Response, request: Request, alert=None) -> d
     '''Demo Page for investors'''
     return EMPLOYER_TEMPLATES.TemplateResponse(
         "demo.html",
+        {
+            "request": request,
+            "alert":alert
+        }
+    )
+
+@api_router.get("/vision", status_code=200)
+async def employee_vision(response:Response, request: Request, alert=None) -> dict:
+    '''Demo Page for investors'''
+    return EMPLOYER_TEMPLATES.TemplateResponse(
+        "vision.html",
         {
             "request": request,
             "alert":alert
@@ -683,7 +700,7 @@ async def view_company_team(response: Response, request: Request,  manager: Mana
     if filter_search != None:
         filter_search = filter_search.strip()
     members = get_team(manager.company_id, keyword, filter_search)
-    roles = get_roles(manager.company_id)
+    roles = get_job_roles(manager.company_id)
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "team.html",
         {
@@ -736,11 +753,9 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
     if not check_emp_in_team(manager.company_id, team_id):
         return RedirectResponse(url="/company/team", status_code=302)
     
-    print(team_id)
     employee = get_employee_info(team_id)
     role_id, role_name = get_team_role(team_id)
-    print(role_id, role_name)
-    modules = get_role_modules(role_id)
+    modules = get_report_modules(role_id)
     # print(modules)
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -751,14 +766,10 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
             completed_training = 0
             total_training = 0
             for mod in tool['modules']:
-                print(mod)
-                # print(mod)
-                cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s ORDER BY id ASC", (mod['module_id'], team_id))
+                cur.execute("SELECT * FROM training WHERE module_id = %s AND team_id = %s AND test_bool = 'false' AND (response is not NULL or training_type = 'software') ORDER BY id ASC", (mod['module_id'], team_id))
                 mod_data = cur.fetchall()
                 mod_data = [dict(row) for row in mod_data]
-                print(mod_data)
                 mod['responses'] = mod_data
-                print(mod['responses'])
                 total = [response['sentiment'] for response in mod['responses'] if response['sentiment'] != None]
                 if len(total) == 0:
                     print('no sentiment')
@@ -775,7 +786,11 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
                 else:
                     mod['avg_time'] = mod['total_time']/len(time_spent)
                 mod['completed'] = len([response['training_status'] for response in mod['responses'] if response['training_status'] == 'completed'])
-                mod['progress'] = int(mod['completed'] / len(mod['responses']) * 100)
+                if len(mod['responses']) == 0:
+                    mod['progress'] = 0
+                else:
+                    mod['progress'] = int(mod['completed'] / len(mod['responses']) * 100)
+                mod['analytics'] = get_mod_analytics(mod['module_id'], team_id)
                 mod['comprehensive'] = {}
                 mod['comprehensive']['total_time'] = ["Total Time (minutes)", round(mod['total_time'] / 60,2)]
                 mod['comprehensive']['avg_time'] = ["Avg. Minutes / Module", round(mod['avg_time'] / 60,2)]
@@ -790,7 +805,10 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
             tool_comp['total_time'] = ["Total Time (minutes)", tool_time]
             tool_comp['completed'] = ["Number Completed", completed_training]
             tool_comp['total_training'] = ["Total Modules", total_training]
-            tool_comp['progress'] = ["Progress", int(completed_training/total_training * 100)]
+            if total_training == 0:
+                tool_comp['progress'] = ["Progress", 0]
+            else:
+                tool_comp['progress'] = ["Progress", int(completed_training/total_training * 100)]
             tool_comp['total'] = ["Total Modules", tool_length]
             tool['comprehensive'] = tool_comp
 
@@ -799,7 +817,10 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
     comprehensive['total_time'] = ["Total Time (minutes)", round(sum([tool['comprehensive']['total_time'][1] for tool in modules]) / 60, 2)]
     comprehensive['avg_time'] = ["Avg. minutes / Module ", round(sum([tool['comprehensive']['avg_time'][1] for tool in modules])/len(modules) / 60, 2)]
     comprehensive['avg_sentiment'] = ["Avg. Sentiment Score", round(sum([tool['comprehensive']['avg_sentiment'][1] for tool in modules])/len(modules),2)]
-    comprehensive['progress'] = ["Progress", str(int(sum([tool['comprehensive']['completed'][1]  for tool in modules])/sum([tool['comprehensive']['total_training'][1] for tool in modules]) * 100)) + '%']
+    if sum([tool['comprehensive']['total_training'][1] for tool in modules]) == 0:
+        comprehensive['progress'] = ["Progress", 0]
+    else:
+        comprehensive['progress'] = ["Progress", str(int(sum([tool['comprehensive']['completed'][1]  for tool in modules])/sum([tool['comprehensive']['total_training'][1] for tool in modules]) * 100)) + '%']
     
     for tool in modules:
         tool['comprehensive'] = {
@@ -813,7 +834,6 @@ async def view_employee(response: Response, request: Request, team_id: str, mana
         "employee.html",
         {
             "request": request,
-            "employee": 'Hi',
             "employee": employee,
             "role_name": role_name,
             "name": manager.first_name,
@@ -871,7 +891,7 @@ async def add_company_role(response: Response, request: Request,  manager: Manag
         return RedirectResponse(url="/company/add_company")
 
 
-    roles = get_roles(manager.company_id)
+    roles = get_job_roles(manager.company_id)
     modules = get_tools()
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "addRole.html",
@@ -978,6 +998,24 @@ async def unassign_role(response: Response, request: Request, team_id: str = For
         return RedirectResponse(url='/company/team?alert='+str(unassign['body']), status_code=302)
 
 
+@api_router.post("/company/employee/reset", status_code=200)
+async def reset_role(response: Response, request: Request, team_id: str = Form(), manager: Manager = Depends(get_current_manager)) -> dict:
+    """
+    Unassign role to this company
+    """
+    if not manager:
+        return RedirectResponse(url="/company/logout")
+    elif manager.company_id == None:
+        return RedirectResponse(url="/company/add_company")
+    
+    reset = reset_employee_role(manager.company_id, team_id)
+    if reset['status'] == 'success':
+        return RedirectResponse(url='/company/team', status_code=302)
+    else:
+        return RedirectResponse(url='/company/team?alert='+str(reset['body']), status_code=302)
+
+
+
 @api_router.get("/company/add_modules/{role_id}", status_code=200)
 async def add_modules(role_id:str, response: Response, request: Request,  manager: Manager = Depends(get_current_manager)) -> dict:
     """
@@ -1014,10 +1052,11 @@ async def add_modules(role_id:str, response: Response, request: Request,  manage
         search_modules = search_modules_by_keyword(query['keyword'], tool.tool_id, manager.company_id)
 
     # remove from public or private if already added
-    # for p in public_modules:
-    #     for a in added_modules:
-    #         if p.id == a.id:
-    #             public_modules.remove(p)
+    for p in public_modules:
+        for a in added_modules:
+            if p.id == a.id or p.name == a.name:
+                print('removed:' + p.name)
+                public_modules.remove(p)
 
 
     for p in private_modules:
@@ -1980,6 +2019,8 @@ async def addComplianceSubmit(response: Response, role_id:str, request: Request,
     # textInput = request.form['textInput']
     # moduleName = request.form['moduleName']
     data = {'textInput': textInput, 'moduleName': moduleName}
+    summary = generate_compliance_summary(textInput, 5)
+    print(summary)
     questions = generate_compliance_questions(textInput)
     questions = format_questions(questions)
     # return render_template('addCompliance.html', questions=questions, data=data)
@@ -1990,6 +2031,7 @@ async def addComplianceSubmit(response: Response, role_id:str, request: Request,
             "role_id": role_id,
             "name": manager.first_name,
             "data": data,
+            "summary": summary,
             "questions": questions
         }
     )
@@ -2115,13 +2157,19 @@ async def saveCompliance(response: Response, role_id:str, request: Request,  man
 # SIMULATOR TRAINING
 
 @api_router.post("/company/add_module/simulator/{role_id}/{tool_id}", status_code=200)
-async def addSimulatorSubmit(response: Response, request: Request, role_id:str, tool_id:str, manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...)) -> dict:
+async def addSimulatorSubmit(response: Response, request: Request, role_id:str, tool_id:str, manager: Manager = Depends(get_current_manager), moduleName: str = Form(...), num_chats: int = Form(...), customer: str = Form(...), situation: str = Form(...), problem: str = Form(...), respond: str = Form(...), format:str=Form(...)) -> dict:
     company_id = manager.company_id
     if tool_id not in ['1', '2']:
         # error
         return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
     desc = generate_description(customer + situation + problem + respond)
-    module_id = add_module_simulator(company_id, moduleName, desc, tool_id, num_chats, customer, situation, problem, respond)
+    # print the format
+    print('foamt', format)
+    # print form response
+    form_data = await request.form()
+    form_data = jsonable_encoder(form_data)
+    print(form_data)
+    module_id = add_module_simulator(company_id, moduleName, desc, tool_id, num_chats, customer, situation, problem, respond, format)
     # generate first chat
     first_chat = generate_simulator(num_chats, customer, situation, problem, respond)
     # get everything after colon if there is a colon
@@ -2167,18 +2215,42 @@ async def testSimulator(response: Response, request: Request, role_id:str, modul
     team_id = manager.company_id
     with get_db_connection() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("""SELECT module_title, customer, situation, problem, respond FROM module WHERE module_id = %s""", (module_id,))
+        cur.execute("""SELECT module_title, customer, situation, problem, respond, format FROM module WHERE module_id = %s""", (module_id,))
         module_info = cur.fetchone()
         name = module_info['module_title']
         text = 'Customer: ' + module_info['customer'] + 'Situation: ' + module_info['situation'] + 'Problem: ' + module_info['problem'] + 'Respond: ' + module_info['respond']
         chat = get_training_simulator(module_id, team_id)
 
+        # if last chat is pending but has a response, then set view_video to true
+        if chat[-1]['content'] != None and chat[-1]['role'] == 'user':
+            view_video = chat[-1]['content']
+            audio = chat[-2]['content']
+        else:
+            view_video = False
+            audio = chat[-1]['content']
         # get training id
         cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND training_status = 'completed' and team_id = %s""", (module_id, team_id))
         completed = cur.fetchone()['count']
         cur.execute("""SELECT COUNT(*) as count FROM training WHERE module_id = %s AND team_id = %s""", (module_id, team_id))
         total = cur.fetchone()['count']
-        print('values', completed, total)
+
+
+        # get simulator video if there isnt one already
+        with get_db_connection() as conn:
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cur.execute("""SELECT vid_query, query_id as query, training_id FROM training WHERE team_id = %s AND module_id = %s AND training_status = 'pending' ORDER BY id ASC LIMIT 1""", (team_id, module_id))
+            video_id = cur.fetchone()
+            print(video_id)
+            if video_id['vid_query'] == None:
+                # create video
+                training_id = video_id['training_id']
+                video_id = create_simulator_video(chat[-1]['content'])
+                # add video to training
+                cur.execute("""UPDATE training SET vid_query = %s WHERE training_id = %s""", (video_id, training_id))
+            else:
+                video_id = video_id['vid_query']
+
+
         if completed < total:
             cur.execute("""SELECT training_id FROM training WHERE module_id = %s AND training_status = 'pending' and team_id = %s ORDER BY id ASC LIMIT 1""", (module_id, team_id))
             training_id = cur.fetchone()['training_id']
@@ -2188,10 +2260,15 @@ async def testSimulator(response: Response, request: Request, role_id:str, modul
     # return render_template('testSimulator.html', chat=chat, title=name, completed=completed, total=total, module_id=module_id, training_id=training_id, customer=module_info['customer'], situation=module_info['situation'], problem=module_info['problem'], respond=module_info['respond'])
     response = EMPLOYER_TEMPLATES.TemplateResponse(
         "testSimulator.html",
+        # "voice.html",
         {
             "request": request,
+            "video_id": video_id,
             "name": manager.first_name,
             "chat": chat,
+            "audio": audio,
+            "view_video": view_video,
+            "format": module_info['format'],
             "text": text,
             "role_id": role_id,
             "title": name,
@@ -2206,6 +2283,91 @@ async def testSimulator(response: Response, request: Request, role_id:str, modul
         }
     )
     return response
+
+
+@api_router.post("/company/submit_simulator_video/{module_id}/{role_id}", status_code=200)
+async def submitSimulatorVideo(response: Response, request: Request, role_id:str, module_id: str, video: UploadFile = File(...), training_id: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Save Video'''
+    # Load the binary data into a bytes buffer
+    filename = generate_id()
+    # read the file contents into memory
+    file_content = await video.read()
+    # use ffmpeg to convert the video to MP4 format
+    ffmpeg_input = ffmpeg.input('pipe:', format='webm')
+    ffmpeg_output = ffmpeg.output(ffmpeg_input, filename + '.mp4', r=30)
+    ffmpeg.run(ffmpeg_output, input=file_content)
+    # upload the MP4 file to the Wasabi bucket
+    with open(filename + '.mp4', 'rb') as f:
+        my_bucket = configs.wasabi.Bucket('simulator')
+        my_bucket.put_object(Key=filename + '.mp4', Body=f)
+
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""Update training SET response = %s WHERE training_id = %s""", (filename + '.mp4', training_id))
+
+    # delete the local file
+    os.remove(filename + '.mp4')
+
+    # Return a redirect response to the simulator page
+    return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
+
+
+@api_router.post("/company/submit_simulator_video/reset/{module_id}/{role_id}", status_code=200)
+async def submitSimulatorVideoReset(response: Response, request: Request, role_id:str, module_id: str, training_id: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+    '''Remove video from training'''
+    # check that manager has permission to view the module (either access is public or manager is the creator)
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s""", (module_id,))
+        access, company_id = cur.fetchone()
+        if access == 'private' and company_id != manager.company_id:
+            # error
+            return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+        
+    # remove video from training
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""Update training SET response = NULL WHERE training_id = %s""", (training_id,))
+        
+    return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
+
+
+@api_router.post("/company/submit_simulator_video/save/{module_id}/{role_id}", status_code=200)
+async def submitSimulatorVideoSave(response: Response, request: Request, role_id:str, module_id: str, training_id: str = Form(...), manager: Manager = Depends(get_current_manager)) -> dict:
+    '''save video tp training'''
+    # check that manager has permission to view the module (either access is public or manager is the creator)
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT access, company_id FROM module WHERE module_id = %s""", (module_id,))
+        access, company_id = cur.fetchone()
+        if access == 'private' and company_id != manager.company_id:
+            # error
+            return RedirectResponse(url=f"/company/add_modules/{role_id}?alert='Error'", status_code=302)
+
+    
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""SELECT response FROM training WHERE training_id = %s""", (training_id,))
+        video_filename = cur.fetchone()['response']
+        
+    # get mp3 from mp4 file
+    ffmpeg_input = ffmpeg.input("https://s3.us-west-1.wasabisys.com/simulator/" + video_filename)
+    ffmpeg_output = ffmpeg.output(ffmpeg_input, 'audio.mp3', acodec='libmp3lame', ac=1, ar=16000)
+    ffmpeg.run(ffmpeg_output)
+    
+    # get transcript
+    audio_file= open("audio.mp3", "rb")
+    transcript = openai.Audio.transcribe("whisper-1", audio_file)
+
+    # delete the local file
+    os.remove("audio.mp3")
+
+    # save transcript to response
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""Update training SET response = %s, video = %s, training_status = %s WHERE training_id = %s""", (transcript['text'], video_filename, 'completed', training_id))
+
+    return RedirectResponse(url=f"/company/test_module/simulator/{module_id}/{role_id}", status_code=302)
 
 
 @api_router.post("/company/submit_simulator/{module_id}/{role_id}", status_code=200)
@@ -2649,7 +2811,7 @@ async def testSoftwareSubmit(training_id: str, team_id:str, request: Request, ti
             end_time_tracker(time_token, training_id)
             with get_db_connection() as conn:
                 cur = conn.cursor()
-                cur.execute("""UPDATE training SET training_status = 'completed'
+                cur.execute("""UPDATE training SET training_status = 'completed', updated = now()
                             WHERE training_id = %s AND team_id = %s""", (training_id, team_id))
                 conn.commit()
                 # get module_id
