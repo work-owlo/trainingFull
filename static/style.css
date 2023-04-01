@@ -61,7 +61,7 @@ background-color: rgb(245, 245, 245);
 .logo {
     all: unset;
     margin-left:1rem;
-    padding:.3rem;
+    padding:.2rem;
 }
 
 .container {
@@ -199,11 +199,24 @@ background-color: rgb(245, 245, 245);
     color:#70ABAF
 }
 
+.hero {
+    background: linear-gradient(to right, #FFF, #CBDDDF);
+    padding-top:2rem;
+}
+
+.noHover{
+    pointer-events: none;
+}
+
 .header-navbar {
-    position: absolute;
-    margin-top:2rem;
-    margin-left:2%;
-    width:90%;
+    /* position: absolute; */
+    background-color: white;
+    /* background:transparent; */
+    position:fixed;
+    padding:.3rem;
+    padding-left:5rem;
+    padding-right:5rem;
+    width:100%;
     z-index: 100;
 }
 
@@ -495,6 +508,44 @@ td {
     width: 100%;
 }
 
+.play {
+    width: 100%;
+    /* margin-left: 10%; */
+    padding:1rem;
+    margin-top:2rem;
+    margin-bottom:2rem;
+}
+
+#bot_video {
+    background-color: rgb(219, 219, 219) !important; /* or whatever you want */
+}
+
+.video {
+    border-radius: 20px;
+    width: 100%;
+}
+
+.audio {
+    border-radius: 10px;
+    width:100%;
+    background-color: #afced0;
+    height:10rem;
+    margin-bottom:2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.mic {
+    font-size:4rem;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom:1rem;
+    margin-top:3rem;
+    color:white;
+}
+
 .type-contractor {
     /* blue text with border */
     color: #e57346;
@@ -628,8 +679,9 @@ td {
 }
 
 .round {
-    border-radius: 0% 0% 0% 20%;
+    /* border-radius: 0% 0% 0% 20%; */
     position: relative;
+    padding:0px;
 }
   
   .carousel-slideshow {
