@@ -15,7 +15,7 @@ from pathlib import Path
 import re
 import configs
 import io
-import ffmpeg
+# import ffmpeg
 import cv2
 
 from employee_auth import *
@@ -2293,9 +2293,9 @@ async def submitSimulatorVideo(response: Response, request: Request, role_id:str
     # read the file contents into memory
     file_content = await video.read()
     # use ffmpeg to convert the video to MP4 format
-    ffmpeg_input = ffmpeg.input('pipe:', format='webm')
-    ffmpeg_output = ffmpeg.output(ffmpeg_input, filename + '.mp4', r=30)
-    ffmpeg.run(ffmpeg_output, input=file_content)
+    # ffmpeg_input = ffmpeg.input('pipe:', format='webm')
+    # ffmpeg_output = ffmpeg.output(ffmpeg_input, filename + '.mp4', r=30)
+    # ffmpeg.run(ffmpeg_output, input=file_content)
     # upload the MP4 file to the Wasabi bucket
     with open(filename + '.mp4', 'rb') as f:
         my_bucket = configs.wasabi.Bucket('simulator')
