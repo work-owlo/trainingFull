@@ -11,13 +11,19 @@
         </div>
     </div>
 
+    {% if comprehensive['progress'] != '100' %}
+      <div class="alert alert-primary" role="alert" style="text-align: center;">
+        Onboarding for the role is in progress!
+      </div>
+    {% endif %}
+
     <!-- Comprehensive statistics bar -->
     <div class="row row-cols-1 row-cols-md-4 g-4 ">  
         {% for key, value in comprehensive.items() %}
             <div class="col">
                 <div class="card border-primary stats-card" style="">
                     <div class="card-body">
-                    {% if value[1] == 0 %}
+                    {% if value[1] == 0 and not key == 'progress' %}
                     <h5 class="card-title" style="color: #70ABAF;">-</h5>
                     {% elif key == 'avg_sentiment' and value[1] >= 50 %} 
                     <h5 class="card-title" style="color: #70ABAF;">{{value[1]}} (Positive) </h5>
@@ -118,29 +124,56 @@
                         </div>
                     </div>
                     {% if tool['tool_id'] != '4' %}
-                    <div class="report-chat">
-                        <div class="report-chat">
-                            <div class="texts">
-                            {% for response in module['responses'] %} 
-                                {% if response['query_id'] %}
-                                <div class="chat-bot">
-                                    {{ response['query_id'] }}
+
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                          <button class="nav-link active" id="{{module_id}}-activity" data-bs-toggle="tab" data-bs-target="#{{module_id}}-activity-panel" type="button" role="tab" aria-controls="{{module_id}}-activity-panel" aria-selected="true">Activity</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <button class="nav-link" id="{{module_id}}-analysis" data-bs-toggle="tab" data-bs-target="#{{module_id}}-analysis-panel" type="button" role="tab" aria-controls="{{module_id}}-analysis-panel" aria-selected="false">Analysis</button>
+                        </li>
+                      </ul>
+                      <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="{{module_id}}-activity-panel" role="tabpanel" aria-labelledby="{{module_id}}-activity" tabindex="0">
+                            <div class="report-chat" >
+                                <div class="report-chat">
+                                    {% if module['responses']|length == 0 %}
+                                    <div class="alert alert-success" role="alert" style="text-align: center;">
+                                        This module has not been started
+                                    </div>
+                                    {% endif %}
+                                    <div class="texts">
+                                    {% for response in module['responses'] %} 
+                                        {% if response['query_id'] %}
+                                        <div class="chat-bot">
+                                            {{ response['query_id'] }}
+                                        </div>
+                                        {% endif %}
+                                        {% if response['response'] %}
+                                        <div class="chat-user">
+                                            {{ response['response'] }}
+                                        </div>
+                                        {% endif %}
+                                        {% if response['responsetoresponse'] %}
+                                        <div class="chat-bot">
+                                            {{ response['responsetoresponse'] }}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </div>
                                 </div>
-                                {% endif %}
-                                {% if response['response'] %}
-                                <div class="chat-user">
-                                    {{ response['response'] }}
-                                </div>
-                                {% endif %}
-                                {% if response['responsetoresponse'] %}
-                                <div class="chat-bot">
-                                    {{ response['responsetoresponse'] }}
-                                </div>
-                                {% endif %}
-                            {% endfor %}
                             </div>
+
                         </div>
-                    </div>
+                        <div class="tab-pane fade" id="{{module_id}}-analysis-panel" role="tabpanel" aria-labelledby="{{module_id}}-analysis" tabindex="0">
+                            {% if module['analysis']|length == 0 %}
+                                <br>
+                                <div class="alert alert-success" role="alert" style="text-align: center;">
+                                    Analysis will generate after module is completed
+                                </div>
+                            {% endif %}
+                        </div>
+                      </div>
                     {% endif %}
                 </div>
             {% endfor %}

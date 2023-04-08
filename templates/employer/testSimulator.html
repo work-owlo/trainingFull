@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+<script src="https://unpkg.com/wavesurfer.js"></script>
 
 <script>
     $(document).ready(function(){
@@ -45,36 +48,140 @@
         {% if chat|length > 0 %}
         <h4 class="label"> Simulator Created - Try it out!</h4>
         <!-- <video id="video" class="camera" autoplay></video> -->
-        <video id="video" class="video"  autoplay></video>
-        <button id="recordButton" class="btn btn-success" onclick="record()">Begin Response</button>
-        <button id="stopButton"  class="btn btn-success" onclick="stop()" disabled>End Response</button>
-        <div class="test-chat">
-            <div class="texts">
-            {% for c in chat %} 
-                {% if c['role'] == 'assistant' %}
-                <div class="chat-bot">
-                    {{ c['content'] }}
-                </div>
-                {% else %}
-                <div class="chat-user">
-                    {{ c['content'] }}
-                </div>
-                {% endif %}
-            {% endfor %}
-            </div>
-            <!-- automatically scroll to the last text -->
+        {% if format == 'video' %}
+        {% if completed == 0 %}
+        <video id="bot_video" class="video" style="width:100%;height:40vh;cursor:pointer" src="{{video_id}}" type="video/mp4"  {{'autoplay' if not view_video}}></video>
+        {% else %}
+        <video id="bot_video" class="video" style="width:100%;height:40vh;cursor:pointer" src="{{url_for('static', path='image_2.mp4')}}" type="video/mp4"  {{'autoplay' if not view_video}}></video>
+        {% endif %}
+        {% if view_video %}
+            <video id="response_vid" class="video" style="width:100%;height:40vh;cursor:pointer;background-color: rgb(219, 219, 219);" src="https://s3.us-west-1.wasabisys.com/simulator/{{view_video}}" type="video/mp4"></video>
             <script>
-                var objDiv = document.getElementsByClassName("texts")[0];
-                objDiv.scrollTop = objDiv.scrollHeight;
+                window.onload = function() {
+                    const videoElement = document.getElementById('bot_video');
+                    const responseElement = document.getElementById('response_vid');
+    
+                    responseElement.addEventListener('click', function() {
+                    if (responseElement.paused) {
+                        responseElement.play();
+                    } else {
+                        responseElement.pause();
+                    }
+
+                    videoElement.addEventListener('click', function() {
+                    if (videoElement.paused) {
+                        videoElement.play();
+                    } else {
+                        videoElement.pause();
+                    }
+                    });
+
+                    });
+                }
             </script>
-            <div class="text-input">
-                <form action="{{url_for('submitSimulator', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
-                    <!-- disabled trianing id field -->
-                    <input type="hidden" name="training_id" value="{{training_id}}">
-                    <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
-                 </form>
+            
+            <div class="row">
+                <div class="col-3">
+                    <form action="/company/submit_simulator_video/save/{{module_id}}/{{role_id}}" method="POST">
+                        <input type="hidden" name="training_id" value="{{training_id}}">
+                        <button class="btn btn-success">Save Response</button>
+                    </form>
+                </div>
+                <div class="col-3">
+                    <form action="/company/submit_simulator_video/reset/{{module_id}}/{{role_id}}" method="POST">
+                        <input type="hidden" name="training_id" value="{{training_id}}">
+                        <button class="btn btn-success">Re-record</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <script>
+                window.onload = function() {
+                    const videoElement = document.getElementById('bot_video');
+
+                    videoElement.addEventListener('click', function() {
+                    if (videoElement.paused) {
+                        videoElement.play();
+                    } else {
+                        videoElement.pause();
+                    }
+                    });
+                }
+            </script>
+            <video id="video" class="video" style="width:100%;height:40vh;cursor:pointer;background-color: rgb(219, 219, 219);"  autoplay muted></video>
+            <button id="recordButton" class="btn btn-success" onclick="record()">Begin Response</button>
+            <button id="stopButton"  class="btn btn-success" style="display:none" onclick="stop()" disabled>End Response</button>
+        {% endif %}
+              
+        {% elif format == 'audio' %}
+
+            <!-- hidden input of audio -->
+            <input type="hidden" id="audio" name="audio" value="{{audio}}">
+            <button class="btn btn-success-outline play" onclick="speak()">Play</button>
+            <script>
+                const synth = window.speechSynthesis;
+        
+                function speak() {
+                    // wait 1 second
+                    var text = document.getElementById("audio").value;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    synth.speak(utterance);
+                }
+            </script>
+
+                {% if view_video %}
+                    <video class="" style="width:100%;height:3rem;margin-bottom:2rem" src="https://s3.us-west-1.wasabisys.com/simulator/{{view_video}}" type="video/mp4" controls></video>
+                    <div class="row">
+                        <div class="col-3">
+                            <form action="/company/submit_simulator_video/save/{{module_id}}/{{role_id}}" method="POST">
+                                <input type="hidden" name="training_id" value="{{training_id}}">
+                                <button class="btn btn-success">Save Response</button>
+                            </form>
+                        </div>
+                        <div class="col-3">
+                            <form action="/company/submit_simulator_video/reset/{{module_id}}/{{role_id}}" method="POST">
+                                <input type="hidden" name="training_id" value="{{training_id}}">
+                                <button class="btn btn-success">Re-record</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div id="audio" class="audio" style="">
+                        <ion-icon name="mic-outline" class="mic"></ion-icon>
+                    </div>
+                    <button id="recordButton" class="btn btn-success" onclick="record()">Begin Response</button>
+                    <button id="stopButton"  class="btn btn-success" style="display: none;" onclick="stop()" disabled>End Response</button>
+                {% endif %}
+
+        {% else %}
+            <div class="test-chat">
+                <div class="texts">
+                {% for c in chat %} 
+                    {% if c['role'] == 'assistant' %}
+                    <div class="chat-bot">
+                        {{ c['content'] }}
+                    </div>
+                    {% else %}
+                    <div class="chat-user">
+                        {{ c['content'] }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+                <!-- automatically scroll to the last text -->
+                <script>
+                    var objDiv = document.getElementsByClassName("texts")[0];
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                </script>
+                <div class="text-input">
+                    <form action="{{url_for('submitSimulator', module_id=module_id, role_id=role_id)}}" method="POST" id="form">
+                        <!-- disabled trianing id field -->
+                        <input type="hidden" name="training_id" value="{{training_id}}">
+                        <input type="text" class="form-control" name="chat" id="chat" placeholder="Type your message">
+                    </form>
+                </div>
+            </div>
+            {% endif %}
         {% endif %}
     </div>
     <div class="col-md-4">
@@ -113,49 +220,117 @@
       </div>
     </div>
   </div>
+  {% if format == 'video' and not view_video %}
   <script>
     var video = document.getElementById('video');
-    var recordButton = document.getElementById('recordButton');
-    var stopButton = document.getElementById('stopButton');
-    var mediaRecorder = null;
-    var chunks = [];
+        var recordButton = document.getElementById('recordButton');
+        var stopButton = document.getElementById('stopButton');
+        var mediaRecorder = null;
+        var chunks = [];
 
-    navigator.mediaDevices.getUserMedia({video: true})
-        .then(function(stream) {
-            video.srcObject = stream;
-            mediaRecorder = new MediaRecorder(stream, {mimeType: 'video/webm'});
-            mediaRecorder.ondataavailable = function(event) {
-                chunks.push(event.data);
-            };
-            mediaRecorder.onstop = function(event) {
-                var blob = new Blob(chunks, {type: 'video/webm'});
-                chunks = [];
-                var formData = new FormData();
-                formData.append('video', blob, 'recording.webm');
-                fetch('/submit', {method: 'POST', body: formData})
-                    .then(function(response) {
-                        console.log('Video submitted.');
-                    })
-                    .catch(function(error) {
-                        console.error('Unable to submit video.', error);
-                    });
-            };
-        })
-        .catch(function(error) {
-            console.error('Unable to access the camera.', error);
-        });
+        navigator.mediaDevices.getUserMedia({video: true, audio: true})
+            .then(function(stream) {
+                video.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm',
+                    audioBitsPerSecond: 128000
+                });
+                mediaRecorder.ondataavailable = function(event) {
+                    chunks.push(event.data);
+                };
+                mediaRecorder.onstop = function(event) {
+                    var blob = new Blob(chunks, {type: 'video/webm'});
+                    chunks = [];
+                    var formData = new FormData();
+                    formData.append('video', blob, 'recording.webm');
+                    formData.append('training_id', '{{training_id}}');
+                    fetch('http://127.0.0.1:8201/company/submit_simulator_video/{{module_id}}/{{role_id}}', {method: 'POST', body: formData})
+                        .then(function(response) {
+                            window.location.reload();
+                            console.log('Video submitted.');
+                        })
+                        .catch(function(error) {
+                            console.error('Unable to submit video.', error);
+                        });
+                };
+            })
+            .catch(function(error) {
+                console.error('Unable to access the camera.', error);
+            });
 
-    function record() {
-        mediaRecorder.start();
-        recordButton.disabled = true;
-        stopButton.disabled = false;
-    }
+        function record() {
+            mediaRecorder.start();
+            recordButton.disabled = true;
+            stopButton.disabled = false;
+            document.getElementById('stopButton').style.display = 'block';
+            document.getElementById('recordButton').style.display = 'none';
 
-    function stop() {
-        mediaRecorder.stop();
-        recordButton.disabled = false;
-        stopButton.disabled = true;
-    }
-</script>
+        }
+
+        function stop() {
+            mediaRecorder.stop();
+            recordButton.disabled = true;
+            stopButton.disabled = true;
+            document.getElementById('stopButton').style.display = 'none';
+        }
+
+    </script>
+{% elif format == 'audio' %}
+<script>
+    var video = document.getElementById('audio');
+        var recordButton = document.getElementById('recordButton');
+        var stopButton = document.getElementById('stopButton');
+        var mediaRecorder = null;
+        var chunks = [];
+
+        navigator.mediaDevices.getUserMedia({video: false, audio: true})
+            .then(function(stream) {
+                video.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm',
+                    audioBitsPerSecond: 128000
+                });
+                mediaRecorder.ondataavailable = function(event) {
+                    chunks.push(event.data);
+                };
+                mediaRecorder.onstop = function(event) {
+                    var blob = new Blob(chunks, {type: 'video/webm'});
+                    chunks = [];
+                    var formData = new FormData();
+                    formData.append('video', blob, 'recording.webm');
+                    formData.append('training_id', '{{training_id}}');
+                    fetch('http://127.0.0.1:8201/company/submit_simulator_video/{{module_id}}/{{role_id}}', {method: 'POST', body: formData})
+                        .then(function(response) {
+                            window.location.reload();
+                            console.log('Video submitted.');
+                        })
+                        .catch(function(error) {
+                            console.error('Unable to submit video.', error);
+                        });
+                };
+            })
+            .catch(function(error) {
+                console.error('Unable to access the camera.', error);
+            });
+
+        function record() {
+            mediaRecorder.start();
+            recordButton.disabled = true;
+            stopButton.disabled = false;
+            document.getElementById('stopButton').style.display = 'block';
+            document.getElementById('recordButton').style.display = 'none';
+
+        }
+
+        function stop() {
+            mediaRecorder.stop();
+            recordButton.disabled = true;
+            stopButton.disabled = true;
+            document.getElementById('stopButton').style.display = 'none';
+        }
+
+    </script>
+
+{% endif %}
 </html>
 {% endblock %}

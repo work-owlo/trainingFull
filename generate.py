@@ -114,7 +114,7 @@ def generate_simulation_response(init, question_history, tool_name):
     question_history.insert(0, init)
     # get the latest question
     question_history[-1]['content'] = question_history[-1]['content'] + ". Generate reply to this question with you as the customer only.  I will answer as the customer service representative"
-    # print(question_history) 
+    print(question_history) 
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=question_history
@@ -143,7 +143,7 @@ def generate_steps(task, focus, role, documentation=None):
         )
     # print(completion)
     value = completion.choices[0].message['content']
-    # value = "\n\n{\n  \"data\": {\n    \"steps\": [\n      \"Begin by assessing the weight and dimensions of the box(es) before attempting to lift them. Always ensure that the boxes can be lifted safely and without risk of injury.\",\n      \"Take a moment to stretch and loosen up your muscles, especially your back and legs, before lifting. Stand in front of the box with your feet shoulder-width apart.\",\n      \"Squat down, bending at the knees, and grip the box firmly with both hands. Keep your back straight and lift the box up slowly, using the force from your legs rather than your back.\",\n      \"Once the box is off the ground, hug it close to your body to maintain balance and control. Avoid twisting your body or jerking the box in any direction.\",\n      \"If necessary, take small steps to move the box to its desired location. Avoid sudden movements and be aware of your surroundings at all times.\",\n      \"If you need to lift multiple boxes, take breaks as needed to avoid overexertion and fatigue. Always prioritize safety over speed.\",\n      \"When you're finished lifting, take a few additional moments to stretch and relax your muscles. Avoid any activities that could put additional strain on your back or joints.\",\n      \"If you experience discomfort or pain while lifting, stop immediately and seek medical attention if necessary. Report any accidents or injuries to your supervisor.\",\n      \"Be aware of any safety equipment or procedures provided by your employer, such as back braces or lifting devices. Use them as directed to minimize the risk of injury.\",\n      \"Maintain proper posture throughout the lifting process. Keep your shoulders back, your chest out, and your head looking forward.\",\n      \"Take the necessary precautions to prevent slips and falls, especially if you're lifting boxes in a wet or slippery environment. Wear slip-resistant shoes and be mindful of any hazards in your surroundings.\",\n      \"Communicate with your coworkers and supervisors to ensure that everyone is on the same page regarding safety procedures and expectations.\",\n    ],\n    \"questions\": [\n      \"What should you do before attempting to lift a heavy box?\",\n      \"Which part of your body should you prioritize when stretching before lifting?\",\n      \"How should you grip a heavy box when lifting it up?\",\n      \"What should you do to maintain balance and control when lifting a heavy box?\",\n      \"How should you move a heavy box from one location to another?\",\n      \"What should you do if you need to lift multiple heavy boxes?\",\n      \"Why should you prioritize safety over speed when lifting heavy boxes?\",\n      \"What should you do if you experience discomfort or pain while lifting?\",\n      \"What safety equipment or procedures might be provided by your employer to help you lift heavy boxes safely?\",\n      \"What is the proper posture for lifting a heavy box?\",\n      \"What precautions should you take to prevent slips and falls when lifting heavy boxes?\",\n      \"Why is communication important for lifting heavy boxes safely?\",\n    ]\n  }\n}"
+    value = "\n\n{\n  \"data\": {\n    \"steps\": [\n      \"Begin by assessing the weight and dimensions of the box(es) before attempting to lift them. Always ensure that the boxes can be lifted safely and without risk of injury.\",\n      \"Take a moment to stretch and loosen up your muscles, especially your back and legs, before lifting. Stand in front of the box with your feet shoulder-width apart.\",\n      \"Squat down, bending at the knees, and grip the box firmly with both hands. Keep your back straight and lift the box up slowly, using the force from your legs rather than your back.\",\n      \"Once the box is off the ground, hug it close to your body to maintain balance and control. Avoid twisting your body or jerking the box in any direction.\",\n      \"If necessary, take small steps to move the box to its desired location. Avoid sudden movements and be aware of your surroundings at all times.\",\n      \"If you need to lift multiple boxes, take breaks as needed to avoid overexertion and fatigue. Always prioritize safety over speed.\",\n      \"When you're finished lifting, take a few additional moments to stretch and relax your muscles. Avoid any activities that could put additional strain on your back or joints.\",\n      \"If you experience discomfort or pain while lifting, stop immediately and seek medical attention if necessary. Report any accidents or injuries to your supervisor.\",\n      \"Be aware of any safety equipment or procedures provided by your employer, such as back braces or lifting devices. Use them as directed to minimize the risk of injury.\",\n      \"Maintain proper posture throughout the lifting process. Keep your shoulders back, your chest out, and your head looking forward.\",\n      \"Take the necessary precautions to prevent slips and falls, especially if you're lifting boxes in a wet or slippery environment. Wear slip-resistant shoes and be mindful of any hazards in your surroundings.\",\n      \"Communicate with your coworkers and supervisors to ensure that everyone is on the same page regarding safety procedures and expectations.\",\n    ],\n    \"questions\": [\n      \"What should you do before attempting to lift a heavy box?\",\n      \"Which part of your body should you prioritize when stretching before lifting?\",\n      \"How should you grip a heavy box when lifting it up?\",\n      \"What should you do to maintain balance and control when lifting a heavy box?\",\n      \"How should you move a heavy box from one location to another?\",\n      \"What should you do if you need to lift multiple heavy boxes?\",\n      \"Why should you prioritize safety over speed when lifting heavy boxes?\",\n      \"What should you do if you experience discomfort or pain while lifting?\",\n      \"What safety equipment or procedures might be provided by your employer to help you lift heavy boxes safely?\",\n      \"What is the proper posture for lifting a heavy box?\",\n      \"What precautions should you take to prevent slips and falls when lifting heavy boxes?\",\n      \"Why is communication important for lifting heavy boxes safely?\",\n    ]\n  }\n}"
     # remove all \n
     value = value.replace("\n", "")
     # remove all \t
@@ -174,3 +174,31 @@ def generate_physical_questions(task, focus, role, documentation=None):
         )
     return clean_output(completion.choices[0].message['content'])
 
+
+def generate_compliance_summary(reg, num):
+    prompt = """Give """ + str(num) + """ 2-sentence blocks to teach an employee about """ + reg
+    prompt += """Output as {"data": [summary_1, summary2, summary3]}  No other text"""
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        max_tokens=600,
+        messages=[
+            {"role": "user", "content": prompt}
+        ])
+    summary = completion.choices[0].message['content']
+    print("Compliance Summary: ", summary)
+   
+    return json.loads(summary)["data"]
+
+
+def generate_analysis(training_data, goal):
+    prompt = "conversation:" + training_data
+    prompt+= "Did the user meet the goal of " + goal + "? Provide actionable next steps to improve. Give your response as a json in the format {'data': {'goal_met':..., 'goal_met_description'..., 'steps': [...]}}"
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        max_tokens=600,
+        messages=[
+            {"role": "user", "content": prompt}
+        ])
+    analysis = completion.choices[0].message['content']
+    print("Analysis: ", analysis)
+    return json.loads(analysis)["data"]

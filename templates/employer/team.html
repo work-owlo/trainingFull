@@ -31,20 +31,7 @@
                 </div>
             </form>
             <!-- Team Table -->
-            <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col" style="width:5rem">ID</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Status</th>
-                    <th scope="col" class="invisible">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <table class="table">
                 {% if roles|length > 0 %}
                     <tr>
                         <form action="/company/assign_employee" method="post">
@@ -56,7 +43,11 @@
                             
                             <select class="form-select search-inputs" name="role_id" id="role_id" aria-label="Filter" required>
                                 {% for role in roles %}
-                                    <option value="{{role['role_id']}}">{{role['role_name']}}</option>
+                                    {% if role['disabled'] == '1' %}
+                                        <option value="{{role['role_id']}}" disabled>{{role['role_name']}}</option>
+                                    {% else %}
+                                        <option value="{{role['role_id']}}">{{role['role_name']}}</option>
+                                    {% endif %}
                                 {% endfor %}
                                 <!-- <option value="dispatch">Dispatch</option>
                                 <option value="driver">Driver</option> -->
@@ -64,7 +55,7 @@
                         
                         </span></td>
 
-                        <td><span class="type"> 
+                        <td colspan="2"><span class="type"> 
                             
                             <select class="form-select search-inputs" name="employment_type" id="employment_type" aria-label="Filter" required>
                                 <option value="employee">Employee</option>
@@ -79,9 +70,25 @@
                     
                     </tr>
                 {% endif %}
+                </table>
+                <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col" style="width:5rem">ID</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" >Updated</th>
+                    <th scope="col" class="invisible">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {% if members|length == 0 %}
                     <tr>
-                        <td colspan="8">No members found</td>
+                        <td colspan="9">No members found</td>
                     </tr>
                   {% endif %}
                   {% for member in members %}
@@ -93,6 +100,7 @@
                         <td >{{member['role']|title}}</td>
                         <td><span class="type-{{member['employment_type']|lower}}"> {{member['employment_type']|title}} </span></td>
                         <td><span class="status-{{'pending' if member['status']|int < 100 else 'completed'}}"> {{member['status']|title}}% </span></td>
+                        <td><span class=""> {{member['date_updated'] if member['date_updated'] else '-'}} </span></td>
                         <td>
                         <div class="btn-group dropend">
                             <button type="button" class="btn-clear" data-bs-toggle="dropdown" aria-expanded="false">
@@ -100,11 +108,17 @@
                             </button>
                             <ul class="dropdown-menu">
                               <!-- Dropdown menu links -->
-                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View Training</a></li>
+                                <li><a class="dropdown-item" href="/company/employee/view/{{member['id']}}">View Report</a></li>
                                 <li>
                                     <form action="/company/employee/remind/{{member['id']}}" method="post" class="remind">
                                         <input type="hidden" name="team_id" value="{{member['id']}}">
                                         <button class="dropdown-item">Remind</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="/company/employee/reset/" method="post">
+                                        <input type="hidden" name="team_id" value="{{member['id']}}">
+                                        <button class="dropdown-item">Reset Progress</button>
                                     </form>
                                 </li>
                                 <li>

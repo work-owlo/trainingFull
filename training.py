@@ -5,18 +5,21 @@ from nlp import *
 import datetime
 import spacy
 import numpy as np
+import requests
 from scipy.spatial.distance import cosine
 
-def get_roles(company_id):
+def get_job_roles(company_id):
     '''Get all roles that from company_id from the database.'''
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("SELECT role_id, role_name FROM job_roles WHERE company_id = %s and status != 'deleted' ORDER BY role_name asc", (company_id,))
         roles = cur.fetchall()
         roles_list = []
+        roles_list.append(Role(role_id=0, role_name="--- Yours ---", disabled='1'))
         if roles != None:
             for role in roles:
                 roles_list.append(Role(role_id=role[0], role_name=role[1]))
+    roles_list.append(Role(role_id=0, role_name="--- Public ---", disabled='1'))
     return roles_list + get_public_roles()
 
 
@@ -153,11 +156,11 @@ def add_module(company_id, title, desc, tool_id, text, access='private'):
     return module_id
 
 
-def add_module_simulator(company_id, title, desc, tool_id, num_chats, customer, situation, problem, respond, access='private', text=None):
+def add_module_simulator(company_id, title, desc, tool_id, num_chats, customer, situation, problem, respond, format, access='private', text=None):
     module_id = generate_id()
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("INSERT INTO module (module_id, company_id, tool_id, module_title, module_description, access, module_text, num_chats, customer, situation, problem, respond) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (module_id, company_id, tool_id, title, desc, access, text, num_chats, customer, situation, problem, respond))
+        cur.execute("INSERT INTO module (module_id, company_id, tool_id, module_title, module_description, access, module_text, num_chats, customer, situation, problem, respond, format) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (module_id, company_id, tool_id, title, desc, access, text, num_chats, customer, situation, problem, respond, format))
     return module_id
 
 
@@ -322,10 +325,13 @@ def get_training_simulator(module_id, team_id):
                 training_data.append({'role': 'assistant', 'content': question})
             else:
                 training_data.append({'role': 'assistant', 'content': pending['query_id']})
+                if pending['response']:
+                    training_data.append({'role': 'user', 'content': pending['response']})
         for i in training_data:
             # remove any occurrences of the phrase "Generate reply to this question with you as the customer only.  I will answer as the customer service representative"
             i['content'] = i['content'].replace("Generate reply to this question with you as the customer only.  I will answer as the customer service representative", "")
             i['content'] = i['content'].replace("Generate reply to this question with you as the customer only. I will answer as the customer service representative", "")
+        print('training_data: ', training_data)
         return training_data
     
 
@@ -335,31 +341,55 @@ def generate_prompt(module_id):
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute("SELECT * FROM module WHERE module_id = %s", (module_id,))
         module = cur.fetchone()
-        prompt = f"Problem: {module['problem']} "
-        prompt += f"You play the role of a {module['customer']}"
-        prompt += f"Sitation: {module['situation']}"
-        prompt += f"Respond: {module['respond']}"
-        prompt += f"Make the conversation last {module['num_chats'] * 2} chats"
-        prompt += "Only give me the first chat of the conversation"
+        prompt = f" Problem: {module['problem']} "
+        prompt += f" You play the role of a {module['customer']}"
+        prompt += f" Sitation: {module['situation']}"
+        prompt += f" Respond: {module['respond']}"
+        prompt += f" Make the conversation last {module['num_chats'] * 2} chats"
+        prompt += " Only give me the first chat of the conversation"
     return {'role': 'assistant', 'content': prompt}
 
 
 
 def update_training_status(training_id, response, status, score=None):
-    print(training_id, response, status)
     '''Update training status'''
     sentiment = get_sentiment_score(response)
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("UPDATE training SET training_status = %s, response = %s, responsetoresponse = %s, sentiment = %s WHERE training_id = %s", (status, response, score, sentiment, training_id))
-        conn.commit()
+        cur.execute("UPDATE training SET updated = now(), training_status = %s, response = %s, responsetoresponse = %s, sentiment = %s WHERE training_id = %s", (status, response, score, sentiment, training_id))
+        
+        # get progress for this module, and if 100%, generate action items
+        cur.execute("SELECT count(*) FROM training WHERE module_id = (SELECT module_id FROM training WHERE training_id = %s) AND team_id = (SELECT team_id FROM training WHERE training_id = %s)", (training_id, training_id))
+        total = cur.fetchone()[0]
+
+        cur.execute("SELECT count(*) FROM training WHERE module_id = (SELECT module_id FROM training WHERE training_id = %s) AND team_id = (SELECT team_id FROM training WHERE training_id = %s) AND training_status = 'pending'", (training_id, training_id))
+        pending = cur.fetchone()[0]
+        progress = (total - pending) / total
+        if progress == 1:
+            cur.execute("SELECT module_id, team_id FROM training WHERE training_id = %s", (training_id,))
+            module_id = cur.fetchone()[0]
+            team_id = cur.fetchone()[1]
+            training_data = get_training_simulator(module_id, team_id)
+            # get goal of module
+            cur.execute("SELECT respond FROM module WHERE module_id = %s", (module_id,))
+            goal = cur.fetchone()[0]
+            simulator = generate_analysis(training_data, goal)
+            cur.execute("INSERT INTO goal (team_id, module_id, goal_met, goal_desc, steps) VALUES (%s, %s, %s, %s, %s)", (team_id, module_id, simulator['goal_met'], simulator['goal_desc'], simulator['steps']))
+
+
+def get_mod_analytics(module_id, team_id):
+    '''Get module analytics'''
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM goal WHERE module_id = %s AND team_id = %s", (module_id, team_id))
+        return cur.fetchone()
+    
 
 def update_training_status_slides(training_id, status):
     with get_db_connection() as conn:
         cur = conn.cursor()
-        cur.execute("UPDATE training SET training_status = %s WHERE training_id = %s", (status, training_id))
+        cur.execute("UPDATE training SET training_status = %s, updated = now() WHERE training_id = %s", (status, training_id))
         conn.commit()
-
 
 
 def time_tracker(training_id):
@@ -387,3 +417,48 @@ def end_time_tracker(tracker_id, training_id):
         cur.execute("DELETE FROM training_time_tracker WHERE time_tracker_token = %s", (tracker_id,))
         conn.commit()
 
+
+def create_simulator_video(text):
+    # url = "https://api.d-id.com/talks"
+    # print(text)
+    # payload = {
+    #     "script": {
+    #         "type": "text",
+    #         "provider": {
+    #             "type": "microsoft",
+    #             "voice_id": "Jenny"
+    #         },
+    #         "ssml": "false",
+    #         "input": text
+    #     },
+    #     "config": {
+    #         "fluent": "false",
+    #         "pad_audio": "0.0"
+    #     },
+    #     "source_url": "https://clips-presenters.d-id.com/amy/image.png"
+    # }
+    # headers = {
+    #     "accept": "application/json",
+    #     "content-type": "application/json",
+    #     "authorization": "Basic WVc1emFIVnNjR0YxYkVCaVpYSnJaV3hsZVM1bFpIVTpydm1SQ09DUVFfSTI5ZkItTFU3czk="
+    # }
+
+    # response = requests.post(url, json=payload, headers=headers)
+    # print(response.json())
+    # return get_talk(response.json()['id'])
+    id = 'tlk_4z8eg9_SRpae6WUybyL_3'
+    return get_talk(id)
+
+
+def get_talk(id):
+
+    url = "https://api.d-id.com/talks/" + id
+
+    headers = {
+        "accept": "application/json",
+        "authorization": "Basic WVc1emFIVnNjR0YxYkVCaVpYSnJaV3hsZVM1bFpIVTpydm1SQ09DUVFfSTI5ZkItTFU3czk="
+    }
+
+    response = requests.get(url, headers=headers)
+    print(response.json()['result_url'])
+    return response.json()['result_url']

@@ -516,7 +516,7 @@ async def company_landing(response:Response, request: Request, alert=None) -> di
         return RedirectResponse(url="/company/team") 
     return EMPLOYER_TEMPLATES.TemplateResponse(
         # "landing_local.html",
-        "landing.html",
+        "landing_updated.html",
         {
             "request": request,
             "alert":alert,

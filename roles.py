@@ -6,6 +6,7 @@ from employees import get_training_progress
 from graph import *
 import spacy
 import numpy as np
+from datetime import datetime
 from scipy.spatial.distance import cosine
 
 def add_role(company_id, role_id, role_name, role_description):
@@ -106,6 +107,19 @@ def get_employee_id(email):
     return employee_id[0]
 
 
+def get_updated(team_id):
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT updated FROM training WHERE team_id = %s AND training_status = 'completed' ORDER BY updated DESC LIMIT 1", (team_id,))
+        updated = cur.fetchone()
+        if updated == None:
+            return None
+        else:
+            updated_date = datetime.strftime(updated[0], '%m/%d/%y')
+            return updated_date
+
+
 def get_team(company_id, keyword=None, status=None):
     ''' Get all employees in company and filter if needed'''
     # lowercase keyword and status
@@ -126,7 +140,7 @@ def get_team(company_id, keyword=None, status=None):
         team_list = []
         if employees != None:
             for employee in employees:
-                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], status=int(get_training_progress(employee[0]))))
+                team_list.append(Member(id=employee[0], id_input=employee[3], first_name=employee[4], last_name=employee[5], email=employee[6], role=employee[7], employee_id=employee[1], role_id=employee[2], employment_type=employee[8], date_updated=get_updated(employee[0]), status=int(get_training_progress(employee[0]))))
         print(status)
         if status == 'completed':
             team_list = [t for t in team_list if t.status == '100']
@@ -268,6 +282,24 @@ def unasign_employee_role(company_id, team_id):
     return return_success()
 
 
+def reset_employee_role(company_id, team_id):
+    '''Reset employee role by setting status to pending'''
+    with get_db_connection() as conn:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # assign_employee_role(manager.company_id, id_input, first_name, last_name, email, role_id, employment_type)
+        cur.execute("SELECT company_id, role_id, first_name, last_name, email, employment_type FROM team WHERE team_id = %s AND status != 'unassigned'", (team_id,))
+        employee = cur.fetchone()
+        if employee == None:
+            return return_error("Employee not found")
+        elif employee['company_id'] != company_id:
+            return return_error("Permission Denied")
+        else:
+            cur.execute(
+                "DELETE FROM training WHERE team_id = %s", (team_id,))
+            add_training_tasks(team_id, employee['role_id'])
+            # assign_employee_role(employee['company_id'], team_id, employee['first_name'], employee['last_name'], employee['email'], employee['role_id'], employee['employment_type'])
+    return return_success()
+
 def delete_role(company_id, role_id):
     '''Delete role by setting status to deleted'''
     permission = check_role_in_company(company_id, role_id)
@@ -391,7 +423,7 @@ def get_team_role(team_id):
         return role[0], role[1]
 
 
-def get_role_modules(role_id):
+def get_report_modules(role_id):
     '''Get all the modules for a role'''
     # get all tools
     with get_db_connection() as conn:

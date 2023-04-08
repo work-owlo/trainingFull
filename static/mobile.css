@@ -6,6 +6,13 @@
         margin: 0 auto;
     }
 
+    .mobile {
+        display:block
+    }
+    /* .desktop {
+        display:none;
+    } */
+
     .hero-landing {
         margin-top:7rem;
     }

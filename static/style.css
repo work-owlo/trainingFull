@@ -153,6 +153,22 @@ background-color: rgb(245, 245, 245);
     text-align: center;
 }
 
+.nav-link:hover {
+    color: #70ABAF;
+}
+
+.nav-link.active,
+.nav-link:active {
+  background-color: #70ABAF !important;
+  /* You can customize the color here */
+}
+
+.nav-link,
+.nav-link {
+  background-color: #f6f6f6 !important;
+  /* You can customize the color here */
+}
+
 .container-landing {
     width: 80%;
     margin: 0 auto;
@@ -160,18 +176,16 @@ background-color: rgb(245, 245, 245);
 
 .card-train-landing {
     border:1px solid #70ABAF;
-    border-radius:3px;
-    color:#686868;
+    border-radius:10px;
+    color:#000000;
     width: 20rem;
     fill:#686868;
     margin:1rem;
+    margin-left:3rem;
+    padding:1rem;
     display: flex;
     justify-content: center;
-    padding:1rem;
-    padding-top:1.5rem;
     text-align: center;
-    border-radius: 20px;
-    min-height: 15rem;
 }
 
 .text-landing {
@@ -185,23 +199,125 @@ background-color: rgb(245, 245, 245);
     margin-left: 5%;
     z-index:1000;
     top:1rem;
-
-
 }
 
-/* .hero-landing {
-    padding-top:3rem
-} */
+.section {
+    margin-top:5rem;
+}
+
+.hero-landing {
+    color:rgb(0, 0, 0);
+    font-size:2.5rem;
+    font-weight: 700;
+    margin-top: 4rem;
+    letter-spacing: 2px;
+}
+
+.lead {
+    color:rgb(0, 0, 0);
+    font-size:1.3rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
 
 .number-bold {
     font-weight: 700;
     font-size:3rem;
     color:#70ABAF
 }
-
+ 
 .hero {
-    background: linear-gradient(to right, #FFF, #CBDDDF);
+    background-image: url('hero2.png');
+    background-size: cover;
+    /* background-repeat: no-repeat; */
     padding-top:2rem;
+    height:90vh;
+}
+
+.landing-card {
+    padding:2rem;
+    border-radius: 20px;
+    /* height: 20rem; */
+}
+
+.landing-list {
+    text-align: left;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    line-height: 2.5rem;
+    margin-top: 1rem;
+}
+
+.learn-more {
+    text-align: center;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    line-height: 2.5rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+.landing-bottom {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    height:30rem;
+    margin-top:-10rem;
+    z-index:-10;
+    background: linear-gradient(to bottom, #fff, #F9EAE1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.landing-list-title {
+    font-size: 1.4rem;
+}
+
+.landing-list-item {
+    font-size: 1rem;
+    font-weight: 300;
+    /* letter-spacing: 2px; */
+    /* line-height: 2.5rem; */
+    /* margin-top: 1rem; */
+}
+
+.landing-title {
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    text-align: center;
+    margin: 1rem;
+}
+
+
+
+.svg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    margin-left:1rem;
+    margin-top:2rem;
+}
+
+.angled {
+    background-color: white;
+    width: 100%;
+    height:5rem;
+    margin-top:-2.5rem;
+    z-index: 0;
+    transform: skewY(-1deg);
+}
+
+.center_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 75vh; /* optional */
+
 }
 
 .noHover{
@@ -209,17 +325,44 @@ background-color: rgb(245, 245, 245);
 }
 
 .header-navbar {
-    /* position: absolute; */
-    background-color: white;
-    /* background:transparent; */
-    position:fixed;
-    padding:.3rem;
+    position: absolute;
+    top: 2rem;
     padding-left:5rem;
     padding-right:5rem;
     width:100%;
     z-index: 100;
 }
 
+.progress-wrapper {
+    /* display: flex; */
+    align-items: center;
+    height: 100%;
+}
+  
+.pb-label {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-left:10rem;
+    color: #999;
+}
+
+.pg-bottom {
+    margin-top:-2rem;
+}
+
+.progress-bar {
+    position: relative;
+    width: 20px;
+    height: 200px;
+    margin: 0 auto;
+    margin-top:-3rem;
+    background-image: linear-gradient(to bottom, #70ABAF, #AF70AC);
+    height: 100%;
+    border-radius: 100%
+  }
+  
+  
 
 .card-train-low-hover {
     border:1px solid #70ABAF;

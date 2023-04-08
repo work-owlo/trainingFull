@@ -28,6 +28,7 @@ class Member(BaseModel):
     employee_id: str = None
     role_id: str
     employment_type: str
+    date_updated: str = None
     status: str
 
 
@@ -45,6 +46,7 @@ class Role(BaseModel):
     role_name: str
     role_description: str = None
     status: str = None
+    disabled: str = None
 
 
 class Role_Info(BaseModel):

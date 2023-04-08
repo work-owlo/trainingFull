@@ -27,45 +27,106 @@
         </form>
     </div>
     <div class="col">
-        {% if data|length > 0 %}
+
+        <!-- Insert Tab Here -->
         <form action="{{url_for('saveCompliance', role_id=role_id)}}" method="POST">
-            <input type="hidden" name="moduleName" value="{{data['moduleName']}}">
-            <input type="hidden" name="textInput" value="{{data['textInput']}}">
-            <h2 class="label question-label">Edit Questions</h2>
-            <!-- for loop over questions -->
-            {% for i in range(questions|length) %}
-            <div class="mb-3 question-div">
-                <input type="text" class="form-control question" id="question{{i}}" name="question{{i}}" value="{{ questions[i] }}" required>
-                <!-- delete button that deletes input field if clicked -->
-                <button type="button" class="btn btn-danger-outline delete-question" id="deleteQuestion{{i}}"><ion-icon name="close-outline"></ion-icon></button>
-                <script>
-                    $(document).ready(function() {
-                        $("#deleteQuestion{{i}}").click(function() {
-                            $(this).parent().remove();
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link green" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Information</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active green" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Questions</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            
+                {% if data|length > 0 %}
+                    <input type="hidden" name="moduleName" value="{{data['moduleName']}}">
+                    <input type="hidden" name="textInput" value="{{data['textInput']}}">
+                    <h2 class="label question-label">Edit Questions</h2>
+                    <!-- for loop over questions -->
+                    {% for i in range(questions|length) %}
+                    <div class="mb-3 question-div">
+                        <input type="text" class="form-control question" id="question{{i}}" name="question{{i}}" value="{{ questions[i] }}" required>
+                        <!-- delete button that deletes input field if clicked -->
+                        <button type="button" class="btn btn-danger-outline delete-question" id="deleteQuestion{{i}}"><ion-icon name="close-outline"></ion-icon></button>
+                        <script>
+                            $(document).ready(function() {
+                                $("#deleteQuestion{{i}}").click(function() {
+                                    $(this).parent().remove();
+                                });
+                            });
+                        </script>
+                        <br>
+                    </div>
+                    {% endfor %}
+                    <!-- JS button when clicked adds a new input field -->
+                    <button type="button" class="btn btn-success-outline" id="addQuestion">Add Question</button>
+                    <script>
+                        $(document).ready(function() {
+                            $("#addQuestion").click(function() {
+                                var questionCount = $(".question-div").length;
+                                var newQuestion = '<div class="mb-3 question-div"><input type="text" class="form-control question" name="question' + questionCount + '" id="question' + questionCount + '" placeholder="Question" required><button type="button" class="btn btn-danger-outline delete-question" id="deleteQuestion' + questionCount + '"><ion-icon name="close-outline"></ion-icon></button><br></div>';
+                                $(".question-label").after(newQuestion);
+                                $("#deleteQuestion" + questionCount).click(function() {
+                                    $(this).parent().remove();
+                                });
+                            });
                         });
-                    });
-                </script>
-                <br>
+                    </script>
+                    <!-- Add question input form -->
+                    
+                {% endif %}
             </div>
-            {% endfor %}
-            <!-- JS button when clicked adds a new input field -->
-            <button type="button" class="btn btn-success-outline" id="addQuestion">Add Question</button>
-            <script>
-                $(document).ready(function() {
-                    $("#addQuestion").click(function() {
-                        var questionCount = $(".question-div").length;
-                        var newQuestion = '<div class="mb-3 question-div"><input type="text" class="form-control question" name="question' + questionCount + '" id="question' + questionCount + '" placeholder="Question" required><button type="button" class="btn btn-danger-outline delete-question" id="deleteQuestion' + questionCount + '"><ion-icon name="close-outline"></ion-icon></button><br></div>';
-                        $(".question-label").after(newQuestion);
-                        $("#deleteQuestion" + questionCount).click(function() {
-                            $(this).parent().remove();
+            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-interval="false" style="padding:1rem">
+                    <div class="carousel-inner">
+                        {% for c in summary %} 
+                        <div class="carousel-item {{'active' if loop.index == 1}}">
+                          <div class="carousel-slideshow">
+                            <h1 class="carousel-title">{{data['moduleName']}}</h1>
+                            <div class="centered">
+                                <!-- Get number of slide -->
+                              <div class="number">{{loop.index}}</div>
+                              <textarea style="color:white;background: transparent;" rows="12">{{c}}</textarea>
+                            </div>
+                            <!-- Delete button that removes the slide using JS -->
+                            <button type="button" class="btn btn-danger-outline delete-slide" onclick="this.parentElement.parentElement.remove()"><ion-icon name="close-outline"></ion-icon></button>
+                        </div>
+                        </div>
+                      {% endfor %}
+                      
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                      </button>
+                  </div> 
+                  <!-- Add  -->
+                  <button type="button" class="btn btn-success-outline" id="addSlide">Add Slide</button>
+                  <script>
+                    $(document).ready(function() {
+                        $("#addSlide").click(function() {
+                            var slideCount = $(".carousel-item").length + 1;
+                            var newSlide = '<div class="carousel-item"><div class="carousel-slideshow"><h1 class="carousel-title">{{data['moduleName']}}</h1><div class="centered"><div class="number">' + slideCount + '</div><textarea style="color:white;background: transparent;" rows="12"></textarea></div></div></div>';
+                            $(".carousel-inner").append(newSlide);
+                            $('.carousel').carousel(slideCount);
                         });
+                        
                     });
-                });
-            </script>
-            <!-- Add question input form -->
-            <button type="submit" class="btn btn-success">Create</button>
-        {% endif %}
+              </script>
+            </div>
+          </div>
+          <br>
+          <button type="submit" class="btn btn-success">Create Module</button>
         </form>
+        <!-- END Tab -->
+
         
     </div>
 </div>
