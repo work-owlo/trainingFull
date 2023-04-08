@@ -225,8 +225,16 @@ background-color: rgb(245, 245, 245);
     font-size:3rem;
     color:#70ABAF
 }
+
+.mobile {
+    display:none
+}
+
+.desktop {
+    display:block;
+}
  
-.hero {
+.heroo {
     background-image: url('hero2.png');
     background-size: cover;
     /* background-repeat: no-repeat; */

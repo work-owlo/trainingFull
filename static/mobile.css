@@ -9,9 +9,9 @@
     .mobile {
         display:block
     }
-    /* .desktop {
+    .desktop {
         display:none;
-    } */
+    }
 
     .hero-landing {
         margin-top:7rem;
