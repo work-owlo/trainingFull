@@ -515,8 +515,8 @@ async def company_landing(response:Response, request: Request, alert=None) -> di
     if cookie:
         return RedirectResponse(url="/company/team") 
     return EMPLOYER_TEMPLATES.TemplateResponse(
-        "landing_local.html",
-        # "landing_updated.html",
+        # "landing_local.html",
+        "landing_updated.html",
         {
             "request": request,
             "alert":alert,
